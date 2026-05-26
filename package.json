@@ -6,6 +6,15 @@
     "src/runner/*",
     "src/web/*"
   ],
+  "scripts": {
+    "build": "tsx libs/build.ts",
+    "dev": "tsx libs/build.ts --watch",
+    "test": "jest",
+    "test-coverage": "jest --coverage",
+    "lint": "eslint --concurrency=auto src",
+    "format": "prettier --write \"**/*.{ts,tsx,json,js,mjs}\"",
+    "format:ci": "prettier --list-different \"**/*.{ts,tsx,json,js,mjs}\""
+  },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-terser": "^1.0.0",

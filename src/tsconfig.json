@@ -39,5 +39,5 @@
     "isolatedModules": true
   },
   /* Specifies an array of filenames or patterns that should be skipped when resolving include. */
-  "exclude": ["**/dist"]
+  "exclude": ["**/dist", "src/**/__tests__"]
 }
