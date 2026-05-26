@@ -1,0 +1,9 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    // Tabs should never need to emit any kind of files
+    "declaration": false,
+    "jsx": "react-jsx",
+    "types": ["react", "react-konva"]
+  }
+}

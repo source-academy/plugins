@@ -1,4 +1,36 @@
 {
   "name": "plugins",
-  "packageManager": "yarn@4.12.0"
+  "packageManager": "yarn@4.12.0",
+  "workspaces": [
+    "src/common/*",
+    "src/runner/*",
+    "src/web/*"
+  ],
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "@rollup/plugin-terser": "^1.0.0",
+    "@rollup/plugin-typescript": "^12.3.0",
+    "@sourceacademy/conductor": "^0.3.0",
+    "@types/jest": "^30.0.0",
+    "eslint": "^10.0.3",
+    "eslint-config-prettier": "^10.1.8",
+    "jest": "^30.3.0",
+    "prettier": "^3.8.1",
+    "rollup": "^4.60.0",
+    "ts-jest": "^29.4.6",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.57.1"
+  },
+  "dependencies": {
+    "rollup": "^4.60.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/source-academy/plugins.git"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/source-academy/plugins/issues"
+  },
+  "homepage": "https://github.com/source-academy/plugins#readme"
 }
