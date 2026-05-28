@@ -1439,7 +1439,6 @@ __metadata:
     "@rollup/plugin-node-resolve": "npm:^16.0.3"
     "@rollup/plugin-terser": "npm:^1.0.0"
     "@rollup/plugin-typescript": "npm:^12.3.0"
-    "@sourceacademy/common-test": "workspace:*"
     "@types/jest": "npm:^30.0.0"
     jest: "npm:^30.4.2"
     rollup: "npm:^4.60.2"
