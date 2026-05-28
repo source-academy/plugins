@@ -5,6 +5,7 @@ import { spawn } from "child_process";
 const program = new Command();
 
 export async function generateManifest() {
+    await fs.mkdir("dist");
     await Promise.all(packageJSON.workspaces.map(async (workspace) => {
         const manifest: Record<string, unknown> = {};
         const pluginType = workspace.split("/").slice(-2)[0];
@@ -18,7 +19,7 @@ export async function generateManifest() {
 }
 
 export async function build(extraArgs: string[] = []) {
-    await Promise.all([
+    await Promise.allSettled([
         generateManifest(),
         spawn("yarn", ["workspaces", "foreach", "-Apt", "run", "build", ...extraArgs], { stdio: "inherit" })
     ])
