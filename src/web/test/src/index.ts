@@ -11,8 +11,8 @@ export abstract class TestPlugin implements IPlugin {
     [testChannel]: IChannel<any>[],
   ) {
     this.__testChannel = testChannel;
-    this.__testChannel.subscribe((message) => {
-        console.log(message);
+    this.__testChannel.subscribe(message => {
+      console.log(message);
     });
     this.__testChannel.send("ping");
   }

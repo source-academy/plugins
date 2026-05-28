@@ -34,7 +34,7 @@
 
     /* Ensure that imports used only as types get removed */
     // "verbatimModuleSyntax": true,
-    "isolatedModules": true,
+    "isolatedModules": true
   },
   /* Specifies an array of filenames or patterns that should be skipped when resolving include. */
   "exclude": ["**/dist"]

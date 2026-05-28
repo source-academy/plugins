@@ -34,5 +34,5 @@
     // "verbatimModuleSyntax": true,
     "isolatedModules": true,
     "types": ["node"]
-  },
+  }
 }
