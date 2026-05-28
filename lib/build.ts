@@ -34,7 +34,7 @@ export async function spawnPromise(...args: Parameters<typeof spawn>) {
 export async function build(extraArgs: string[] = []) {
   await Promise.all([
     generateManifest(),
-    spawnPromise("yarn", ["workspaces", "foreach", "-Apt", "run", "build", ...extraArgs], {
+    spawnPromise("yarn", ["workspaces", "foreach", "-Apt", "--topological-dev", "run", "build", ...extraArgs], {
       stdio: "inherit",
     }),
   ]);
