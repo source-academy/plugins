@@ -22,6 +22,13 @@ jobs:
         run: yarn install --frozen-lockfile
       - name: yarn run build
         run: yarn run build 
+      - name: Create Release Pull Request or Publish to npm
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          publish: changeset publish
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Upload artifacts
         id: deployment
         uses: actions/upload-pages-artifact@v3
