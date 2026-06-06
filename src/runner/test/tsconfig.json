@@ -3,6 +3,7 @@
   "exclude": ["./dist"],
   "include": ["./src"],
   "compilerOptions": {
+    "declaration": true,
     "outDir": "./dist",
     "rootDir": "./src",
     "types": ["jest"]
