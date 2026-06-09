@@ -1763,6 +1763,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sourceacademy/plugin-directory@source-academy/plugin-directory#main":
+  version: 0.0.2
+  resolution: "@sourceacademy/plugin-directory@https://github.com/source-academy/plugin-directory.git#commit=28515735bd7b271b685793de96938e049f70ace9"
+  checksum: 10c0/e5d4185ff0ff2d5cca39decd011fb56d6296dc0f9fe37fac444b51e04f3db919a84811baa3852a65cec763fa78c36166b6187b0567ca473e302f26cc14377749
+  languageName: node
+  linkType: hard
+
 "@sourceacademy/runner-test@workspace:src/runner/test":
   version: 0.0.0-use.local
   resolution: "@sourceacademy/runner-test@workspace:src/runner/test"
@@ -4832,6 +4839,7 @@ __metadata:
   dependencies:
     "@changesets/cli": "npm:^2.31.0"
     "@sourceacademy/conductor": "npm:^0.3.0"
+    "@sourceacademy/plugin-directory": "source-academy/plugin-directory#main"
     "@types/jest": "npm:^30.0.0"
     "@types/node": "npm:^25.9.1"
     commander: "npm:^14.0.3"

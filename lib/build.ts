@@ -2,14 +2,16 @@ import { Command } from "commander";
 import packageJSON from "../package.json" with { type: "json" };
 import fs from "fs/promises";
 import { spawn } from "child_process";
+import pathlib from "path";
+import type { IPluginDefinition } from "@sourceacademy/plugin-directory/dist/types/IPluginDefinition.js";
 import process from "process";
 const program = new Command();
-
 interface Manifest {
   type: "installable" | "external";
 }
 
 const globalManifest: Record<string, Record<string, Manifest>> = {};
+const pluginDirectory: Record<string, IPluginDefinition> = {};
 
 /**
  * Generates the manifest files for each plugin and updates the changeset config to ignore non-installable plugins.
@@ -33,17 +35,30 @@ async function generateManifest() {
       const pluginType = workspace.split("/").slice(-3)[0];
       for await (const file of fs.glob(`${workspace}manifest.json`)) {
         const manifestFile = JSON.parse(await fs.readFile(file, "utf-8"));
+        const packageJSONPath = file.replace("manifest.json", "package.json");
+        const packageJSONFile = JSON.parse(await fs.readFile(packageJSONPath, "utf-8"));
         // folderName is the name of the plugin folder (generally the same as the plugin name)
-        const folderName = file.split("/").slice(-2)[0];
+        const folderName = file.split(pathlib.sep).slice(-2)[0];
         manifest[folderName] = manifestFile as Manifest;
         if (manifestFile.type !== "installable") {
           ignoreList.push(`@sourceacademy/${pluginType}-${folderName}`);
+          pluginDirectory[folderName] = pluginDirectory[folderName] || {
+            id: folderName,
+            name: folderName,
+            description: packageJSONFile.description,
+            resolutions: {},
+          };
+          pluginDirectory[folderName].resolutions[pluginType] =
+            "./" + pluginType + "/" + folderName + "/index.mjs";
         }
       }
       globalManifest[pluginType] = manifest;
       await fs.writeFile(`dist/${pluginType}.json`, JSON.stringify(manifest, null, 2));
     }),
   );
+
+  // Write the plugin directory to the dist folder. This is used by the plugin loaders to load non-installable plugins.
+  await fs.writeFile(`dist/directory.json`, JSON.stringify(pluginDirectory, null, 2));
 
   // Update changeset config to ignore non-installable plugins
   const changesetConfig = await fs.readFile(".changeset/config.json", "utf-8");
@@ -88,7 +103,7 @@ async function copyDistFiles() {
           if (pluginManifest.type === "external") {
             await fs.cp(
               `src/${pluginType}/${pluginName}/dist`,
-              `dist/${pluginType}/${pluginName}/dist`,
+              `dist/${pluginType}/${pluginName}`,
               { recursive: true },
             );
           }
