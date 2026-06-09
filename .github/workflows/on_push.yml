@@ -1,4 +1,4 @@
-name: Build and deploy runner
+name: Build and deploy plugins
 on:
   push:
     branches:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    name: Build runner
+    name: Build plugins
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -35,9 +35,21 @@ jobs:
         with:
           path: dist/
 
-  deploy:
+  test-coverage:
     needs: build
-    name: Deploy runner
+    name: Test coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run tests
+        run: yarn run test-coverage
+      - name: Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy:
+    needs: test-coverage
+    name: Deploy plugins
     permissions:
       pages: write
       id-token: write

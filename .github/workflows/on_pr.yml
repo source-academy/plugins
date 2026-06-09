@@ -1,9 +1,6 @@
-name: Node.js CI
+name: PR Build and Test Plugins
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main

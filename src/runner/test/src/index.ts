@@ -1,5 +1,5 @@
 import { CHANNEL_ID, RUNNER_ID, type TestMessage } from "@sourceacademy/common-test";
-import { IPlugin, IChannel, IConduit } from "@sourceacademy/conductor/conduit";
+import type { IPlugin, IChannel, IConduit } from "@sourceacademy/conductor/conduit";
 export abstract class TestPlugin implements IPlugin {
   readonly id: string = RUNNER_ID;
   static readonly channelAttach = [CHANNEL_ID];

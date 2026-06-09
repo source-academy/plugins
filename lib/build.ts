@@ -19,7 +19,7 @@ const globalManifest: Record<string, Record<string, Manifest>> = {};
  * await generateManifest();
  * This will generate the manifest files for each plugin and update the changeset config to ignore non-installable plugins.
  */
-export async function generateManifest() {
+async function generateManifest() {
   // Create dist directory if it doesn't exist
   await fs.mkdir("dist", { recursive: true });
 
@@ -59,7 +59,7 @@ export async function generateManifest() {
  * @example
  * await spawnPromise("yarn", ["build"]);
  */
-export async function spawnPromise(...args: Parameters<typeof spawn>) {
+async function spawnPromise(...args: Parameters<typeof spawn>) {
   return new Promise<void>((resolve, reject) => {
     const child = spawn(...args);
     child.on("close", code => {
@@ -78,7 +78,7 @@ export async function spawnPromise(...args: Parameters<typeof spawn>) {
  * @example
  * await copyDistFiles();
  */
-export async function copyDistFiles() {
+async function copyDistFiles() {
   await Promise.all(
     // Iterate over each plugin type (web, runner, common)
     Object.entries(globalManifest).map(async ([pluginType, manifest]) => {
@@ -106,7 +106,7 @@ export async function copyDistFiles() {
  * await build(["--watch"]);
  * This will run the build script of each plugin with the --watch flag, which is useful for development.
  */
-export async function build(extraArgs: string[] = []) {
+async function build(extraArgs: string[] = []) {
   await Promise.all([
     generateManifest(),
     spawnPromise(
