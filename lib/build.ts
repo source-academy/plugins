@@ -2,6 +2,7 @@ import { Command } from "commander";
 import packageJSON from "../package.json" with { type: "json" };
 import fs from "fs/promises";
 import { spawn } from "child_process";
+import process from "process";
 const program = new Command();
 
 interface Manifest {
@@ -109,10 +110,11 @@ export async function build(extraArgs: string[] = []) {
   await Promise.all([
     generateManifest(),
     spawnPromise(
-      "yarn",
+      process.platform === "win32" ? "yarn.cmd" : "yarn",
       ["workspaces", "foreach", "-Apt", "--topological-dev", "run", "build", ...extraArgs],
       {
         stdio: "inherit",
+        shell: true,
       },
     ),
   ]);
