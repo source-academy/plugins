@@ -21,7 +21,7 @@
     "@sourceacademy/conductor": "^0.3.0",
     "@sourceacademy/plugin-directory": "source-academy/plugin-directory#main",
     "@types/jest": "^30.0.0",
-    "@types/node": "^25.9.1",
+    "@types/node": "^22",
     "commander": "^14.0.3",
     "eslint": "^10.0.3",
     "eslint-config-prettier": "^10.1.8",
@@ -40,5 +40,12 @@
   "bugs": {
     "url": "https://github.com/source-academy/plugins/issues"
   },
-  "homepage": "https://github.com/source-academy/plugins#readme"
+  "homepage": "https://github.com/source-academy/plugins#readme",
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "^22.16.0",
+      "onFail": "error"
+    }
+  }
 }
