@@ -1914,7 +1914,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:^25.9.1":
+"@types/node@npm:*":
   version: 25.9.2
   resolution: "@types/node@npm:25.9.2"
   dependencies:
@@ -1927,6 +1927,15 @@ __metadata:
   version: 12.20.55
   resolution: "@types/node@npm:12.20.55"
   checksum: 10c0/3b190bb0410047d489c49bbaab592d2e6630de6a50f00ba3d7d513d59401d279972a8f5a598b5bb8ddc1702f8a2f4ec57a65d93852f9c329639738e7053637d1
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^22":
+  version: 22.19.20
+  resolution: "@types/node@npm:22.19.20"
+  dependencies:
+    undici-types: "npm:~6.21.0"
+  checksum: 10c0/933d4466f1a498dd7c8e173af7265a53e9d410cab4a827ccc348414d5065a9a40ba7a7c994a71b3ee651188111db3b43573b830dc30a61a7489f3e6efc537bf7
   languageName: node
   linkType: hard
 
@@ -4832,7 +4841,7 @@ __metadata:
     "@sourceacademy/conductor": "npm:^0.3.0"
     "@sourceacademy/plugin-directory": "source-academy/plugin-directory#main"
     "@types/jest": "npm:^30.0.0"
-    "@types/node": "npm:^25.9.1"
+    "@types/node": "npm:^22"
     commander: "npm:^14.0.3"
     eslint: "npm:^10.0.3"
     eslint-config-prettier: "npm:^10.1.8"
@@ -5581,6 +5590,13 @@ __metadata:
   version: 7.24.6
   resolution: "undici-types@npm:7.24.6"
   checksum: 10c0/d9cd8befb643ac904615c280a095ba4240531f6bb4a5e75a22a7483630ca8d3f1016d2ab6ace6ceda1f63b3a2db2fe037fafe121d6917a0187573aa548ff78ca
+  languageName: node
+  linkType: hard
+
+"undici-types@npm:~6.21.0":
+  version: 6.21.0
+  resolution: "undici-types@npm:6.21.0"
+  checksum: 10c0/c01ed51829b10aa72fc3ce64b747f8e74ae9b60eafa19a7b46ef624403508a54c526ffab06a14a26b3120d055e1104d7abe7c9017e83ced038ea5cf52f8d5e04
   languageName: node
   linkType: hard
 
