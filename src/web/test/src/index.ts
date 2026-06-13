@@ -1,7 +1,13 @@
 import { CHANNEL_ID, WEB_ID, type TestMessage } from "@sourceacademy/common-test";
-import type { IPlugin, IChannel, IConduit } from "@sourceacademy/conductor/conduit";
+import {
+  type IPlugin,
+  type IChannel,
+  type IConduit,
+  checkIsPluginClass,
+} from "@sourceacademy/conductor/conduit";
 
-export abstract class TestPlugin implements IPlugin {
+@checkIsPluginClass
+export class TestPlugin implements IPlugin {
   readonly id: string = WEB_ID;
   static readonly channelAttach = [CHANNEL_ID];
   private readonly __testChannel: IChannel<TestMessage>;
