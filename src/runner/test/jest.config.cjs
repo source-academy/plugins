@@ -1,4 +1,5 @@
 module.exports = {
+  rootDir: ".",
   preset: "ts-jest/presets/js-with-ts-esm",
   testEnvironment: "node",
   transform: {
@@ -6,7 +7,7 @@ module.exports = {
       "ts-jest",
       {
         useESM: true,
-        tsconfig: "src/tsconfig.json",
+        tsconfig: "<rootDir>/tsconfig.json",
       },
     ],
   },

@@ -5,7 +5,9 @@
   "compilerOptions": {
     "declaration": true,
     "outDir": "./dist",
-    "rootDir": "./src",
-    "types": ["jest"]
+    "rootDir": ".",
+    "paths": {
+      "@py-slang/*": ["C:/Users/Migue/OneDrive/Desktop/Projects/py-slang-2/src/*"]
+    }
   }
 }

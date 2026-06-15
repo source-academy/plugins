@@ -109,10 +109,11 @@ export async function build(extraArgs: string[] = []) {
   await Promise.all([
     generateManifest(),
     spawnPromise(
-      "yarn",
+      process.platform === "win32" ? "yarn.cmd" : "yarn",
       ["workspaces", "foreach", "-Apt", "--topological-dev", "run", "build", ...extraArgs],
       {
         stdio: "inherit",
+        shell: true,
       },
     ),
   ]);
