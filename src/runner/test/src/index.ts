@@ -11,7 +11,7 @@ export abstract class TestPlugin implements IPlugin {
   static readonly channelAttach = [CHANNEL_ID];
   private readonly __testChannel: IChannel<TestMessage>;
   constructor(
-    _conduit: IConduit,
+    conduit: IConduit,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [testChannel]: IChannel<any>[],
   ) {
