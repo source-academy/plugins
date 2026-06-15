@@ -7,7 +7,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": [
-    "@sourceacademy/web-test"
-  ]
+  "ignore": []
 }
