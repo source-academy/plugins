@@ -150,7 +150,7 @@ async function transformSingle(path: string) {
   let file = (await readFile(path)).toString("utf-8");
 
   // Create a mock "module" object, then return the exports
-  file = `export default require => {let module = {exports: null}; ${file}; return module.exports;}`;
+  file = `export default require => {let module = {exports: {}}; let exports = module.exports; ${file}; return module.exports;}`;
   await writeFile(path, file);
 }
 

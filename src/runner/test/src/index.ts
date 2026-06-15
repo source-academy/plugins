@@ -1,17 +1,18 @@
 import { CHANNEL_ID, RUNNER_ID, type TestMessage } from "@sourceacademy/common-test";
 import {
-  type IPlugin,
+  checkIsPluginClass,
   type IChannel,
   type IConduit,
-  checkIsPluginClass,
+  type IPlugin,
 } from "@sourceacademy/conductor/conduit";
+
 @checkIsPluginClass
 export abstract class TestPlugin implements IPlugin {
   readonly id: string = RUNNER_ID;
   static readonly channelAttach = [CHANNEL_ID];
   private readonly __testChannel: IChannel<TestMessage>;
   constructor(
-    conduit: IConduit,
+    _conduit: IConduit,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [testChannel]: IChannel<any>[],
   ) {

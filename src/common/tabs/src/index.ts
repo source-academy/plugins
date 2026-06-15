@@ -1,4 +1,5 @@
 import type { IconName } from "@blueprintjs/icons";
+import type React from "react";
 
 /**
  * The Tab interface represents a tab that can be registered with the tab service.
