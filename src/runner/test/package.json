@@ -1,7 +1,7 @@
 {
   "name": "@sourceacademy/runner-test",
   "version": "0.0.1",
-  "packageManager": "yarn@4.6.0",
+  "packageManager": "yarn@4.12.0",
   "description": "The test runner plugin for the plugins repository",
   "scripts": {
     "build": "rollup -c",
@@ -30,9 +30,13 @@
     "@rollup/plugin-typescript": "^12.3.0",
     "@sourceacademy/common-test": "workspace:*",
     "@sourceacademy/conductor": ">=0.3.0",
+    "@vitest/coverage-istanbul": "^4.1.9",
     "rollup": "^4.60.2",
     "tslib": "^2.8.1",
     "typescript": "^6.0.3",
     "vitest": "^4.1.9"
+  },
+  "dependencies": {
+    "py-slang": "github:proto-aiken-13/py-slang#branch-ev3-engine"
   }
 }
