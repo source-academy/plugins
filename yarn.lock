@@ -1269,7 +1269,7 @@ __metadata:
 "@sourceacademy/conductor@npm:>=0.3.0, @sourceacademy/conductor@npm:^0.3.0":
   version: 0.3.0
   resolution: "@sourceacademy/conductor@npm:0.3.0"
-  checksum: 10c0/b781a2952d1e70251d340fc099df60a86cd6b25c3c15f43c367a401562792f6173720928f9f7df9292331a0f929fa15e5ad38bad0b7e051374d3ad81c0ed2ce2
+  checksum: 10c0/e6d50cc0b9188fa5ec54c3bb2e6b9a0f9391ba37449e74a326c89c4e14deb00c4882700062427737e6f6fca556fd95d91fa9d7f6e125fe1d43938a65cc3c0c4d
   languageName: node
   linkType: hard
 
