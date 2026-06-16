@@ -1526,7 +1526,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitest/coverage-istanbul@npm:4.1.9":
+"@vitest/coverage-istanbul@npm:^4.1.9":
   version: 4.1.9
   resolution: "@vitest/coverage-istanbul@npm:4.1.9"
   dependencies:
@@ -3119,7 +3119,7 @@ __metadata:
     "@sourceacademy/conductor": "npm:^0.3.0"
     "@sourceacademy/plugin-directory": "source-academy/plugin-directory#main"
     "@types/node": "npm:^25.9.1"
-    "@vitest/coverage-istanbul": "npm:4.1.9"
+    "@vitest/coverage-istanbul": "npm:^4.1.9"
     commander: "npm:^15.0.0"
     eslint: "npm:^10.0.3"
     eslint-config-prettier: "npm:^10.1.8"

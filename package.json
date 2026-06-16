@@ -22,7 +22,7 @@
     "@sourceacademy/conductor": "^0.3.0",
     "@sourceacademy/plugin-directory": "source-academy/plugin-directory#main",
     "@types/node": "^25.9.1",
-    "@vitest/coverage-istanbul": "4.1.9",
+    "@vitest/coverage-istanbul": "^4.1.9",
     "commander": "^15.0.0",
     "eslint": "^10.0.3",
     "eslint-config-prettier": "^10.1.8",
