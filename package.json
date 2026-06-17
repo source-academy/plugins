@@ -10,8 +10,9 @@
   "scripts": {
     "build": "tsx lib/build.ts",
     "dev": "tsx lib/build.ts --watch",
-    "test": "jest",
-    "test-coverage": "jest --coverage",
+    "test": "vitest run",
+    "test-coverage": "vitest run --coverage",
+    "test:dev": "vitest",
     "lint": "eslint --concurrency=auto src",
     "format": "prettier --write \"**/*.{ts,tsx,json,js,mjs}\"",
     "format:ci": "prettier --list-different \"**/*.{ts,tsx,json,js,mjs}\""
@@ -20,17 +21,16 @@
     "@changesets/cli": "^2.31.0",
     "@sourceacademy/conductor": "^0.3.0",
     "@sourceacademy/plugin-directory": "source-academy/plugin-directory#main",
-    "@types/jest": "^30.0.0",
     "@types/node": "^25.9.1",
+    "@vitest/coverage-istanbul": "^4.1.9",
     "commander": "^15.0.0",
     "eslint": "^10.0.3",
     "eslint-config-prettier": "^10.1.8",
-    "jest": "^30.4.2",
     "prettier": "^3.8.1",
-    "ts-jest": "^29.4.11",
     "tsx": "^4.22.3",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.57.1"
+    "typescript-eslint": "^8.57.1",
+    "vitest": "^4.1.9"
   },
   "repository": {
     "type": "git",
