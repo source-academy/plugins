@@ -33,7 +33,11 @@ export class CseMachineHostPlugin implements IPlugin {
   readonly id: string = WEB_ID;
   static readonly channelAttach = [CSE_CHANNEL];
 
-  /** Set by the host app; called with each received batch of snapshots. */
+  /**
+   * Set by the host app; called with each received batch of snapshots.
+   * Snapshots received before this is set are silently dropped — wire this callback
+   * immediately after constructing the plugin.
+   */
   receiveSnapshots?: (snapshots: CseSnapshot[]) => void;
 
   constructor(
@@ -45,7 +49,11 @@ export class CseMachineHostPlugin implements IPlugin {
       throw new Error("CSE channel is required but was not provided.");
     }
     (cseChannel as IChannel<CseSnapshotMessage>).subscribe(message => {
-      if (message?.type === CSE_MESSAGE_TYPE_SNAPSHOTS && Array.isArray(message.snapshots)) {
+      if (
+        message?.type === CSE_MESSAGE_TYPE_SNAPSHOTS &&
+        Array.isArray(message.snapshots) &&
+        message.totalSteps === message.snapshots.length
+      ) {
         this.receiveSnapshots?.(message.snapshots);
       }
     });

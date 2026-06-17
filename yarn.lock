@@ -1366,6 +1366,7 @@ __metadata:
     typescript: "npm:^6.0.3"
     vitest: "npm:^4.1.9"
   peerDependencies:
+    "@sourceacademy/common-cse-machine": ">=0.0.1"
     "@sourceacademy/conductor": ">=0.3.0"
   languageName: unknown
   linkType: soft
@@ -1397,10 +1398,13 @@ __metadata:
     "@rollup/plugin-typescript": "npm:^12.3.0"
     "@sourceacademy/common-cse-machine": "workspace:*"
     "@sourceacademy/conductor": "npm:>=0.3.0"
+    "@vitest/coverage-istanbul": "npm:^4.1.9"
     rollup: "npm:^4.60.2"
     tslib: "npm:^2.8.1"
     typescript: "npm:^6.0.3"
+    vitest: "npm:^4.1.9"
   peerDependencies:
+    "@sourceacademy/common-cse-machine": ">=0.0.1"
     "@sourceacademy/conductor": ">=0.3.0"
   languageName: unknown
   linkType: soft

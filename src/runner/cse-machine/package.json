@@ -25,6 +25,7 @@
     }
   },
   "peerDependencies": {
+    "@sourceacademy/common-cse-machine": ">=0.0.1",
     "@sourceacademy/conductor": ">=0.3.0"
   },
   "devDependencies": {

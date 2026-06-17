@@ -5,7 +5,10 @@
   "description": "The web/host-side CSE machine plugin: receives evaluation snapshots for rendering",
   "scripts": {
     "build": "rollup -c",
-    "prepack": "yarn build"
+    "prepack": "yarn build",
+    "test": "vitest run",
+    "test-coverage": "vitest run --coverage",
+    "test:dev": "vitest"
   },
   "license": "ISC",
   "files": [
@@ -22,6 +25,7 @@
     }
   },
   "peerDependencies": {
+    "@sourceacademy/common-cse-machine": ">=0.0.1",
     "@sourceacademy/conductor": ">=0.3.0"
   },
   "devDependencies": {
@@ -30,8 +34,10 @@
     "@rollup/plugin-typescript": "^12.3.0",
     "@sourceacademy/common-cse-machine": "workspace:*",
     "@sourceacademy/conductor": ">=0.3.0",
+    "@vitest/coverage-istanbul": "^4.1.9",
     "rollup": "^4.60.2",
     "tslib": "^2.8.1",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
   }
 }
