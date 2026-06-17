@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import {
   CSE_CHANNEL,
   CSE_MESSAGE_TYPE_SNAPSHOTS,

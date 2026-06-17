@@ -1252,6 +1252,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sourceacademy/common-cse-machine@workspace:*, @sourceacademy/common-cse-machine@workspace:src/common/cse-machine":
+  version: 0.0.0-use.local
+  resolution: "@sourceacademy/common-cse-machine@workspace:src/common/cse-machine"
+  dependencies:
+    "@rollup/plugin-node-resolve": "npm:^16.0.3"
+    "@rollup/plugin-terser": "npm:^1.0.0"
+    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@vitest/coverage-istanbul": "npm:^4.1.9"
+    rollup: "npm:^4.60.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^6.0.3"
+    vitest: "npm:^4.1.9"
+  languageName: unknown
+  linkType: soft
+
 "@sourceacademy/common-test@workspace:*, @sourceacademy/common-test@workspace:src/common/test":
   version: 0.0.0-use.local
   resolution: "@sourceacademy/common-test@workspace:src/common/test"
@@ -1280,6 +1295,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sourceacademy/runner-cse-machine@workspace:src/runner/cse-machine":
+  version: 0.0.0-use.local
+  resolution: "@sourceacademy/runner-cse-machine@workspace:src/runner/cse-machine"
+  dependencies:
+    "@rollup/plugin-node-resolve": "npm:^16.0.3"
+    "@rollup/plugin-terser": "npm:^1.0.0"
+    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@sourceacademy/common-cse-machine": "workspace:*"
+    "@sourceacademy/conductor": "npm:>=0.3.0"
+    "@vitest/coverage-istanbul": "npm:^4.1.9"
+    rollup: "npm:^4.60.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^6.0.3"
+    vitest: "npm:^4.1.9"
+  peerDependencies:
+    "@sourceacademy/conductor": ">=0.3.0"
+  languageName: unknown
+  linkType: soft
+
 "@sourceacademy/runner-test@workspace:src/runner/test":
   version: 0.0.0-use.local
   resolution: "@sourceacademy/runner-test@workspace:src/runner/test"
@@ -1293,6 +1327,23 @@ __metadata:
     tslib: "npm:^2.8.1"
     typescript: "npm:^6.0.3"
     vitest: "npm:^4.1.9"
+  peerDependencies:
+    "@sourceacademy/conductor": ">=0.3.0"
+  languageName: unknown
+  linkType: soft
+
+"@sourceacademy/web-cse-machine@workspace:src/web/cse-machine":
+  version: 0.0.0-use.local
+  resolution: "@sourceacademy/web-cse-machine@workspace:src/web/cse-machine"
+  dependencies:
+    "@rollup/plugin-node-resolve": "npm:^16.0.3"
+    "@rollup/plugin-terser": "npm:^1.0.0"
+    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@sourceacademy/common-cse-machine": "workspace:*"
+    "@sourceacademy/conductor": "npm:>=0.3.0"
+    rollup: "npm:^4.60.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^6.0.3"
   peerDependencies:
     "@sourceacademy/conductor": ">=0.3.0"
   languageName: unknown

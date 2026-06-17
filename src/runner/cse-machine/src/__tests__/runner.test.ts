@@ -1,3 +1,4 @@
+import { test, expect } from "vitest";
 import { CseMachinePlugin } from "..";
 import {
   CSE_CHANNEL,

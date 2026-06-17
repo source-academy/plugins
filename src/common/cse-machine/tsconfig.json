@@ -6,6 +6,6 @@
     "declaration": true,
     "outDir": "./dist",
     "rootDir": "./src",
-    "types": ["jest"]
+    "types": []
   }
 }
