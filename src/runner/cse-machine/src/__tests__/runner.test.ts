@@ -23,15 +23,11 @@ test("sendSnapshots forwards a snapshots message over the channel", () => {
       stepIndex: 0,
       control: [],
       stash: [],
-      environments: [
-        { id: "g", name: "global", parentId: null, bindings: [], isActive: true },
-      ],
+      environments: [{ id: "g", name: "global", parentId: null, bindings: [], isActive: true }],
     },
   ];
   plugin.sendSnapshots(snapshots);
 
   expect(plugin.id).toBe(RUNNER_ID);
-  expect(sent).toEqual([
-    { type: CSE_MESSAGE_TYPE_SNAPSHOTS, snapshots, totalSteps: 1 },
-  ]);
+  expect(sent).toEqual([{ type: CSE_MESSAGE_TYPE_SNAPSHOTS, snapshots, totalSteps: 1 }]);
 });

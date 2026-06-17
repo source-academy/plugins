@@ -19,9 +19,7 @@ describe("common-cse-machine", () => {
       stepIndex: 0,
       control: [{ displayText: "x + 1" }],
       stash: [{ displayValue: "1", label: "number" }],
-      environments: [
-        { id: "g", name: "global", parentId: null, bindings: [], isActive: true },
-      ],
+      environments: [{ id: "g", name: "global", parentId: null, bindings: [], isActive: true }],
       currentLine: 1,
     };
     const msg = { type: CSE_MESSAGE_TYPE_SNAPSHOTS, snapshots: [snap], totalSteps: 1 };
