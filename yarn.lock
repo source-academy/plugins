@@ -1740,6 +1740,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sourceacademy/common-cse-machine@workspace:*, @sourceacademy/common-cse-machine@workspace:src/common/cse-machine":
+  version: 0.0.0-use.local
+  resolution: "@sourceacademy/common-cse-machine@workspace:src/common/cse-machine"
+  dependencies:
+    "@rollup/plugin-node-resolve": "npm:^16.0.3"
+    "@rollup/plugin-terser": "npm:^1.0.0"
+    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@types/jest": "npm:^30.0.0"
+    jest: "npm:^30.4.2"
+    rollup: "npm:^4.60.2"
+    ts-jest: "npm:^29.4.11"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^6.0.3"
+  languageName: unknown
+  linkType: soft
+
 "@sourceacademy/common-test@workspace:*, @sourceacademy/common-test@workspace:src/common/test":
   version: 0.0.0-use.local
   resolution: "@sourceacademy/common-test@workspace:src/common/test"
@@ -1769,6 +1785,26 @@ __metadata:
   checksum: 10c0/e5d4185ff0ff2d5cca39decd011fb56d6296dc0f9fe37fac444b51e04f3db919a84811baa3852a65cec763fa78c36166b6187b0567ca473e302f26cc14377749
   languageName: node
   linkType: hard
+
+"@sourceacademy/runner-cse-machine@workspace:src/runner/cse-machine":
+  version: 0.0.0-use.local
+  resolution: "@sourceacademy/runner-cse-machine@workspace:src/runner/cse-machine"
+  dependencies:
+    "@rollup/plugin-node-resolve": "npm:^16.0.3"
+    "@rollup/plugin-terser": "npm:^1.0.0"
+    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@sourceacademy/common-cse-machine": "workspace:*"
+    "@sourceacademy/conductor": "npm:>=0.3.0"
+    "@types/jest": "npm:^30.0.0"
+    jest: "npm:^30.4.2"
+    rollup: "npm:^4.60.2"
+    ts-jest: "npm:^29.4.11"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^6.0.3"
+  peerDependencies:
+    "@sourceacademy/conductor": ">=0.3.0"
+  languageName: unknown
+  linkType: soft
 
 "@sourceacademy/runner-test@workspace:src/runner/test":
   version: 0.0.0-use.local
