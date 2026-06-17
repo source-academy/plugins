@@ -68,4 +68,4 @@ export abstract class TestPlugin implements IPlugin {
     tabService.showTab(tab.id);
   }
 }
-checkIsPluginClass(TestPlugin)
+checkIsPluginClass(TestPlugin);

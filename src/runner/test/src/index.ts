@@ -22,4 +22,4 @@ export abstract class TestPlugin implements IPlugin {
     this.__testChannel.send("ping");
   }
 }
-checkIsPluginClass(TestPlugin)
+checkIsPluginClass(TestPlugin);
