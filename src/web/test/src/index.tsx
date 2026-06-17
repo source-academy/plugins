@@ -7,6 +7,41 @@ import {
 } from "@sourceacademy/conductor/conduit";
 import type { ITabService, Tab } from "@sourceacademy/common-tabs";
 
+function Element({
+  workspaceLocation,
+  tabService,
+  id,
+}: {
+  workspaceLocation?: string;
+  tabService: ITabService;
+  id: string;
+}) {
+  return (
+    <div
+      style={{
+        width: "100%",
+        display: "flex",
+        alignItems: "center",
+        flexDirection: "column",
+        gap: "5px",
+      }}
+    >
+      This is a test tab. The location is {workspaceLocation}
+      <button onClick={() => tabService.hideTab(id)}>Click here to hide the tab!</button>
+      <button
+        onClick={() => {
+          tabService.hideTab(id);
+          setTimeout(() => {
+            tabService.showTab(id);
+          }, 1000);
+        }}
+      >
+        Click here to temporarily hide the tab!
+      </button>
+    </div>
+  );
+}
+
 @checkIsPluginClass
 export abstract class TestPlugin implements IPlugin {
   readonly id: string = WEB_ID;
@@ -26,12 +61,7 @@ export abstract class TestPlugin implements IPlugin {
     const tab = {
       id: "test-tab",
       iconName: "airplane",
-      body: (
-        <div>
-          This is a test tab
-          <button onClick={() => tabService.hideTab(tab.id)}>Click here to hide the tab!</button>
-        </div>
-      ),
+      body: <Element tabService={tabService} id="test-tab" />,
       label: "Test Tab",
       disabled: false,
     } satisfies Tab;
