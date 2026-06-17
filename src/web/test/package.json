@@ -22,8 +22,8 @@
     }
   },
   "peerDependencies": {
-    "@sourceacademy/conductor": ">=0.3.0",
     "@sourceacademy/common-tabs": "^0.0.1",
+    "@sourceacademy/conductor": ">=0.3.0",
     "react": "^19",
     "react-dom": "^19"
   },
