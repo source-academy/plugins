@@ -30,6 +30,9 @@ export class CseMachinePlugin implements IPlugin {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [cseChannel]: IChannel<any>[],
   ) {
+    if (!cseChannel) {
+      throw new Error("CSE channel is required but was not provided.");
+    }
     this.__cseChannel = cseChannel;
   }
 

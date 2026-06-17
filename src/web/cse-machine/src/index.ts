@@ -41,6 +41,9 @@ export class CseMachineHostPlugin implements IPlugin {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [cseChannel]: IChannel<any>[],
   ) {
+    if (!cseChannel) {
+      throw new Error("CSE channel is required but was not provided.");
+    }
     (cseChannel as IChannel<CseSnapshotMessage>).subscribe(message => {
       if (message?.type === CSE_MESSAGE_TYPE_SNAPSHOTS && Array.isArray(message.snapshots)) {
         this.receiveSnapshots?.(message.snapshots);
