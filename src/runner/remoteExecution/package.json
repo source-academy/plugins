@@ -1,0 +1,11 @@
+{
+  "name": "@sourceacademy/runner-remote-execution",
+  "version": "0.0.1",
+  "dependencies": {
+    "py-slang": "github:proto-aiken-13/py-slang#branch-ev3-engine"
+  },
+  "devDependencies": {
+    "@sourceacademy/common-test": "workspace:*",
+    "@sourceacademy/conductor": ">=0.3.0"
+  }
+}
