@@ -1,5 +1,11 @@
 import { CHANNEL_ID, RUNNER_ID, type TestMessage } from "@sourceacademy/common-test";
-import type { IPlugin, IChannel, IConduit } from "@sourceacademy/conductor/conduit";
+import {
+  checkIsPluginClass,
+  type IChannel,
+  type IConduit,
+  type IPlugin,
+} from "@sourceacademy/conductor/conduit";
+
 export abstract class TestPlugin implements IPlugin {
   readonly id: string = RUNNER_ID;
   static readonly channelAttach = [CHANNEL_ID];
@@ -16,3 +22,4 @@ export abstract class TestPlugin implements IPlugin {
     this.__testChannel.send("ping");
   }
 }
+checkIsPluginClass(TestPlugin);

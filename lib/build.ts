@@ -1,6 +1,6 @@
 import { Command } from "commander";
 import packageJSON from "../package.json" with { type: "json" };
-import fs from "fs/promises";
+import fs, { readFile, writeFile } from "fs/promises";
 import { spawn } from "child_process";
 import pathlib from "path";
 import type { IPluginDefinition } from "@sourceacademy/plugin-directory/dist/types/IPluginDefinition.js";
@@ -49,7 +49,7 @@ async function generateManifest() {
             resolutions: {},
           };
           pluginDirectory[folderName].resolutions[pluginType] =
-            "./" + pluginType + "/" + folderName + "/index.mjs";
+            "./" + pluginType + "/" + folderName + "/index.js";
         }
       }
       globalManifest[pluginType] = manifest;
@@ -58,7 +58,10 @@ async function generateManifest() {
   );
 
   // Write the plugin directory to the dist folder. This is used by the plugin loaders to load non-installable plugins.
-  await fs.writeFile(`dist/directory.json`, JSON.stringify(pluginDirectory, null, 2));
+  await fs.writeFile(
+    `dist/directory.json`,
+    JSON.stringify(Object.values(pluginDirectory), null, 2),
+  );
 
   // Update changeset config to ignore non-installable plugins
   const changesetConfig = await fs.readFile(".changeset/config.json", "utf-8");
@@ -134,6 +137,33 @@ async function build(extraArgs: string[] = []) {
     ),
   ]);
   await copyDistFiles();
+  await transform();
+}
+
+/**
+ * Transforms a particular external plugin to its final form
+ */
+async function transformSingle(path: string) {
+  if (path.endsWith("mjs")) {
+    return;
+  }
+  let file = (await readFile(path)).toString("utf-8");
+
+  // Create a mock "module" object, then return the exports
+  file = `export default require => {let module = {exports: {}}; let exports = module.exports; ${file}; return module.exports;}`;
+  await writeFile(path, file);
+}
+
+/**
+ * Transforms the plugins to its final form
+ * For external plugins, this wraps it in an "export default require => { ... }" or "export default import => { ... }"
+ */
+async function transform() {
+  const promises = [];
+  for await (const file of fs.glob(`./dist/*/*/index.*js`)) {
+    promises.push(transformSingle(file));
+  }
+  await Promise.all(promises);
 }
 
 // TO-DO: Add more options

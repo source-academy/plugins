@@ -22,6 +22,12 @@ jobs:
         run: yarn install --frozen-lockfile
       - name: yarn run build
         run: yarn run build 
+      - name: Run tests
+        run: yarn run test-coverage
+      - name: Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Create Release Pull Request or Publish to npm
         id: changesets
         uses: changesets/action@v1
@@ -36,20 +42,8 @@ jobs:
         with:
           path: dist/
 
-  test-coverage:
-    needs: build
-    name: Test coverage
-    runs-on: ubuntu-latest
-    steps:
-      - name: Run tests
-        run: yarn run test-coverage
-      - name: Coveralls
-        uses: coverallsapp/github-action@v2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
   deploy:
-    needs: test-coverage
+    needs: build
     name: Deploy plugins
     permissions:
       pages: write
