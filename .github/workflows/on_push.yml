@@ -43,7 +43,7 @@ jobs:
           path: dist/
 
   deploy:
-    needs: test-coverage
+    needs: build
     name: Deploy plugins
     permissions:
       pages: write
