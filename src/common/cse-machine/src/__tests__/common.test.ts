@@ -1,8 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  CSE_MESSAGE_TYPE_SNAPSHOTS,
-  type CseSnapshot,
-} from "../index";
+import { CSE_MESSAGE_TYPE_SNAPSHOTS, type CseSnapshot } from "../index";
 
 describe("common-cse-machine", () => {
   it("a snapshot is structured-clone-able", () => {
