@@ -58,6 +58,11 @@ export interface CseSerializedValue {
  * `displayText` is what the control stack shows. `metadata` carries the typed info the
  * animation/rendering system dispatches on (e.g. `instrType`, `symbol`, `numOfArgs`,
  * `startLine`/`endLine`, `nodeType`).
+ *
+ * Unlike {@link CseSerializedValue}, instructions have no `label` field: they are operations
+ * (apply, branch, assignment, …), not typed values, so a coarse type-tag is not meaningful
+ * here. Renderers should use `displayText` for display and `metadata.instrType` (or equivalent)
+ * for dispatch.
  */
 export interface CseSerializedInstruction {
   /** Pre-rendered display text for the control item. */

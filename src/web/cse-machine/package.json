@@ -5,10 +5,7 @@
   "description": "The web/host-side CSE machine plugin: receives evaluation snapshots for rendering",
   "scripts": {
     "build": "rollup -c",
-    "prepack": "yarn build",
-    "test": "vitest run",
-    "test-coverage": "vitest run --coverage",
-    "test:dev": "vitest"
+    "prepack": "yarn build"
   },
   "license": "ISC",
   "files": [

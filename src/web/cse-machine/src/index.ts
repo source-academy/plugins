@@ -29,16 +29,15 @@ export type {
  *
  * This plugin owns only the transport/receipt, so it is language-agnostic and reusable.
  */
-export class CseMachineHostPlugin implements IPlugin {
+export abstract class CseMachineHostPlugin implements IPlugin {
   readonly id: string = WEB_ID;
   static readonly channelAttach = [CSE_CHANNEL];
 
   /**
-   * Set by the host app; called with each received batch of snapshots.
-   * Snapshots received before this is set are silently dropped — wire this callback
-   * immediately after constructing the plugin.
+   * Called by the plugin with each received batch of snapshots.
+   * Implement this in the host app to wire snapshots into the visualization layer.
    */
-  receiveSnapshots?: (snapshots: CseSnapshot[]) => void;
+  abstract receiveSnapshots(snapshots: CseSnapshot[]): void;
 
   constructor(
     _conduit: IConduit,
@@ -54,7 +53,7 @@ export class CseMachineHostPlugin implements IPlugin {
         Array.isArray(message.snapshots) &&
         message.totalSteps === message.snapshots.length
       ) {
-        this.receiveSnapshots?.(message.snapshots);
+        this.receiveSnapshots(message.snapshots);
       }
     });
   }

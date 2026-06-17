@@ -19,6 +19,14 @@ const makeChannel = () => {
   return channel as unknown as IChannel<unknown> & { emit: (msg: unknown) => void };
 };
 
+const makePlugin = (channel: IChannel<unknown>, onReceive?: (s: CseSnapshot[]) => void) => {
+  const receive = onReceive ?? vi.fn();
+  class TestPlugin extends CseMachineHostPlugin {
+    receiveSnapshots = receive;
+  }
+  return { plugin: new TestPlugin({} as IConduit, [channel]), receive };
+};
+
 const snapshot: CseSnapshot = {
   stepIndex: 0,
   control: [],
@@ -32,15 +40,14 @@ test("attaches to the cse channel and uses the web id", () => {
 
 test("id is WEB_ID", () => {
   const channel = makeChannel();
-  const plugin = new CseMachineHostPlugin({} as IConduit, [channel]);
+  const { plugin } = makePlugin(channel);
   expect(plugin.id).toBe(WEB_ID);
 });
 
 test("receiveSnapshots is called when a valid snapshots message arrives", () => {
   const channel = makeChannel();
-  const plugin = new CseMachineHostPlugin({} as IConduit, [channel]);
   const receive = vi.fn();
-  plugin.receiveSnapshots = receive;
+  makePlugin(channel, receive);
 
   channel.emit({ type: CSE_MESSAGE_TYPE_SNAPSHOTS, snapshots: [snapshot], totalSteps: 1 });
 
@@ -50,9 +57,8 @@ test("receiveSnapshots is called when a valid snapshots message arrives", () => 
 
 test("invalid messages are silently ignored", () => {
   const channel = makeChannel();
-  const plugin = new CseMachineHostPlugin({} as IConduit, [channel]);
   const receive = vi.fn();
-  plugin.receiveSnapshots = receive;
+  makePlugin(channel, receive);
 
   channel.emit({ type: "unknown", snapshots: [snapshot] });
   channel.emit(null);
@@ -62,7 +68,10 @@ test("invalid messages are silently ignored", () => {
 });
 
 test("constructor throws when cseChannel is not provided", () => {
-  expect(() => new CseMachineHostPlugin({} as IConduit, [])).toThrow(
+  class TestPlugin extends CseMachineHostPlugin {
+    receiveSnapshots = vi.fn();
+  }
+  expect(() => new TestPlugin({} as IConduit, [])).toThrow(
     "CSE channel is required but was not provided.",
   );
 });
