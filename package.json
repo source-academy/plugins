@@ -15,7 +15,8 @@
     "test:dev": "vitest",
     "lint": "eslint --concurrency=auto src",
     "format": "prettier --write \"**/*.{ts,tsx,json,js,mjs}\"",
-    "format:ci": "prettier --list-different \"**/*.{ts,tsx,json,js,mjs}\""
+    "format:ci": "prettier --list-different \"**/*.{ts,tsx,json,js,mjs}\"",
+    "template": "tsx lib/templates/template.ts"
   },
   "devDependencies": {
     "@changesets/cli": "^2.31.0",
@@ -40,5 +41,8 @@
   "bugs": {
     "url": "https://github.com/source-academy/plugins/issues"
   },
-  "homepage": "https://github.com/source-academy/plugins#readme"
+  "homepage": "https://github.com/source-academy/plugins#readme",
+  "dependencies": {
+    "@inquirer/prompts": "^8.5.2"
+  }
 }
