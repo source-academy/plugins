@@ -1,7 +1,5 @@
 {
   "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "types": ["jest"]
-  },
-  "include": ["src/**/__tests__"]
+  "include": ["**/__tests__/**/*.ts", "**/__tests__/**/*.tsx"],
+  "exclude": ["**/dist"]
 }
