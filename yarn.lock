@@ -1826,6 +1826,26 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@sourceacademy/web-cse-machine@workspace:src/web/cse-machine":
+  version: 0.0.0-use.local
+  resolution: "@sourceacademy/web-cse-machine@workspace:src/web/cse-machine"
+  dependencies:
+    "@rollup/plugin-node-resolve": "npm:^16.0.3"
+    "@rollup/plugin-terser": "npm:^1.0.0"
+    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@sourceacademy/common-cse-machine": "workspace:*"
+    "@sourceacademy/conductor": "npm:>=0.3.0"
+    "@types/jest": "npm:^30.0.0"
+    jest: "npm:^30.4.2"
+    rollup: "npm:^4.60.2"
+    ts-jest: "npm:^29.4.11"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^6.0.3"
+  peerDependencies:
+    "@sourceacademy/conductor": ">=0.3.0"
+  languageName: unknown
+  linkType: soft
+
 "@sourceacademy/web-test@workspace:src/web/test":
   version: 0.0.0-use.local
   resolution: "@sourceacademy/web-test@workspace:src/web/test"
