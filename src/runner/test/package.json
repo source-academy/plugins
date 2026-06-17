@@ -32,6 +32,7 @@
     "@rollup/plugin-typescript": "^12.3.0",
     "@sourceacademy/common-test": "workspace:*",
     "@sourceacademy/conductor": ">=0.3.0",
+    "@sourceacademy/runner-remote-execution": "workspace:*",
     "@types/jest": "^30.0.0",
     "jest": "^30.4.2",
     "rollup": "^4.60.2",

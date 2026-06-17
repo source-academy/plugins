@@ -1733,6 +1733,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sourceacademy/runner-remote-execution@workspace:*, @sourceacademy/runner-remote-execution@workspace:src/runner/remoteExecution":
+  version: 0.0.0-use.local
+  resolution: "@sourceacademy/runner-remote-execution@workspace:src/runner/remoteExecution"
+  dependencies:
+    "@sourceacademy/common-test": "workspace:*"
+    "@sourceacademy/conductor": "npm:>=0.3.0"
+    py-slang: "github:proto-aiken-13/py-slang#branch-ev3-engine"
+  languageName: unknown
+  linkType: soft
+
 "@sourceacademy/runner-test@workspace:src/runner/test":
   version: 0.0.0-use.local
   resolution: "@sourceacademy/runner-test@workspace:src/runner/test"
@@ -1742,6 +1752,7 @@ __metadata:
     "@rollup/plugin-typescript": "npm:^12.3.0"
     "@sourceacademy/common-test": "workspace:*"
     "@sourceacademy/conductor": "npm:>=0.3.0"
+    "@sourceacademy/runner-remote-execution": "workspace:*"
     "@types/jest": "npm:^30.0.0"
     jest: "npm:^30.4.2"
     py-slang: "github:proto-aiken-13/py-slang#branch-ev3-engine"
