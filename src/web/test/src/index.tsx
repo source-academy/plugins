@@ -42,7 +42,6 @@ function Element({
   );
 }
 
-@checkIsPluginClass
 export abstract class TestPlugin implements IPlugin {
   readonly id: string = WEB_ID;
   static readonly channelAttach = [CHANNEL_ID];
@@ -69,3 +68,4 @@ export abstract class TestPlugin implements IPlugin {
     tabService.showTab(tab.id);
   }
 }
+checkIsPluginClass(TestPlugin)

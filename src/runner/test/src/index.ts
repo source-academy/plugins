@@ -6,7 +6,6 @@ import {
   type IPlugin,
 } from "@sourceacademy/conductor/conduit";
 
-@checkIsPluginClass
 export abstract class TestPlugin implements IPlugin {
   readonly id: string = RUNNER_ID;
   static readonly channelAttach = [CHANNEL_ID];
@@ -23,3 +22,4 @@ export abstract class TestPlugin implements IPlugin {
     this.__testChannel.send("ping");
   }
 }
+checkIsPluginClass(TestPlugin)
