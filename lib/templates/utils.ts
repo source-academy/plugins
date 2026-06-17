@@ -2,6 +2,9 @@ export function validateName(value: string) {
   if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(value)) {
     return "Please enter a valid name in kebab-case (lowercase letters, numbers, and hyphens only)";
   }
+  if (value.endsWith("-plugin")) {
+    return "Please do not end the name with '-plugin'";
+  }
   return true;
 }
 

@@ -81,6 +81,12 @@ export async function generateTemplate(config: Config) {
   // Copy the template files from the lib/templates directory to the src directory
   const templatePath = pathlib.join(import.meta.dirname, location);
   const bundlePath = pathlib.join(import.meta.dirname, "..", "..", "src", location, name);
+  if (await fs.stat(bundlePath).catch(() => false)) {
+    console.error(
+      `Error: The plugin directory ${bundlePath} already exists. Please delete it or choose a different name.`,
+    );
+    process.exit(1);
+  }
   await fs.cp(templatePath, bundlePath, { recursive: true });
 
   // Update the package.json based on the plugin configuration.
@@ -105,7 +111,7 @@ export async function generateTemplate(config: Config) {
 
   // For the runner and web templates, replace the placeholder PluginName with the actual plugin name in the template files.
   if (pluginName) {
-    for await (const file of fs.glob(`${bundlePath}/**/*.ts`)) {
+    for await (const file of fs.glob(`${bundlePath.replace(pathlib.sep, "/")}/**/*.{ts,tsx}`)) {
       const content = await fs.readFile(file, "utf-8");
       const updatedContent = content.replace(/PluginName/g, pluginName);
       await fs.writeFile(file, updatedContent);
