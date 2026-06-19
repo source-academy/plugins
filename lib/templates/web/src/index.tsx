@@ -6,7 +6,7 @@ import {
 } from "@sourceacademy/conductor/conduit";
 import type { ITabService, Tab } from "@sourceacademy/common-tabs";
 
-export abstract class TestPlugin implements IPlugin {
+export abstract class PluginName implements IPlugin {
   readonly id: string = "__plugin_id";
   static readonly channelAttach = ["__channel_id"];
   private readonly __testChannel: IChannel<string>;
@@ -32,4 +32,4 @@ export abstract class TestPlugin implements IPlugin {
     tabService.showTab(tab.id);
   }
 }
-checkIsPluginClass(TestPlugin);
+checkIsPluginClass(PluginName);

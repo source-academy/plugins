@@ -15,14 +15,15 @@ export function validatePluginName(value: string) {
   return true;
 }
 
-export function generateDefaultPluginName(name: string, location: string) {
-  return (
-    name
-      .split("-")
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join("") +
-    location.charAt(0).toUpperCase() +
-    location.slice(1) +
-    "Plugin"
-  );
+export function generateDefaultPluginName(name: string, location: string, type: string) {
+  return type == "installable"
+    ? "Base"
+    : "" +
+        name
+          .split("-")
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join("") +
+        location.charAt(0).toUpperCase() +
+        location.slice(1) +
+        "Plugin";
 }

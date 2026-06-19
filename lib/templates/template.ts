@@ -61,7 +61,7 @@ export async function getConfig(): Promise<Config> {
     pluginName = await input({
       message: "What is the name of the plugin class? (use PascalCase)",
       required: false,
-      default: generateDefaultPluginName(name, location),
+      default: generateDefaultPluginName(name, location, type),
       validate: validatePluginName,
     });
   } else {
@@ -97,8 +97,8 @@ export async function generateTemplate(config: Config) {
   packageJSONContent.description = config.description;
   if (type === "external") {
     // For external plugins, the main entry point is at index.js, instead of the default index.cjs
-    packageJSONContent.exports["."].import = "./dist/index.js";
-    packageJSONContent.module = "./dist/index.js";
+    packageJSONContent.exports["."].require = "./dist/index.js";
+    packageJSONContent.main = "./dist/index.js";
   }
   await fs.writeFile(packageJSON, JSON.stringify(packageJSONContent, null, 2));
 
@@ -113,7 +113,10 @@ export async function generateTemplate(config: Config) {
   if (pluginName) {
     for await (const file of fs.glob(`${bundlePath.replace(pathlib.sep, "/")}/**/*.{ts,tsx}`)) {
       const content = await fs.readFile(file, "utf-8");
-      const updatedContent = content.replace(/PluginName/g, pluginName);
+      let updatedContent = content.replace(/PluginName/g, pluginName);
+      if (type === "external") {
+        updatedContent = updatedContent.replace(/abstract /g, "");
+      }
       await fs.writeFile(file, updatedContent);
     }
   }
