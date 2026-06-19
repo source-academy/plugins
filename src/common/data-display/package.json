@@ -1,0 +1,33 @@
+{
+  "name": "@sourceacademy/common-data-display",
+  "version": "0.0.1",
+  "packageManager": "yarn@4.6.0",
+  "description": "A common set of types and utilities for displaying box-and-pointer diagrams",
+  "scripts": {
+    "build": "rollup -c",
+    "prepack": "yarn build"
+  },
+  "license": "ISC",
+  "files": [
+    "dist"
+  ],
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "@rollup/plugin-terser": "^1.0.0",
+    "@rollup/plugin-typescript": "^12.3.0",
+    "rollup": "^4.60.2",
+    "tslib": "^2.8.1",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
+  }
+}
