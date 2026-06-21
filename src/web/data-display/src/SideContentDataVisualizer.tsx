@@ -7,21 +7,22 @@ import {
   Classes,
   Icon,
   Tooltip,
-} from '@blueprintjs/core';
-import { IconNames } from '@blueprintjs/icons';
-import { useHotkeys, type HotkeyItem } from '@mantine/hooks';
-import type { Tab } from '@sourceacademy/common-tabs';
-import classNames from 'classnames';
-import i18n from 'i18next';
-import { useEffect, useState } from 'react';
+} from "@blueprintjs/core";
+import { IconNames } from "@blueprintjs/icons";
+import { useHotkeys, type HotkeyItem } from "@mantine/hooks";
+import type { Tab } from "@sourceacademy/common-tabs";
+import classNames from "classnames";
+import i18n from "i18next";
+import { useEffect, useState } from "react";
 
-import { Trans, initReactI18next, useTranslation } from 'react-i18next';
-import DataVisualizer from './dataVisualizer';
-import type { Step } from './dataVisualizerTypes';
+import { Trans, initReactI18next, useTranslation } from "react-i18next";
+import DataVisualizer from "./dataVisualizer";
+import type { Step } from "./dataVisualizerTypes";
 
 type Props = {
   workspaceLocation: string;
-}; export function ItalicLink({ href, children }: { href: string, children?: React.ReactNode }) {
+};
+export function ItalicLink({ href, children }: { href: string; children?: React.ReactNode }) {
   return (
     <a href={href} rel="noopener noreferrer" target="_blank">
       <i>{children}</i>
@@ -30,26 +31,24 @@ type Props = {
 }
 
 const translations = {
-  defaultText: 'The data visualizer helps you to visualize data structures.',
+  defaultText: "The data visualizer helps you to visualize data structures.",
   instructions:
-    'It is activated by calling the function <0/>, where <1/> would be the <2/> data structure that you want to visualize and <3/> is the number of structures.',
+    "It is activated by calling the function <0/>, where <1/> would be the <2/> data structure that you want to visualize and <3/> is the number of structures.",
   reference:
-    'The data visualizer uses box-and-pointer diagrams, as introduced in <0>Structure and Interpretation of Computer Programs, JavaScript Edition, Chapter 2, Section 2</0>.',
-  label: 'Data Visualizer',
-  previous: 'Previous',
-  next: 'Next',
+    "The data visualizer uses box-and-pointer diagrams, as introduced in <0>Structure and Interpretation of Computer Programs, JavaScript Edition, Chapter 2, Section 2</0>.",
+  label: "Data Visualizer",
+  previous: "Previous",
+  next: "Next",
 };
-i18n
-  .use(initReactI18next)
-  .init({
-    resources: {
-      en: translations,
-    },
-    fallbackLng: 'en',
-    interpolation: {
-      escapeValue: false
-    }
-  });
+i18n.use(initReactI18next).init({
+  resources: {
+    en: { translation: translations },
+  },
+  fallbackLng: "en",
+  interpolation: {
+    escapeValue: false,
+  },
+});
 
 function SideContentDataVisualizer({ workspaceLocation }: Props) {
   const [steps, setSteps] = useState<Step[]>([]);
@@ -79,26 +78,26 @@ function SideContentDataVisualizer({ workspaceLocation }: Props) {
   const finalStep = !steps || currentStep === steps.length - 1;
 
   const hotkeyBindings: HotkeyItem[] = [
-    ['ArrowLeft', onPrevButtonClick],
-    ['ArrowRight', onNextButtonClick],
+    ["ArrowLeft", onPrevButtonClick],
+    ["ArrowRight", onNextButtonClick],
   ];
   useHotkeys(hotkeyBindings);
 
   return (
-    <div className={classNames('sa-data-visualizer', Classes.DARK)}>
+    <div className={classNames("sa-data-visualizer", Classes.DARK)}>
       {steps.length > 1 ? (
         <div
           style={{
-            position: 'relative',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
+            position: "relative",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
             marginBottom: 10,
           }}
         >
           <Button
             style={{
-              position: 'absolute',
+              position: "absolute",
               left: 0,
             }}
             size="large"
@@ -115,7 +114,7 @@ function SideContentDataVisualizer({ workspaceLocation }: Props) {
           </h3>
           <Button
             style={{
-              position: 'absolute',
+              position: "absolute",
               right: 0,
             }}
             size="large"
@@ -133,20 +132,20 @@ function SideContentDataVisualizer({ workspaceLocation }: Props) {
         <div
           key={step.length} // To ensure the style refreshes if the step length changes
           style={{
-            display: 'flex',
-            flexDirection: 'row',
-            overflowX: 'auto',
+            display: "flex",
+            flexDirection: "row",
+            overflowX: "auto",
           }}
         >
           {step?.map((elem, i) => (
-            <div key={i} style={{ margin: step.length > 1 ? 0 : '0 auto' }}>
-              {' '}
+            <div key={i} style={{ margin: step.length > 1 ? 0 : "0 auto" }}>
+              {" "}
               {/* To center element when there is only one */}
-              <Card style={{ background: '#1a2530', padding: 10 }}>
+              <Card style={{ background: "#1a2530", padding: 10 }}>
                 {step.length > 1 && (
                   <h5
                     className={classNames(Classes.HEADING, Classes.MONOSPACE_TEXT)}
-                    style={{ marginTop: 0, marginBottom: 20, whiteSpace: 'nowrap' }}
+                    style={{ marginTop: 0, marginBottom: 20, whiteSpace: "nowrap" }}
                   >
                     Structure {i + 1}
                   </h5>
@@ -165,18 +164,18 @@ function SideContentDataVisualizer({ workspaceLocation }: Props) {
             <Tooltip content="Original View" position="top">
               <AnchorButton
                 style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
                 onMouseUp={() => {
-                  DataVisualizer.setMode('normal');
+                  DataVisualizer.setMode("normal");
                   DataVisualizer.redraw();
                   onViewModeClick(currentStep);
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <Icon icon="grid-view" />
                   <Checkbox
                     checked={DataVisualizer.getNormalMode()}
@@ -192,20 +191,20 @@ function SideContentDataVisualizer({ workspaceLocation }: Props) {
           <Tooltip content="Binary Tree View" position="top">
             <AnchorButton
               style={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
                 marginLeft: 10,
               }}
               onMouseUp={() => {
-                DataVisualizer.setMode('binTree');
+                DataVisualizer.setMode("binTree");
                 DataVisualizer.redraw();
                 onViewModeClick(currentStep);
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Icon icon="one-to-many" style={{ transform: 'rotate(90deg)', marginLeft: 6 }} />
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <Icon icon="one-to-many" style={{ transform: "rotate(90deg)", marginLeft: 6 }} />
                 <Checkbox
                   checked={DataVisualizer.getBinTreeMode()}
                   style={{ marginTop: 7 }}
@@ -218,19 +217,19 @@ function SideContentDataVisualizer({ workspaceLocation }: Props) {
           <Tooltip content="General Tree View" position="top">
             <AnchorButton
               style={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
                 marginLeft: 10,
               }}
               onMouseUp={() => {
-                DataVisualizer.setMode('tree');
+                DataVisualizer.setMode("tree");
                 DataVisualizer.redraw();
                 onViewModeClick(currentStep);
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <Icon icon="diagram-tree" />
                 <Checkbox
                   checked={DataVisualizer.getTreeMode()}
@@ -248,27 +247,22 @@ function SideContentDataVisualizer({ workspaceLocation }: Props) {
 }
 
 const makeDataVisualizerTabFrom = (location: string): Tab => ({
-  label: i18n.t('label'),
+  label: i18n.t("label"),
   iconName: IconNames.EYE_OPEN,
   body: <SideContentDataVisualizer workspaceLocation={location} />,
-  id: 'dataviz',
+  id: "dataviz",
 });
 
 function DataVisualizerDefaultText() {
   const { t } = useTranslation();
-  
   return (
     <p id="data-visualizer-default-text" className={Classes.RUNNING_TEXT}>
-      {
-        t('defaultText')
-      }
+      {t("defaultText")}
       <br />
       <br />
       <Trans
-        ns="sideContent"
-        i18nKey={'instructions'}
+        i18nKey={"instructions"}
         components={[
-
           <code>
             draw_data(x<sub>1</sub>, x<sub>2</sub>, ... x<sub>n</sub>)
           </code>,
@@ -287,11 +281,9 @@ function DataVisualizerDefaultText() {
       <br />
       <br />
       <Trans
-        ns="sideContent"
-        i18nKey={'reference'}
-
+        i18nKey={"reference"}
         // TODO: fix this
-        components={[<ItalicLink href={'https://github.com/source-academy'} />]}
+        components={[<ItalicLink href={"https://github.com/source-academy"} />]}
       />
     </p>
   );
