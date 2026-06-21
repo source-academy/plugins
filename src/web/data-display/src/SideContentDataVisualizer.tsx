@@ -9,7 +9,7 @@ import {
   Tooltip,
 } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import type { HotkeyItem } from '@mantine/hooks';
+import { useHotkeys, type HotkeyItem } from '@mantine/hooks';
 import type { Tab } from '@sourceacademy/common-tabs';
 import classNames from 'classnames';
 import i18n from 'i18next';
@@ -57,12 +57,10 @@ function SideContentDataVisualizer({ workspaceLocation }: Props) {
 
   useEffect(() => {
     DataVisualizer.init(steps => {
-      console.log("Yayyyy");
       setSteps(steps);
       setCurrentStep(0);
     });
   }, [workspaceLocation]);
-  console.log(steps.length)
 
   const onPrevButtonClick = () => {
     setCurrentStep(prev => Math.max(0, prev - 1));
@@ -84,9 +82,9 @@ function SideContentDataVisualizer({ workspaceLocation }: Props) {
     ['ArrowLeft', onPrevButtonClick],
     ['ArrowRight', onNextButtonClick],
   ];
+  useHotkeys(hotkeyBindings);
 
   return (
-    // <HotKeys bindings={hotkeyBindings}>
     <div className={classNames('sa-data-visualizer', Classes.DARK)}>
       {steps.length > 1 ? (
         <div
@@ -246,7 +244,6 @@ function SideContentDataVisualizer({ workspaceLocation }: Props) {
         </>
       )}
     </div>
-    // </HotKeys>
   );
 }
 
@@ -259,6 +256,7 @@ const makeDataVisualizerTabFrom = (location: string): Tab => ({
 
 function DataVisualizerDefaultText() {
   const { t } = useTranslation();
+  
   return (
     <p id="data-visualizer-default-text" className={Classes.RUNNING_TEXT}>
       {

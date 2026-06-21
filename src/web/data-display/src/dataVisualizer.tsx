@@ -195,7 +195,7 @@ export default class DataVisualizer {
   }
 
   public static drawData(structures: Data[]): void {
-    console.log(structures);
+    
     if (!DataVisualizer.setSteps) {
       throw new Error('Data visualizer not initialized');
     }
@@ -220,10 +220,10 @@ export default class DataVisualizer {
       }
     }
     DataVisualizer._instance.addStep(structures);
-    console.log("About to call setSteps!");
-    console.log(DataVisualizer._instance.steps);
+    
+    
     DataVisualizer.setSteps(DataVisualizer._instance.steps);
-    console.log("Called setSteps!");
+    
   }
 
   public static clearWithData(): void {
@@ -254,7 +254,7 @@ export default class DataVisualizer {
   }
 
   private addStep(structures: Data[]) {
-    console.log(structures)
+    
     const step = structures.map((xs, index) => this.createDrawing(xs, index));
     this.steps.push(step);
   }
