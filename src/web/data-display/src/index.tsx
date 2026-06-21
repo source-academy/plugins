@@ -32,7 +32,6 @@ function serialiseData(data: Data): SerialisedData {
 }
 
 @checkIsPluginClass
-// eslint-disable-next-line @sourceacademy/tab-type
 export default class DisplayDataWebPlugin implements IPlugin {
   id = WEB_ID;
   static channelAttach = [CHANNEL_ID];

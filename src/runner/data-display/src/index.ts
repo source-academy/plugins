@@ -1,6 +1,6 @@
 import type { IPlugin, IChannel, IConduit } from "@sourceacademy/conductor/conduit";
 import { CHANNEL_ID, RUNNER_ID, type Data } from "@sourceacademy/common-data-display";
-export abstract class BaseDataDisplayRunnerPlugin implements IPlugin {
+export abstract class BaseDataDisplayRunnerPlugin<T> implements IPlugin {
   readonly id: string = RUNNER_ID;
   static readonly channelAttach = [CHANNEL_ID];
   private readonly __dataChannel: IChannel<Data>;
@@ -12,7 +12,8 @@ export abstract class BaseDataDisplayRunnerPlugin implements IPlugin {
     this.__dataChannel = dataChannel;
   }
 
-  sendData(data: Data) {
-    this.__dataChannel.send(data);
+  abstract serialiseData(data: T): Data;
+  sendData(data: T) {
+    this.__dataChannel.send(this.serialiseData(data));
   }
 }
