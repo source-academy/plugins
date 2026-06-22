@@ -93,7 +93,7 @@ export class Tree {
      * function appears multiple times in the data structure.
      * @param func The function to construct a node for.
      */
-    function constructFunction(func: Function) {
+    function constructFunction(func: (...args: unknown[]) => unknown) {
       const node = new FunctionTreeNode();
 
       // memoise current function

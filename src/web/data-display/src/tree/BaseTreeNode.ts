@@ -3,7 +3,7 @@ export class TreeNode {
   public nodePos: number = 0;
   public nodeColor: number = 0;
   // Note: Only specific subclasses (e.g., DataTreeNode) are expected to populate `data`.
-  public data?: any;
+  public data?: unknown;
 
   constructor() {
     this.children = null;

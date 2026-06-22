@@ -51,6 +51,7 @@ export default class DisplayDataWebPlugin implements IPlugin {
 
   constructor(
     _conduit: IConduit,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [dataChannel, configChannel]: IChannel<any>[],
     tabService: ITabService,
   ) {

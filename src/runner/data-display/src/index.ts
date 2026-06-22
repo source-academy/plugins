@@ -21,7 +21,7 @@ export abstract class BaseDataDisplayRunnerPlugin<T> implements IPlugin {
     this.__dataChannel = dataChannel;
     this.__configChannel = configChannel;
     // Provide the config to the web plugin when it requests it
-    this.__configChannel.subscribe(msg => {
+    this.__configChannel.subscribe(() => {
       this.__configChannel.send(this.getConfig());
     });
   }

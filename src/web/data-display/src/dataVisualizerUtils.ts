@@ -27,9 +27,10 @@ export function isArray(data: Data): data is Array<Data> {
   return Array.isArray(data);
 }
 
-export function isFunction(data: Data): data is Function {
+export function isFunction(data: Data): data is (...args: unknown[]) => unknown {
   return typeof data === "function";
 }
+
 export function isPair(data: Data): data is Pair {
   return is_pair(data);
 }

@@ -28,7 +28,7 @@ export default class DataVisualizer {
   public static nodeColor: number[] = [];
   public static longestNodePos: number = 0;
   public static colorMap: WeakMap<Array<Data>, number> = new WeakMap();
-  public static posMap: WeakMap<any, number> = new WeakMap();
+  public static posMap: WeakMap<Data[], number> = new WeakMap();
 
   private steps: Step[] = [];
   private nodeLabel = 0;
@@ -36,7 +36,7 @@ export default class DataVisualizer {
 
   private constructor() {}
 
-  public static isBinaryTree(structures: Data[], data: any): boolean {
+  public static isBinaryTree(structures: Data[], data: unknown): boolean {
     if (structures == null) {
       return true;
     }
@@ -77,7 +77,7 @@ export default class DataVisualizer {
     }
   }
 
-  public static isGeneralTree(structures: Data[], data: any): boolean {
+  public static isGeneralTree(structures: Data[], data: unknown): boolean {
     if (structures == null) {
       return true;
     }
