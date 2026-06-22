@@ -21,6 +21,9 @@
       "types": "./dist/index.d.ts"
     }
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "@sourceacademy/conductor": ">=0.3.0"
   },
