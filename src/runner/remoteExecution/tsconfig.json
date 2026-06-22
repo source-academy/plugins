@@ -1,7 +1,7 @@
 {
   "extends": "../../tsconfig.json",
   "exclude": ["./dist"],
-  "include": ["./src", "./index.ts", "../../../node_modules/py-slang/src/**/*"],
+  "include": ["./src", "./index.ts"],
   "compilerOptions": {
     "declaration": true,
     "outDir": "./dist",
