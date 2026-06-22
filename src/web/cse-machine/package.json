@@ -1,6 +1,6 @@
 {
   "name": "@sourceacademy/web-cse-machine",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "packageManager": "yarn@4.6.0",
   "description": "The web/host-side CSE machine plugin: receives evaluation snapshots for rendering",
   "scripts": {
@@ -22,7 +22,7 @@
     }
   },
   "peerDependencies": {
-    "@sourceacademy/common-cse-machine": ">=0.0.1",
+    "@sourceacademy/common-cse-machine": ">=0.1.0",
     "@sourceacademy/conductor": ">=0.3.0"
   },
   "devDependencies": {
