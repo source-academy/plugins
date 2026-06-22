@@ -1,11 +1,8 @@
 import nodeResolve from "@rollup/plugin-node-resolve";
 import terser from "@rollup/plugin-terser";
 import typescript from "@rollup/plugin-typescript";
-import path from "path";
 
-/**
- * @type {import('rollup').RollupOptions}
- */
+/** @type {import('rollup').RollupOptions} */
 export default {
   input: "src/index.ts",
   output: [
@@ -18,15 +15,5 @@ export default {
       format: "esm",
     },
   ],
-  plugins: [
-    nodeResolve(),
-    typescript({
-      compilerOptions: {
-        rootDir: path.resolve(__dirname, "../../../../../"),
-        declarationDir: "./dist",
-        declaration: true,
-      },
-    }),
-    terser(),
-  ],
+  plugins: [nodeResolve(), typescript(), terser()],
 };
