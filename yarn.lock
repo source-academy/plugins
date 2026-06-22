@@ -1375,6 +1375,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@sourceacademy/runner-remote-execution@workspace:src/runner/remoteExecution"
   dependencies:
+    "@rollup/plugin-commonjs": "npm:^29.0.3"
     "@rollup/plugin-node-resolve": "npm:^16.0.3"
     "@rollup/plugin-terser": "npm:^1.0.0"
     "@rollup/plugin-typescript": "npm:^12.3.0"
