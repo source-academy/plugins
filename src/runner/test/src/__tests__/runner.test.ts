@@ -2,8 +2,8 @@ import { vi, test, expect } from "vitest";
 
 vi.mock("py-slang/src/engines/ev3/EV3Engine", () => ({
   EV3Engine: class MockEV3Engine {
-    async execute(code: string) {
-      return { output: `mock: ${code}` };
+    execute(code: string) {
+      return Promise.resolve({ output: `mock: ${code}` });
     }
   },
 }));
