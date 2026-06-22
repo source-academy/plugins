@@ -1,4 +1,4 @@
-import { remoteRunnerPlugin } from "..";
+import { remoteRunnerPlugin } from "@sourceacademy/runner-remote-execution";
 import type { PySlangMessage } from "@sourceacademy/common-test";
 import { test, expect } from "vitest";
 
@@ -8,8 +8,12 @@ test("compiles and processes python code via EV3Engine", async () => {
 
   const mockChannel = {
     name: "py_slang_channel",
-    send: (msg: PySlangMessage) => { sentMessages.push(msg); },
-    subscribe: (handler: (msg: PySlangMessage) => void) => { messageHandler = handler; },
+    send: (msg: PySlangMessage) => {
+      sentMessages.push(msg);
+    },
+    subscribe: (handler: (msg: PySlangMessage) => void) => {
+      messageHandler = handler;
+    },
     unsubscribe: () => {},
     close: () => {},
   };
