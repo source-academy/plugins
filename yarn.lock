@@ -1412,6 +1412,13 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@sourceacademy/wasm-util@npm:^1.0.6":
+  version: 1.0.6
+  resolution: "@sourceacademy/wasm-util@npm:1.0.6"
+  checksum: 10c0/5f86a348c79142c062d5b8b3c45418bc0358ceb2fc4ace0393ea75797b9d66d06ab270c4ec12d304066e0879016db36a017c1696b9f14a62ae59c42d012b47ed
+  languageName: node
+  linkType: hard
+
 "@sourceacademy/web-cse-machine@workspace:src/web/cse-machine":
   version: 0.0.0-use.local
   resolution: "@sourceacademy/web-cse-machine@workspace:src/web/cse-machine"
@@ -1431,13 +1438,6 @@ __metadata:
     "@sourceacademy/conductor": ">=0.3.0"
   languageName: unknown
   linkType: soft
-
-"@sourceacademy/wasm-util@npm:^1.0.6":
-  version: 1.0.6
-  resolution: "@sourceacademy/wasm-util@npm:1.0.6"
-  checksum: 10c0/5f86a348c79142c062d5b8b3c45418bc0358ceb2fc4ace0393ea75797b9d66d06ab270c4ec12d304066e0879016db36a017c1696b9f14a62ae59c42d012b47ed
-  languageName: node
-  linkType: hard
 
 "@sourceacademy/web-test@workspace:src/web/test":
   version: 0.0.0-use.local
@@ -2022,7 +2022,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"commander@npm:^2.20.0":
+"commander@npm:^2.19.0, commander@npm:^2.20.0":
   version: 2.20.3
   resolution: "commander@npm:2.20.3"
   checksum: 10c0/74c781a5248c2402a0a3e966a0a2bba3c054aad144f5c023364be83265e796b20565aa9feff624132ff629aa64e16999fa40a743c10c12f7c61e96a794b99288
@@ -2503,6 +2503,22 @@ __metadata:
   version: 2.0.6
   resolution: "fast-levenshtein@npm:2.0.6"
   checksum: 10c0/111972b37338bcb88f7d9e2c5907862c280ebf4234433b95bc611e518d192ccb2d38119c4ac86e26b668d75f7f3894f4ff5c4982899afced7ca78633b08287c4
+  languageName: node
+  linkType: hard
+
+
+
+"fast-levenshtein@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "fast-levenshtein@npm:3.0.0"
+  dependencies:
+    fastest-levenshtein: "npm:^1.0.7"
+  languageName: node
+  linkType: hard
+
+"fastest-levenshtein@npm:^1.0.7":
+  version: 1.0.16
+  resolution: "fastest-levenshtein@npm:1.0.16"
   languageName: node
   linkType: hard
 
