@@ -47,7 +47,7 @@ const translations = {
     original: "Original View",
     binaryTree: "Binary Tree View",
     generalTree: "General Tree View",
-  }
+  },
 };
 i18n.use(initReactI18next).init({
   resources: {
