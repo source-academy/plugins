@@ -8,6 +8,9 @@
     "prepack": "yarn build"
   },
   "license": "ISC",
+  "publishConfig": {
+    "access": "public"
+  },
   "files": [
     "dist"
   ],
