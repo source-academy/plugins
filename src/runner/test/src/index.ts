@@ -5,11 +5,7 @@ export abstract class TestPlugin implements IPlugin {
   readonly id: string = RUNNER_ID;
   static readonly channelAttach = [CHANNEL_ID];
   private readonly __testChannel: IChannel<TestMessage>;
-  constructor(
-    _conduit: IConduit,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    [testChannel]: IChannel<any>[],
-  ) {
+  constructor(_conduit: IConduit, [testChannel]: IChannel<any>[]) {
     this.__testChannel = testChannel;
     this.__testChannel.subscribe(message => {
       console.log(message);
@@ -17,5 +13,3 @@ export abstract class TestPlugin implements IPlugin {
     this.__testChannel.send("ping");
   }
 }
-
-export { remoteRunnerPlugin } from "../../remoteExecution/index";

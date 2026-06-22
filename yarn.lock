@@ -1739,7 +1739,11 @@ __metadata:
   dependencies:
     "@sourceacademy/common-test": "workspace:*"
     "@sourceacademy/conductor": "npm:>=0.3.0"
+    "@types/jest": "npm:^30.0.0"
+    jest: "npm:^30.4.2"
     py-slang: "github:proto-aiken-13/py-slang#branch-ev3-engine"
+    ts-jest: "npm:^29.4.11"
+    typescript: "npm:^6.0.3"
   languageName: unknown
   linkType: soft
 

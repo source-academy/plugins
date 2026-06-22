@@ -1,7 +1,7 @@
 {
   "extends": "../../tsconfig.json",
   "exclude": ["./dist"],
-  "include": ["./src", "../remoteExecution"],
+  "include": ["./src", "./index.ts"],
   "compilerOptions": {
     "declaration": true,
     "outDir": "./dist",
