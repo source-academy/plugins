@@ -7,7 +7,7 @@ import typescript from "@rollup/plugin-typescript";
  */
 export default {
   input: "src/index.ts",
-  external: (id) => id.includes("py-slang"),
+  external: id => id.includes("py-slang"),
   output: [
     {
       file: "dist/index.cjs",
