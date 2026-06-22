@@ -15,5 +15,5 @@ export default {
       format: "esm",
     },
   ],
-  plugins: [nodeResolve(), typescript(), terser()],
+  plugins: [nodeResolve({ extensions: [".ts", ".tsx", ".js", ".jsx"] }), typescript(), terser()],
 };
