@@ -11,32 +11,30 @@ import {
   CONFIG_CHANNEL_ID,
   DATA_CHANNEL_ID,
   WEB_ID,
+  type ArrayValue,
   type Config,
   type Data,
 } from "@sourceacademy/common-data-display";
 import type { Data as SerialisedData } from "./dataVisualizerTypes";
 function serialiseData(data: Data): SerialisedData {
-  const objCache: Map<Data, SerialisedData> = new Map();
+  const arrayCache: Map<ArrayValue, SerialisedData[]> = new Map();
   function helper(data: Data): SerialisedData {
-    if (objCache.has(data)) {
-      return objCache.get(data);
-    }
-    objCache.set(data, []);
     switch (data.type) {
       case "array":
-        (objCache.get(data) as Data[]).push(...data.value.map(helper));
-        break;
+        if (arrayCache.has(data)) {
+          return arrayCache.get(data);
+        }
+        const serialisedArray: SerialisedData[] = [];
+        arrayCache.set(data, serialisedArray);
+        serialisedArray.push(...data.value.map(helper));
+        return serialisedArray;
       case "function":
-        objCache.set(data, () => {});
-        break;
+        return () => {};
       case "null":
-        objCache.set(data, null);
-        break;
+        return null;
       case "string":
-        objCache.set(data, data.value);
-        break;
+        return data.value;
     }
-    return objCache.get(data);
   }
   return helper(data);
 }
