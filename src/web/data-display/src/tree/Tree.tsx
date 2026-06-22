@@ -1,17 +1,17 @@
-import DataVisualizer from '../dataVisualizer';
-import type { Data } from '../dataVisualizerTypes';
-import { isArray, isFunction } from '../dataVisualizerUtils';
-import { AlreadyParsedTreeNode } from './AlreadyParsedTreeNode';
-import { BinaryTreeDrawer } from './BinaryTreeDrawer';
-import { GeneralTreeDrawer } from './GeneralTreeDrawer';
-import { OriginalDrawer } from './OriginalDrawer';
+import DataVisualizer from "../dataVisualizer";
+import type { Data } from "../dataVisualizerTypes";
+import { isArray, isFunction } from "../dataVisualizerUtils";
+import { AlreadyParsedTreeNode } from "./AlreadyParsedTreeNode";
+import { BinaryTreeDrawer } from "./BinaryTreeDrawer";
+import { GeneralTreeDrawer } from "./GeneralTreeDrawer";
+import { OriginalDrawer } from "./OriginalDrawer";
 import {
   ArrayTreeNode,
   DataTreeNode,
   DrawableTreeNode,
   FunctionTreeNode,
   TreeNode,
-} from './TreeNode';
+} from "./TreeNode";
 
 /**
  *  A tree object built based on the given Data, Function or Array of

@@ -13,17 +13,31 @@ export default {
     {
       file: "dist/index.js",
       format: "cjs",
-      inlineDynamicImports: true
+      inlineDynamicImports: true,
     },
     {
       file: "dist/index.mjs",
       format: "esm",
-      inlineDynamicImports: true
+      inlineDynamicImports: true,
     },
   ],
-  plugins: [replace({
-    preventAssignment: true,
-    "process.env.NODE_ENV": JSON.stringify("production"),
-  }), nodeResolve({ preferBuiltins: false, browser: true }), commonjs(), typescript(), terser()],
-  external: ["react", "react-dom", "react/jsx-runtime", "@blueprintjs/core", "@blueprintjs/icons", "react-konva", "konva"],
+  plugins: [
+    replace({
+      preventAssignment: true,
+      "process.env.NODE_ENV": JSON.stringify("production"),
+    }),
+    nodeResolve({ preferBuiltins: false, browser: true }),
+    commonjs(),
+    typescript(),
+    terser(),
+  ],
+  external: [
+    "react",
+    "react-dom",
+    "react/jsx-runtime",
+    "@blueprintjs/core",
+    "@blueprintjs/icons",
+    "react-konva",
+    "konva",
+  ],
 };

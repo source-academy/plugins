@@ -1,4 +1,4 @@
-import { TreeNode } from './BaseTreeNode';
+import { TreeNode } from "./BaseTreeNode";
 
 /**
  * Represents a node whose drawable should be cached.

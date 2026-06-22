@@ -1,8 +1,8 @@
-import { memo } from 'react';
-import { Arrow } from 'react-konva';
+import { memo } from "react";
+import { Arrow } from "react-konva";
 
-import { Config } from '../Config';
-import DataVisualizer from '../dataVisualizer';
+import { Config } from "../Config";
+import DataVisualizer from "../dataVisualizer";
 
 type Props = {
   from: { x: number; y: number };
@@ -19,7 +19,7 @@ function ArrowDrawable(props: Props) {
     // Binary Tree View and General Tree View
     return (
       <Arrow
-        key={props + ''}
+        key={props + ""}
         points={[
           props.from.x,
           props.from.y,
@@ -38,7 +38,7 @@ function ArrowDrawable(props: Props) {
     // OriginalView
     return (
       <Arrow
-        key={props + ''}
+        key={props + ""}
         points={[
           props.from.x,
           props.from.y,

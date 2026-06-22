@@ -70,6 +70,12 @@ The `Data` type is a discriminated union with four subtypes. Each subtype is an 
 
 Native JS types aren't directly passed over the channels since functions cannot be passed from a web worker to the main thread. 
 
+## Configuration Types
+The `Config` type contains language-specific configuration required for the web plugin including
+- `sicpTextbookName`: The name section of the SICP book which contains hierarchical data, as well as box-and-pointer diagrams
+- `sicpTextbookUrl`: The URL of the aforementioned section
+- `functionCallText`: The function call displayed as an example. For example, `draw_data(x1, x2, ..., xn)`. The suffix after `x` in `x<number>` and `xn` are automatically converted to subscript.
+
 ## Further reading
 - To use the runner-side plugin, install [`@sourceacademy/runner-data-display`](https://github.com/source-academy/plugins/tree/main/src/runner/data-display)
 - To use the web plugin, check out the [Github repo](https://github.com/source-academy/plugins/tree/main/src/web/data-display)

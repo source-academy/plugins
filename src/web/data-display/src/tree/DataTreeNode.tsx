@@ -1,5 +1,5 @@
-import type { Data } from '../dataVisualizerTypes';
-import { TreeNode } from './BaseTreeNode';
+import type { Data } from "../dataVisualizerTypes";
+import { TreeNode } from "./BaseTreeNode";
 
 /**
  * Represents node corresponding to a data object (neither pair nor function).

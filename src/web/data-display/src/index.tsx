@@ -7,7 +7,13 @@ import {
 } from "@sourceacademy/conductor/conduit";
 import makeDataVisualizerTabFrom from "./SideContentDataVisualizer";
 import DataVisualizer from "./dataVisualizer";
-import { CHANNEL_ID, WEB_ID, type Data } from "@sourceacademy/common-data-display";
+import {
+  CONFIG_CHANNEL_ID,
+  DATA_CHANNEL_ID,
+  WEB_ID,
+  type Config,
+  type Data,
+} from "@sourceacademy/common-data-display";
 import type { Data as SerialisedData } from "./dataVisualizerTypes";
 function serialiseData(data: Data): SerialisedData {
   const objCache: Map<Data, SerialisedData> = new Map();
@@ -38,15 +44,25 @@ function serialiseData(data: Data): SerialisedData {
 @checkIsPluginClass
 export default class DisplayDataWebPlugin implements IPlugin {
   id = WEB_ID;
-  static channelAttach = [CHANNEL_ID];
+  static channelAttach = [DATA_CHANNEL_ID, CONFIG_CHANNEL_ID];
 
   private __dataChannel: IChannel<Data>;
+  private __configChannel: IChannel<Config | null>;
 
-  constructor(_conduit: IConduit, [channel]: IChannel<any>[], tabService: ITabService) {
-    this.__dataChannel = channel;
-    const tab = makeDataVisualizerTabFrom("playground");
-    tabService.registerTab(tab);
-    tabService.showTab(tab.id);
+  constructor(
+    _conduit: IConduit,
+    [dataChannel, configChannel]: IChannel<any>[],
+    tabService: ITabService,
+  ) {
+    this.__dataChannel = dataChannel;
+    this.__configChannel = configChannel;
+    this.__configChannel.subscribe(msg => {
+      if (msg === null) return;
+      const tab = makeDataVisualizerTabFrom("playground", msg);
+      tabService.registerTab(tab);
+      tabService.showTab(tab.id);
+    });
+    this.__configChannel.send(null);
     this.__dataChannel.subscribe(data => {
       DataVisualizer.drawData([serialiseData(data)]);
     });

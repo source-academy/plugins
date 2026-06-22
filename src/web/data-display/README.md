@@ -25,6 +25,8 @@ This package ([`@sourceacademy/web-data-display`](https://github.com/source-acad
 
 The entry point is `src/index.tsx`, which contains the actual host plugin. It subscribes to a data channel, which receives the [`Data`](../../common/data-display/README.md#data-types) type. It serialises the data into a native JS format which is then displayed in a tab.
 
+It also subscribes to a configuration channel
+
 ## Serialisation
 
 The [`Data`](../../common/data-display/README.md#data-types) type is serialised again into a native JS structure for the internal data visualizer.

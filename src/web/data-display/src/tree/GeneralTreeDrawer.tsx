@@ -1,19 +1,19 @@
-import Konva from 'konva';
-import { Layer, Stage, Text } from 'react-konva';
+import Konva from "konva";
+import { Layer, Stage, Text } from "react-konva";
 
-import { Config } from '../Config';
-import DataVisualizer from '../dataVisualizer';
-import { toText } from '../dataVisualizerUtils';
-import { ArrowDrawable, BackwardArrowDrawable } from '../drawable/Drawable';
-import { AlreadyParsedTreeNode } from './AlreadyParsedTreeNode';
-import { OriginalDrawer } from './OriginalDrawer';
+import { Config } from "../Config";
+import DataVisualizer from "../dataVisualizer";
+import { toText } from "../dataVisualizerUtils";
+import { ArrowDrawable, BackwardArrowDrawable } from "../drawable/Drawable";
+import { AlreadyParsedTreeNode } from "./AlreadyParsedTreeNode";
+import { OriginalDrawer } from "./OriginalDrawer";
 import {
   ArrayTreeNode,
   DataTreeNode,
   DrawableTreeNode,
   FunctionTreeNode,
   TreeNode,
-} from './TreeNode';
+} from "./TreeNode";
 
 /**
  * Tree drawer for general tree view
@@ -26,7 +26,7 @@ export class GeneralTreeDrawer extends OriginalDrawer {
         <Stage key={key} width={445} height={100}>
           <Layer>
             <Text
-              text={'General Tree View only supports trees (no cycles)'}
+              text={"General Tree View only supports trees (no cycles)"}
               align="center"
               fontStyle="normal"
               fontSize={20}
@@ -41,8 +41,8 @@ export class GeneralTreeDrawer extends OriginalDrawer {
       const text = toText(this.tree.rootNode.data);
       const textConfig = {
         text: text,
-        align: 'center',
-        fontStyle: 'normal',
+        align: "center",
+        fontStyle: "normal",
         fontSize: 20,
         fill: Config.Stroke,
       };
@@ -73,7 +73,7 @@ export class GeneralTreeDrawer extends OriginalDrawer {
         }
         height={this.downCOUNTER * Config.BoxHeight * 4 + Config.BoxHeight + y * 2}
       >
-        <Layer key={x + ', ' + y} offsetX={0} offsetY={this.minY}>
+        <Layer key={x + ", " + y} offsetX={0} offsetY={this.minY}>
           {this.drawables}
         </Layer>
       </Stage>
@@ -120,10 +120,10 @@ export class GeneralTreeDrawer extends OriginalDrawer {
           drawnNode.drawableY! - Config.ArrowMarginTop - Config.StrokeWidth / 2,
         );
         arrow = (
-          <BackwardArrowDrawable key={'Arrow (back)' + parentX + x + parentY + y} {...arrowProps} />
+          <BackwardArrowDrawable key={"Arrow (back)" + parentX + x + parentY + y} {...arrowProps} />
         );
       } else {
-        arrow = <ArrowDrawable key={'Arrow' + parentX + x + parentY + y} {...arrowProps} />;
+        arrow = <ArrowDrawable key={"Arrow" + parentX + x + parentY + y} {...arrowProps} />;
       }
       this.drawables.push(arrow);
     }

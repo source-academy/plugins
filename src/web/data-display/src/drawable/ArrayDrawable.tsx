@@ -1,11 +1,11 @@
-import { PureComponent } from 'react';
-import { Group, Line, Rect, Text } from 'react-konva';
+import { PureComponent } from "react";
+import { Group, Line, Rect, Text } from "react-konva";
 
-import { Config } from '../Config';
-import DataVisualizer from '../dataVisualizer';
-import { isEmptyList, isList, toText } from '../dataVisualizerUtils';
-import { DataTreeNode, TreeNode } from '../tree/TreeNode';
-import { NullDrawable } from './Drawable';
+import { Config } from "../Config";
+import DataVisualizer from "../dataVisualizer";
+import { isEmptyList, isList, toText } from "../dataVisualizerUtils";
+import { DataTreeNode, TreeNode } from "../tree/TreeNode";
+import { NullDrawable } from "./Drawable";
 
 type ArrayProps = {
   nodes: TreeNode[];
@@ -23,16 +23,16 @@ class ArrayDrawable extends PureComponent<ArrayProps> {
       const nodeValue = node.data;
       if (!isList(nodeValue)) {
         const textValue: string | undefined = toText(nodeValue);
-        const textToDisplay = textValue ?? '*' + DataVisualizer.displaySpecialContent(node);
+        const textToDisplay = textValue ?? "*" + DataVisualizer.displaySpecialContent(node);
         return (
           <Text
-            key={'' + nodeValue + index}
+            key={"" + nodeValue + index}
             text={textToDisplay}
             align="center"
             width={Config.BoxWidth}
             x={Config.BoxWidth * index}
             y={Math.floor((Config.BoxHeight - 1.2 * 12) / 2)}
-            fontStyle={textValue === undefined ? 'italic' : 'normal'}
+            fontStyle={textValue === undefined ? "italic" : "normal"}
             fill="white"
             preventDefault={false}
           />
@@ -64,7 +64,7 @@ class ArrayDrawable extends PureComponent<ArrayProps> {
           Array.from(Array(this.props.nodes.length - 1), (e, i) => {
             return (
               <Line
-                key={'line' + i}
+                key={"line" + i}
                 points={[Config.BoxWidth * (i + 1), 0, Config.BoxWidth * (i + 1), Config.BoxHeight]}
                 strokeWidth={Config.StrokeWidth}
                 stroke={Config.Stroke}

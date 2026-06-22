@@ -3,8 +3,8 @@
  */
 export const Config = {
   StrokeWidth: 2,
-  Stroke: 'white',
-  Fill: 'white',
+  Stroke: "white",
+  Fill: "white",
 
   NWidth: 90,
   BoxWidth: 45,

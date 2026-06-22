@@ -1,8 +1,8 @@
-import { Group } from 'react-konva';
+import { Group } from "react-konva";
 
-import { Config } from '../Config';
-import { ArrowDrawable, FunctionDrawable } from '../drawable/Drawable';
-import { DrawableTreeNode } from './DrawableTreeNode';
+import { Config } from "../Config";
+import { ArrowDrawable, FunctionDrawable } from "../drawable/Drawable";
+import { DrawableTreeNode } from "./DrawableTreeNode";
 
 /**
  * Represents a node corresponding to a Source (and Javascript) function.
@@ -16,7 +16,7 @@ export class FunctionTreeNode extends DrawableTreeNode {
     colorIndex: number,
   ): React.ReactElement {
     this._drawable = (
-      <Group key={x + ', ' + y}>
+      <Group key={x + ", " + y}>
         <FunctionDrawable {...{ x, y }} />
         {(parentX !== x || parentY !== y) && (
           <ArrowDrawable

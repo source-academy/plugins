@@ -17,7 +17,7 @@ export function head(xs: unknown): unknown {
   if (is_pair(xs)) {
     return xs[0];
   } else {
-    throw new Error('head(xs) expects a pair as argument xs, but encountered ' + xs);
+    throw new Error("head(xs) expects a pair as argument xs, but encountered " + xs);
   }
 }
 
@@ -28,7 +28,7 @@ export function tail(xs: unknown): unknown {
   if (is_pair(xs)) {
     return xs[1];
   } else {
-    throw new Error('tail(xs) expects a pair as argument xs, but encountered ' + xs);
+    throw new Error("tail(xs) expects a pair as argument xs, but encountered " + xs);
   }
 }
 

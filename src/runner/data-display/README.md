@@ -28,10 +28,10 @@ This is encompassed by the `BaseDataDisplayRunnerPlugin<T>` abstract class.
 
 ### API Reference
 The abstract class is generic, where the type parameter `T` represents the language value type. 
-It has two functions
 | Name          | Description |
 |---------------|-------------|
-| `abstract serialiseData(data: T): Data` | It serialises the language value type into the language-agnostic [`Data`](https://github.com/source-academy/plugins/tree/main/src/common/data-display/README.md#data-types) type. Ensure it works on circular objects, similar to the example before |
+| `abstract getConfig(): Config` | It returns the language-specific [`Config`](https://github.com/source-academy/plugins/tree/main/src/common/data-display/README.md#configuration-types) type. |
+| `abstract serialiseData(data: T): Data` | It serialises the language value type into the language-agnostic [`Data`](https://github.com/source-academy/plugins/tree/main/src/common/data-display/README.md#data-types) type. Ensure it works on circular objects, similar to the example below |
 | `sendData(data: T): void`  | It is meant to be called by the evaluator when it encounters the `draw_data` function. It serialises a language value and sends it to the web plugin|
 
 ## Usage
@@ -72,6 +72,13 @@ export class DataDisplayRunnerPlugin extends BaseDataDisplayRunnerPlugin<Value> 
       }
     }
     return helper(value);
+  }
+  getConfig(): Config {
+    return {
+      sicpTextbookName: "Structure and Interpretation of Computer Programs, JavaScript Edition, Chapter 2, Section 2",
+      sicpTextbookUrl: "https://sourceacademy.org/sicpjs/2.2",
+      functionCallText: "draw_data(x1, x2, ..., xn)"
+    }
   }
 }
 ```

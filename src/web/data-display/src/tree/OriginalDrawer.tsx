@@ -1,18 +1,18 @@
-import Konva from 'konva';
-import { Layer, Stage, Text } from 'react-konva';
+import Konva from "konva";
+import { Layer, Stage, Text } from "react-konva";
 
-import { Config } from '../Config';
-import { toText } from '../dataVisualizerUtils';
-import { ArrowDrawable, BackwardArrowDrawable } from '../drawable/Drawable';
-import { AlreadyParsedTreeNode } from './AlreadyParsedTreeNode';
-import { Tree } from './Tree';
+import { Config } from "../Config";
+import { toText } from "../dataVisualizerUtils";
+import { ArrowDrawable, BackwardArrowDrawable } from "../drawable/Drawable";
+import { AlreadyParsedTreeNode } from "./AlreadyParsedTreeNode";
+import { Tree } from "./Tree";
 import {
   ArrayTreeNode,
   DataTreeNode,
   DrawableTreeNode,
   FunctionTreeNode,
   TreeNode,
-} from './TreeNode';
+} from "./TreeNode";
 
 /**
  * Base tree drawer for original view
@@ -52,8 +52,8 @@ export class OriginalDrawer {
       const text = toText(this.tree.rootNode.data);
       const textConfig = {
         text: text,
-        align: 'center',
-        fontStyle: 'normal',
+        align: "center",
+        fontStyle: "normal",
         fontSize: 20,
         fill: Config.Stroke,
       };
@@ -76,7 +76,7 @@ export class OriginalDrawer {
 
     return (
       <Stage key={key} width={this.width + this.leftMargin} height={this.height + this.topMargin}>
-        <Layer key={x + ', ' + y} offsetX={this.minX} offsetY={this.minY}>
+        <Layer key={x + ", " + y} offsetX={this.minX} offsetY={this.minY}>
           {this.drawables}
         </Layer>
       </Stage>
@@ -130,10 +130,10 @@ export class OriginalDrawer {
           drawnNode.drawableY! - Config.ArrowMarginTop - Config.StrokeWidth / 2,
         );
         arrow = (
-          <BackwardArrowDrawable key={'Arrow (back)' + parentX + x + parentY + y} {...arrowProps} />
+          <BackwardArrowDrawable key={"Arrow (back)" + parentX + x + parentY + y} {...arrowProps} />
         );
       } else {
-        arrow = <ArrowDrawable key={'Arrow' + parentX + x + parentY + y} {...arrowProps} />;
+        arrow = <ArrowDrawable key={"Arrow" + parentX + x + parentY + y} {...arrowProps} />;
       }
       this.drawables.push(arrow);
     }

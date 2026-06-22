@@ -1,8 +1,8 @@
-import type { Data } from './dataVisualizerTypes';
-import { Config } from './Config';
-import type { Step } from './dataVisualizerTypes';
-import { Tree } from './tree/Tree';
-import { DataTreeNode } from './tree/TreeNode';
+import type { Data } from "./dataVisualizerTypes";
+import { Config } from "./Config";
+import type { Step } from "./dataVisualizerTypes";
+import { Tree } from "./tree/Tree";
+import { DataTreeNode } from "./tree/TreeNode";
 
 /**
  * The data visualizer class.
@@ -13,7 +13,7 @@ import { DataTreeNode } from './tree/TreeNode';
  * clear is used by WorkspaceSaga to reset the visualizer after every "Run" button press
  */
 export default class DataVisualizer {
-  private static empty() { }
+  private static empty() {}
   private static setSteps: (step: Step[]) => void = DataVisualizer.empty;
   public static dataRecords: Data[] = [];
   public static isRedraw = false;
@@ -27,14 +27,14 @@ export default class DataVisualizer {
   public static nodeCount: number[] = [];
   public static nodeColor: number[] = [];
   public static longestNodePos: number = 0;
-  public static colorMap: WeakMap<any, number> = new WeakMap();
+  public static colorMap: WeakMap<Array<Data>, number> = new WeakMap();
   public static posMap: WeakMap<any, number> = new WeakMap();
 
   private steps: Step[] = [];
   private nodeLabel = 0;
   private nodeToLabelMap: Map<DataTreeNode, number> = new Map();
 
-  private constructor() { }
+  private constructor() {}
 
   public static isBinaryTree(structures: Data[], data: any): boolean {
     if (structures == null) {
@@ -150,10 +150,10 @@ export default class DataVisualizer {
    * Set the visualization mode. This ensures only one mode is active at a time.
    * @param mode - 'normal' for original view, 'binTree' for binary tree, 'tree' for general tree
    */
-  public static setMode(mode: 'normal' | 'binTree' | 'tree'): void {
-    DataVisualizer.normalMode = mode === 'normal';
-    DataVisualizer.BinTreeMode = mode === 'binTree';
-    DataVisualizer.treeMode = mode === 'tree';
+  public static setMode(mode: "normal" | "binTree" | "tree"): void {
+    DataVisualizer.normalMode = mode === "normal";
+    DataVisualizer.BinTreeMode = mode === "binTree";
+    DataVisualizer.treeMode = mode === "tree";
   }
 
   // RenderBinaryTree
@@ -195,9 +195,8 @@ export default class DataVisualizer {
   }
 
   public static drawData(structures: Data[]): void {
-    
     if (!DataVisualizer.setSteps) {
-      throw new Error('Data visualizer not initialized');
+      throw new Error("Data visualizer not initialized");
     }
     if (!DataVisualizer.isRedraw) {
       this.dataRecords.push(structures);
@@ -220,10 +219,8 @@ export default class DataVisualizer {
       }
     }
     DataVisualizer._instance.addStep(structures);
-    
-    
+
     DataVisualizer.setSteps(DataVisualizer._instance.steps);
-    
   }
 
   public static clearWithData(): void {
@@ -254,7 +251,6 @@ export default class DataVisualizer {
   }
 
   private addStep(structures: Data[]) {
-    
     const step = structures.map((xs, index) => this.createDrawing(xs, index));
     this.steps.push(step);
   }

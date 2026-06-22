@@ -1,5 +1,5 @@
-import { TreeNode } from './BaseTreeNode';
-import { DrawableTreeNode } from './DrawableTreeNode';
+import { TreeNode } from "./BaseTreeNode";
+import { DrawableTreeNode } from "./DrawableTreeNode";
 
 /**
  * Represents a node that is already parsed earlier in the tree.

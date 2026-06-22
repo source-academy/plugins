@@ -18,9 +18,12 @@ import { useEffect, useState } from "react";
 import { Trans, initReactI18next, useTranslation } from "react-i18next";
 import DataVisualizer from "./dataVisualizer";
 import type { Step } from "./dataVisualizerTypes";
+import type { Config } from "@sourceacademy/common-data-display";
+import React from "react";
 
 type Props = {
   workspaceLocation: string;
+  config: Config;
 };
 export function ItalicLink({ href, children }: { href: string; children?: React.ReactNode }) {
   return (
@@ -34,8 +37,7 @@ const translations = {
   defaultText: "The data visualizer helps you to visualize data structures.",
   instructions:
     "It is activated by calling the function <0/>, where <1/> would be the <2/> data structure that you want to visualize and <3/> is the number of structures.",
-  reference:
-    "The data visualizer uses box-and-pointer diagrams, as introduced in <0>Structure and Interpretation of Computer Programs, JavaScript Edition, Chapter 2, Section 2</0>.",
+  reference: "The data visualizer uses box-and-pointer diagrams, as introduced in <0 />.",
   label: "Data Visualizer",
   previous: "Previous",
   next: "Next",
@@ -50,7 +52,7 @@ i18n.use(initReactI18next).init({
   },
 });
 
-function SideContentDataVisualizer({ workspaceLocation }: Props) {
+function SideContentDataVisualizer({ workspaceLocation, config }: Props) {
   const [steps, setSteps] = useState<Step[]>([]);
   const [currentStep, setCurrentStep] = useState(0);
 
@@ -156,7 +158,7 @@ function SideContentDataVisualizer({ workspaceLocation }: Props) {
           ))}
         </div>
       ) : (
-        <DataVisualizerDefaultText />
+        <DataVisualizerDefaultText config={config} />
       )}
       {steps.length > 0 && (
         <>
@@ -246,14 +248,29 @@ function SideContentDataVisualizer({ workspaceLocation }: Props) {
   );
 }
 
-const makeDataVisualizerTabFrom = (location: string): Tab => ({
+const makeDataVisualizerTabFrom = (location: string, config: Config): Tab => ({
   label: i18n.t("label"),
   iconName: IconNames.EYE_OPEN,
-  body: <SideContentDataVisualizer workspaceLocation={location} />,
+  body: <SideContentDataVisualizer workspaceLocation={location} config={config} />,
   id: "dataviz",
 });
 
-function DataVisualizerDefaultText() {
+function parseFunctionCallText(functionCallText: string) {
+  const parts = functionCallText.split(/(x(?:\d+|n))/g);
+  const parsedParts = parts.map((part, index) => {
+    if (index % 2 === 1) {
+      return (
+        <React.Fragment key={index}>
+          x<sub>{part.slice(1)}</sub>
+        </React.Fragment>
+      );
+    }
+    return part;
+  });
+  return <>{...parsedParts}</>;
+}
+
+function DataVisualizerDefaultText({ config }: { config: Config }) {
   const { t } = useTranslation();
   return (
     <p id="data-visualizer-default-text" className={Classes.RUNNING_TEXT}>
@@ -263,9 +280,7 @@ function DataVisualizerDefaultText() {
       <Trans
         i18nKey={"instructions"}
         components={[
-          <code>
-            draw_data(x<sub>1</sub>, x<sub>2</sub>, ... x<sub>n</sub>)
-          </code>,
+          <code>{parseFunctionCallText(config.functionCallText)}</code>,
 
           <code>
             x<sub>k</sub>
@@ -282,8 +297,9 @@ function DataVisualizerDefaultText() {
       <br />
       <Trans
         i18nKey={"reference"}
-        // TODO: fix this
-        components={[<ItalicLink href={"https://github.com/source-academy"} />]}
+        components={[
+          <ItalicLink href={config.sicpTextbookUrl}>{config.sicpTextbookName}</ItalicLink>,
+        ]}
       />
     </p>
   );
