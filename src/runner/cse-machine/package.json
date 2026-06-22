@@ -1,6 +1,6 @@
 {
   "name": "@sourceacademy/runner-cse-machine",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "packageManager": "yarn@4.6.0",
   "description": "The runner-side CSE machine plugin: sends evaluation snapshots to the host",
   "scripts": {
@@ -22,7 +22,7 @@
     }
   },
   "peerDependencies": {
-    "@sourceacademy/common-cse-machine": ">=0.0.1",
+    "@sourceacademy/common-cse-machine": ">=0.1.0",
     "@sourceacademy/conductor": ">=0.3.0"
   },
   "devDependencies": {

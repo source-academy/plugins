@@ -1,6 +1,6 @@
 {
   "name": "@sourceacademy/web-test",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "packageManager": "yarn@4.6.0",
   "description": "The test web plugin for the plugins repository",
   "scripts": {
