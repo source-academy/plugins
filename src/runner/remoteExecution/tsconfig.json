@@ -6,6 +6,8 @@
     "declaration": true,
     "outDir": "./dist",
     "rootDir": ".",
-    "verbatimModuleSyntax": false
+    "verbatimModuleSyntax": false,
+    "noImplicitAny": false,
+    "target": "es2020"
   }
 }
