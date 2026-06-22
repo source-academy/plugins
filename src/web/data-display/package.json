@@ -1,0 +1,59 @@
+{
+  "name": "@sourceacademy/web-data-display",
+  "version": "0.0.1",
+  "packageManager": "yarn@4.6.0",
+  "description": "A web plugin for displaying box-and-pointer diagrams",
+  "scripts": {
+    "build": "rollup -c",
+    "prepack": "yarn build"
+  },
+  "license": "ISC",
+  "files": [
+    "dist"
+  ],
+  "main": "dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "peerDependencies": {
+    "@sourceacademy/common-tabs": "^0.0.1",
+    "@sourceacademy/conductor": ">=0.3.0",
+    "react": "^19",
+    "react-dom": "^19"
+  },
+  "devDependencies": {
+    "@blueprintjs/core": "^6.16.0",
+    "@blueprintjs/icons": "^6.11.0",
+    "@mantine/hooks": "^9.3.1",
+    "@rollup/plugin-commonjs": "^29.0.3",
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "@rollup/plugin-replace": "^6.0.3",
+    "@rollup/plugin-terser": "^1.0.0",
+    "@rollup/plugin-typescript": "^12.3.0",
+    "@sourceacademy/common-data-display": "workspace:^",
+    "@sourceacademy/common-tabs": "workspace:^",
+    "@sourceacademy/conductor": ">=0.3.0",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/react": "^19.2.17",
+    "canvas": "^3.2.3",
+    "classnames": "^2.5.1",
+    "i18next": "^26.3.1",
+    "konva": "^10.3.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-i18next": "^17.0.8",
+    "react-konva": "^19.0.7",
+    "rollup": "^4.60.2",
+    "tslib": "^2.8.1",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
+  }
+}

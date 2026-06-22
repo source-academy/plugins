@@ -7,5 +7,7 @@ export default defineConfig({
       reporter: "lcov",
       exclude: ["**/dist"],
     },
+    environment: "jsdom",
+    setupFiles: ["./vitest-setup.js"],
   },
 });

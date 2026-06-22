@@ -26,6 +26,7 @@
     "sourceMap": false,
     /* The strict flag enables a wide range of type checking behavior that results in stronger guarantees of program correctness. */
     "strict": true,
+    "strictNullChecks": true,
     /* The target setting changes which JS features are downleveled and which are left intact. */
     "target": "es6",
 

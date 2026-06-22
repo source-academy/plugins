@@ -1,0 +1,208 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`actual konva drawables 1`] = `
+[
+  [
+    {
+      "drawables": [
+        {
+          "children": [
+            {
+              "key": ".0",
+              "props": {
+                "color": "black",
+                "nodes": [
+                  {
+                    "data": "1",
+                    "type": "DataTreeNode",
+                  },
+                  {
+                    "data": "2",
+                    "type": "DataTreeNode",
+                  },
+                ],
+                "x": 1,
+                "y": 1,
+              },
+              "type": "ArrayDrawable",
+            },
+          ],
+          "key": ".$1, 1",
+          "type": "Group",
+        },
+      ],
+      "layer": {
+        "offsetX": 0,
+        "offsetY": 0,
+      },
+      "stage": {
+        "height": 33,
+        "width": 93,
+      },
+    },
+  ],
+  [
+    {
+      "drawables": [
+        {
+          "children": [
+            {
+              "key": ".0",
+              "props": {
+                "color": "black",
+                "nodes": [
+                  {
+                    "data": null,
+                    "type": "DataTreeNode",
+                  },
+                ],
+                "x": 1,
+                "y": 1,
+              },
+              "type": "ArrayDrawable",
+            },
+          ],
+          "key": ".$1, 1",
+          "type": "Group",
+        },
+      ],
+      "layer": {
+        "offsetX": 0,
+        "offsetY": 0,
+      },
+      "stage": {
+        "height": 33,
+        "width": 48,
+      },
+    },
+  ],
+  [
+    {
+      "drawables": [
+        {
+          "children": [
+            {
+              "key": ".0",
+              "props": {
+                "color": "black",
+                "nodes": [
+                  {
+                    "data": 1,
+                    "type": "DataTreeNode",
+                  },
+                  {
+                    "actualNode": {
+                      "childCount": 2,
+                      "drawableX": 1,
+                      "drawableY": 1,
+                      "nodeColor": 0,
+                      "nodePos": 0,
+                      "type": "ArrayTreeNode",
+                    },
+                    "type": "AlreadyParsedTreeNode",
+                  },
+                ],
+                "x": 1,
+                "y": 1,
+              },
+              "type": "ArrayDrawable",
+            },
+          ],
+          "key": ".$1, 1",
+          "type": "Group",
+        },
+        {
+          "key": ".$Arrow (back)46111",
+          "props": {
+            "from": {
+              "x": 68.5,
+              "y": 16,
+            },
+            "to": {
+              "x": 1,
+              "y": 1,
+            },
+          },
+          "type": "BackwardArrowDrawable",
+        },
+      ],
+      "layer": {
+        "offsetX": -15,
+        "offsetY": -15,
+      },
+      "stage": {
+        "height": 63,
+        "width": 108,
+      },
+    },
+  ],
+]
+`;
+
+exports[`loading screen (english) 1`] = `
+<div>
+  <div
+    class="sa-data-visualizer bp6-dark"
+  >
+    <p
+      class="bp6-running-text"
+      id="data-visualizer-default-text"
+    >
+      The data visualizer helps you to visualize data structures.
+      <br />
+      <br />
+      It is activated by calling the function 
+      <code>
+        draw_data(
+        x
+        <sub>
+          1
+        </sub>
+        , 
+        x
+        <sub>
+          2
+        </sub>
+        , ..., 
+        x
+        <sub>
+          n
+        </sub>
+        )
+      </code>
+      , where 
+      <code>
+        x
+        <sub>
+          k
+        </sub>
+      </code>
+       would be the 
+      <code>
+        k
+        <sup>
+          th
+        </sup>
+      </code>
+       data structure that you want to visualize and 
+      <code>
+        n
+      </code>
+       is the number of structures.
+      <br />
+      <br />
+      The data visualizer uses box-and-pointer diagrams, as introduced in 
+      <a
+        href="https://sourceacademy.org/sicpjs/2.2.html"
+        rel="noopener noreferrer"
+        target="_blank"
+      >
+        <i>
+          SICP JS Section 2.2
+        </i>
+      </a>
+      .
+    </p>
+  </div>
+</div>
+`;
