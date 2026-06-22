@@ -41,6 +41,13 @@ const translations = {
   label: "Data Visualizer",
   previous: "Previous",
   next: "Next",
+  call: "Call",
+  structure: "Structure",
+  views: {
+    original: "Original View",
+    binaryTree: "Binary Tree View",
+    generalTree: "General Tree View",
+  }
 };
 i18n.use(initReactI18next).init({
   resources: {
@@ -55,6 +62,7 @@ i18n.use(initReactI18next).init({
 function SideContentDataVisualizer({ workspaceLocation, config }: Props) {
   const [steps, setSteps] = useState<Step[]>([]);
   const [currentStep, setCurrentStep] = useState(0);
+  const { t } = useTranslation();
 
   useEffect(() => {
     DataVisualizer.init(steps => {
@@ -108,11 +116,10 @@ function SideContentDataVisualizer({ workspaceLocation, config }: Props) {
             onClick={onPrevButtonClick}
             disabled={firstStep}
           >
-            {/* TODO: i18n */}
-            Previous
+            {t("previous")}
           </Button>
           <h3 className={Classes.TEXT_LARGE}>
-            Call {currentStep + 1}/{steps.length}
+            {t("call")} {currentStep + 1}/{steps.length}
           </h3>
           <Button
             style={{
@@ -125,8 +132,7 @@ function SideContentDataVisualizer({ workspaceLocation, config }: Props) {
             onClick={onNextButtonClick}
             disabled={finalStep}
           >
-            {/* TODO: i18n */}
-            Next
+            {t("next")}
           </Button>
         </div>
       ) : null}
@@ -149,7 +155,7 @@ function SideContentDataVisualizer({ workspaceLocation, config }: Props) {
                     className={classNames(Classes.HEADING, Classes.MONOSPACE_TEXT)}
                     style={{ marginTop: 0, marginBottom: 20, whiteSpace: "nowrap" }}
                   >
-                    Structure {i + 1}
+                    {t("structure")} {i + 1}
                   </h5>
                 )}
                 {elem}
@@ -163,7 +169,7 @@ function SideContentDataVisualizer({ workspaceLocation, config }: Props) {
       {steps.length > 0 && (
         <>
           <ButtonGroup>
-            <Tooltip content="Original View" position="top">
+            <Tooltip content={t("views.original")} position="top">
               <AnchorButton
                 style={{
                   display: "flex",
@@ -190,7 +196,7 @@ function SideContentDataVisualizer({ workspaceLocation, config }: Props) {
             </Tooltip>
           </ButtonGroup>
 
-          <Tooltip content="Binary Tree View" position="top">
+          <Tooltip content={t("views.binaryTree")} position="top">
             <AnchorButton
               style={{
                 display: "flex",
@@ -216,7 +222,7 @@ function SideContentDataVisualizer({ workspaceLocation, config }: Props) {
               </div>
             </AnchorButton>
           </Tooltip>
-          <Tooltip content="General Tree View" position="top">
+          <Tooltip content={t("views.generalTree")} position="top">
             <AnchorButton
               style={{
                 display: "flex",
