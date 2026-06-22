@@ -23,5 +23,3 @@ export abstract class TestPlugin implements IPlugin {
   }
 }
 checkIsPluginClass(TestPlugin);
-
-export { remoteRunnerPlugin } from "../../remoteExecution/index";
