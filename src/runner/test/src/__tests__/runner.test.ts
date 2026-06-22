@@ -18,8 +18,10 @@ test("compiles and processes python code via EV3Engine", async () => {
     close: () => {},
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mockConduit = {} as any;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   new remoteRunnerPlugin(mockConduit, [mockChannel as any]);
 
   await messageHandler({ type: "run", code: "1 + 1" });
