@@ -21,3 +21,6 @@ dist
 
 # Output of the test coverage process
 coverage
+
+# Claude Code
+CLAUDE.md
