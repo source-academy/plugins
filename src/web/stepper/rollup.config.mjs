@@ -1,11 +1,12 @@
-import nodeResolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
+import nodeResolve from "@rollup/plugin-node-resolve";
 import terser from "@rollup/plugin-terser";
 import typescript from "@rollup/plugin-typescript";
 
-// Shared with the host frontend (resolved at runtime via the host's import map), so they are not
-// bundled: this keeps the bundle tiny and, crucially, makes the plugin use the *same* React and
-// Blueprint instances as the frontend — guaranteeing a single React tree and identical styling.
+// React and Blueprint are provided by the host at load time through the require-provider (see the
+// frontend's `requireProvider`), so they are kept external and resolved via `require(...)` calls in
+// the CommonJS output. Everything else (mantine/hooks, classnames, conductor conduit, the common
+// step protocol) is bundled. wrap.mjs then wraps the CJS output into the host's factory contract.
 const external = [
   "react",
   "react-dom",
@@ -20,9 +21,15 @@ const external = [
 export default {
   input: "src/index.ts",
   output: {
-    file: "dist/index.mjs",
-    format: "esm",
+    file: "dist/index.cjs",
+    format: "cjs",
+    exports: "default",
   },
   external,
-  plugins: [nodeResolve({ browser: true, preferBuiltins: false }), commonjs(), typescript(), terser()],
+  plugins: [
+    nodeResolve({ browser: true, preferBuiltins: false }),
+    commonjs(),
+    typescript(),
+    terser(),
+  ],
 };

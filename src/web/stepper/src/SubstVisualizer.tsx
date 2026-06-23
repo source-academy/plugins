@@ -10,7 +10,12 @@ import {
   Slider,
 } from "@blueprintjs/core";
 import { getHotkeyHandler, type HotkeyItem } from "@mantine/hooks";
-import type { SerializedStepperNode, SerializedStepperStep } from "@sourceacademy/common-stepper";
+import type {
+  SerializedStepperNode,
+  SerializedStepperStep,
+  SyntaxProfile,
+  SyntaxTemplatePart,
+} from "@sourceacademy/common-stepper";
 import classNames from "classnames";
 import { useCallback, useEffect, useState } from "react";
 
@@ -35,9 +40,9 @@ function SubstDefaultText() {
         dragging the slider above to see its evaluation.
         <br />
         <br />
-        On even-numbered steps, the part of the program that will be evaluated next is highlighted in
-        yellow. On odd-numbered steps, the result of the evaluation is highlighted in green. You can
-        change the maximum steps limit (500-5000, default 1000) in the control bar.
+        On even-numbered steps, the part of the program that will be evaluated next is highlighted
+        in yellow. On odd-numbered steps, the result of the evaluation is highlighted in green. You
+        can change the maximum steps limit (500-5000, default 1000) in the control bar.
         <br />
         <br />
         <Divider />
@@ -70,6 +75,8 @@ function SubstCodeDisplay(props: { content: string }) {
 
 type StepperViewProps = {
   content: SerializedStepperStep[];
+  /** The active language's rendering rules; when absent, the default (Source) syntax is used. */
+  profile?: SyntaxProfile;
 };
 
 /**
@@ -172,14 +179,22 @@ export default function StepperView(props: StepperViewProps) {
       />
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
         <ButtonGroup>
-          <Button disabled={!hasRunCode} icon="double-chevron-left" onClick={stepPreviousBreakpoint} />
+          <Button
+            disabled={!hasRunCode}
+            icon="double-chevron-left"
+            onClick={stepPreviousBreakpoint}
+          />
           <Button disabled={!hasRunCode} icon="chevron-left" onClick={stepPrevious} />
           <Button disabled={!hasRunCode} icon="chevron-right" onClick={stepNext} />
           <Button disabled={!hasRunCode} icon="double-chevron-right" onClick={stepNextBreakpoint} />
         </ButtonGroup>
       </div>{" "}
       <br />
-      {hasRunCode ? <CustomASTRenderer {...getAST(stepValue)} /> : <SubstDefaultText />}
+      {hasRunCode ? (
+        <CustomASTRenderer {...getAST(stepValue)} profile={props.profile} />
+      ) : (
+        <SubstDefaultText />
+      )}
       {hasRunCode ? <SubstCodeDisplay content={getExplanation(stepValue)} /> : null}
     </div>
   );
@@ -198,6 +213,25 @@ interface RenderContext {
   isRight?: boolean; // specified for binary expression
   styleWrapper: StyleWrapper;
   popoverDepth?: number;
+  /**
+   * The active language's rendering rules. When present, nodes are rendered generically from their
+   * template (see {@link renderNode}); when absent, the built-in Source/JavaScript renderers are
+   * used. Threaded so a whole tree renders in one language.
+   */
+  profile?: SyntaxProfile;
+}
+
+/** Maps a profile token class to the stepper's CSS colour class. */
+const TOKEN_CLASS: Record<string, string> = {
+  operator: "stepper-operator",
+  identifier: "stepper-identifier",
+  literal: "stepper-literal",
+  conditional: "stepper-conditional-operator",
+};
+
+/** Reads a node property by a (possibly dotted, e.g. `"id.name"`) path, for profile `prop` parts. */
+function readNodeProp(node: StepperNode, path: string): unknown {
+  return path.split(".").reduce<any>((value, key) => (value == null ? value : value[key]), node);
 }
 
 type StyleWrapper = (node: StepperNode) => (preformatted: React.ReactNode) => React.ReactNode;
@@ -262,7 +296,10 @@ function FunctionDefinitionPopoverContent({
 /**
  * renderNode renders a serialized Stepper AST node to a React ReactNode.
  */
-function renderNode(currentNode: StepperNode | null | undefined, renderContext: RenderContext): React.ReactNode {
+function renderNode(
+  currentNode: StepperNode | null | undefined,
+  renderContext: RenderContext,
+): React.ReactNode {
   if (currentNode == null) return null;
   const styleWrapper = renderContext.styleWrapper;
   const popoverDepth = renderContext.popoverDepth ?? 0;
@@ -632,16 +669,109 @@ function renderNode(currentNode: StepperNode | null | undefined, renderContext: 
     return renderedArguments;
   };
 
-  // Entry point of rendering
-  const renderer = (renderers as unknown as Record<string, (node: StepperNode) => React.ReactNode>)[
-    currentNode.type
-  ];
+  // Renders a node generically from a language profile's template (see SyntaxProfile). The host
+  // knows no grammar: each part emits literal text or recurses into a child (itself rendered via the
+  // profile), so any language renders with zero host-side, language-specific code. Only `child`
+  // parts establish a parenthesisation context; list/block/line items intentionally do not.
+  const renderTemplate = (node: StepperNode, template: SyntaxTemplatePart[]): React.ReactNode => {
+    const childContext = (extra: Partial<RenderContext>): RenderContext => ({
+      styleWrapper,
+      popoverDepth,
+      profile: renderContext.profile,
+      ...extra,
+    });
+    const cls = (c?: string) => (c ? TOKEN_CLASS[c] : undefined);
+    const renderPart = (part: SyntaxTemplatePart, key: number): React.ReactNode => {
+      if (typeof part === "string") return <span key={key}>{part}</span>;
+      if ("token" in part)
+        return (
+          <span key={key} className={cls(part.cls)}>
+            {part.token}
+          </span>
+        );
+      if ("prop" in part) {
+        const value = readNodeProp(node, part.prop);
+        return (
+          <span key={key} className={cls(part.cls)}>
+            {value == null ? "" : String(value)}
+          </span>
+        );
+      }
+      if ("child" in part) {
+        const child = node[part.child] as StepperNode | null | undefined;
+        return (
+          <span key={key}>
+            {renderNode(child, childContext({ parentNode: node, isRight: part.isRight }))}
+          </span>
+        );
+      }
+      if ("list" in part) {
+        const items = (node[part.list] as StepperNode[] | undefined) ?? [];
+        if (items.length === 0) return null;
+        return (
+          <span key={key}>
+            {part.prefix}
+            {items.map((item, i) => (
+              <span key={i}>
+                {i !== 0 ? part.sep : null}
+                {renderNode(item, childContext({}))}
+              </span>
+            ))}
+          </span>
+        );
+      }
+      if ("block" in part) {
+        const items = (node[part.block] as StepperNode[] | undefined) ?? [];
+        return (
+          <span key={key}>
+            {items.map((item, i) => (
+              <div key={i} style={{ marginLeft: "15px" }}>
+                {renderNode(item, childContext({}))}
+              </div>
+            ))}
+          </span>
+        );
+      }
+      if ("lines" in part) {
+        const items = (node[part.lines] as StepperNode[] | undefined) ?? [];
+        return (
+          <span key={key}>
+            {items.map((item, i) => (
+              <div key={i}>{renderNode(item, childContext({}))}</div>
+            ))}
+          </span>
+        );
+      }
+      if ("when" in part) {
+        return node[part.when] ? (
+          <span key={key}>{part.parts.map((p, i) => renderPart(p, i))}</span>
+        ) : null;
+      }
+      return null;
+    };
+    return <span>{template.map((part, i) => renderPart(part, i))}</span>;
+  };
+
+  // Entry point of rendering. With a language profile, render the node generically from its
+  // template; otherwise fall back to the built-in Source/JavaScript renderers above.
+  const profile = renderContext.profile;
+  const template = profile?.templates[currentNode.type];
   const isParenthesis = expressionNeedsParenthesis(
     currentNode,
     renderContext.parentNode,
     renderContext.isRight,
+    profile,
   );
-  let result: React.ReactNode = renderer ? renderer(currentNode) : `<${currentNode.type}>`; // For debugging in case some AST renderer has not been implemented yet
+  let result: React.ReactNode;
+  if (profile) {
+    // A profile is authoritative: never fall back to JS syntax for an unmapped node type.
+    result = template ? renderTemplate(currentNode, template) : `<${currentNode.type}>`;
+  } else {
+    const renderer = (
+      renderers as unknown as Record<string, (node: StepperNode) => React.ReactNode>
+    )[currentNode.type];
+    result = renderer ? renderer(currentNode) : `<${currentNode.type}>`; // For debugging in case some AST renderer has not been implemented yet
+  }
   if (isParenthesis) {
     result = (
       <span>
@@ -662,7 +792,9 @@ function renderNode(currentNode: StepperNode | null | undefined, renderContext: 
 /**
  * A React component that handles rendering of a single step's AST + markers.
  */
-function CustomASTRenderer(props: SerializedStepperStep): React.ReactNode {
+function CustomASTRenderer(
+  props: SerializedStepperStep & { profile?: SyntaxProfile },
+): React.ReactNode {
   const getDisplayedNode = useCallback((): React.ReactNode => {
     function markerStyleWrapper(node: StepperNode) {
       // eslint-disable-next-line react/display-name
@@ -687,6 +819,7 @@ function CustomASTRenderer(props: SerializedStepperStep): React.ReactNode {
     return renderNode(props.ast, {
       styleWrapper: markerStyleWrapper,
       popoverDepth: 0,
+      profile: props.profile,
     });
   }, [props]);
   return <div className="stepper-display">{getDisplayedNode()}</div>;
@@ -700,17 +833,25 @@ function expressionNeedsParenthesis(
   node: StepperNode,
   parentNode?: StepperNode,
   isRightHand?: boolean,
+  profile?: SyntaxProfile,
 ) {
   if (parentNode === undefined) {
     return false;
   }
 
-  const nodePrecedence = EXPRESSIONS_PRECEDENCE[node.type as keyof typeof EXPRESSIONS_PRECEDENCE];
+  // A profile supplies its language's precedence; otherwise use the built-in JavaScript tables.
+  const exprPrecedence = profile?.expressionPrecedence ?? EXPRESSIONS_PRECEDENCE;
+  const opPrecedence = profile?.operatorPrecedence ?? OPERATOR_PRECEDENCE;
+
+  const nodePrecedence = exprPrecedence[node.type as keyof typeof exprPrecedence] as
+    | number
+    | undefined;
   if (nodePrecedence === NEEDS_PARENTHESES) {
     return true;
   }
-  const parentNodePrecedence =
-    EXPRESSIONS_PRECEDENCE[parentNode.type as keyof typeof EXPRESSIONS_PRECEDENCE];
+  const parentNodePrecedence = exprPrecedence[parentNode.type as keyof typeof exprPrecedence] as
+    | number
+    | undefined;
   if (nodePrecedence === undefined || parentNodePrecedence === undefined) {
     return false;
   }
@@ -742,10 +883,9 @@ function expressionNeedsParenthesis(
     return true;
   }
 
-  const nodeOperatorPrecedence =
-    OPERATOR_PRECEDENCE[node.operator as keyof typeof OPERATOR_PRECEDENCE];
+  const nodeOperatorPrecedence = opPrecedence[node.operator as keyof typeof opPrecedence];
   const parentNodeOperatorPrecedence =
-    OPERATOR_PRECEDENCE[parentNode.operator as keyof typeof OPERATOR_PRECEDENCE];
+    opPrecedence[parentNode.operator as keyof typeof opPrecedence];
   return isRightHand
     ? nodeOperatorPrecedence <= parentNodeOperatorPrecedence
     : nodeOperatorPrecedence <= parentNodeOperatorPrecedence;

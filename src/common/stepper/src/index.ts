@@ -75,6 +75,65 @@ export interface SerializedStepperStep {
 }
 
 /* -------------------------------------------------------------------------- */
+/*                              Syntax profiles                               */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * The serialized stepper AST is structural (estree-shaped) and language-agnostic — node `type`s and
+ * field names are shared across languages, but the *surface syntax* (keywords, punctuation, layout)
+ * is not. A {@link SyntaxProfile} is the data a language's runner ships so the host can render that
+ * language's syntax **without any per-language code in the host**: the host is a generic interpreter
+ * of these profiles. A new language becomes renderable by providing a profile and registering its
+ * runner — the host is never edited. When no profile is supplied, the host falls back to its default
+ * (Source/JavaScript) renderer.
+ *
+ * Everything here is plain JSON so it can cross the runner→host channel.
+ */
+
+/** A CSS class hint for a rendered token, mapped by the host to its stepper colour classes. */
+export type StepperTokenClass = "operator" | "identifier" | "literal" | "conditional";
+
+/**
+ * One piece of a node's render template. A template is an ordered list of parts; the host emits each
+ * part in order, recursing into child nodes (which are themselves rendered via the profile), so the
+ * generic interpreter never needs to know any language's grammar.
+ *
+ *  - `string` — a literal token, rendered as-is.
+ *  - `{ token, cls? }` — a literal token with an optional style class (e.g. a keyword/operator).
+ *  - `{ prop, cls? }` — the node's own (possibly dotted, e.g. `"id.name"`) property, as text.
+ *  - `{ child, isRight? }` — recurse into `node[child]` (a single child node); a `null` child renders
+ *    nothing. `isRight` marks the right operand of a binary/logical node so the host parenthesises
+ *    with the correct associativity. Only `child` parts establish a parenthesisation context.
+ *  - `{ list, sep, prefix?, cls? }` — render each node in the `node[list]` array, joined by `sep`;
+ *    `prefix` is emitted before the list only when it is non-empty (e.g. a leading space).
+ *  - `{ block }` — render the `node[block]` array as an indented suite (one statement per line).
+ *  - `{ lines }` — render the `node[lines]` array one-per-line without extra indentation (the root).
+ *  - `{ when, parts }` — render `parts` only when `node[when]` is present (e.g. an optional `else`).
+ */
+export type SyntaxTemplatePart =
+  | string
+  | { token: string; cls?: StepperTokenClass }
+  | { prop: string; cls?: StepperTokenClass }
+  | { child: string; isRight?: boolean }
+  | { list: string; sep: string; prefix?: string; cls?: StepperTokenClass }
+  | { block: string }
+  | { lines: string }
+  | { when: string; parts: SyntaxTemplatePart[] };
+
+/**
+ * A language's complete rendering rules: a per-node-type template table plus the precedence maps the
+ * host uses to insert parentheses generically. Authored once per language and shipped by its runner.
+ */
+export interface SyntaxProfile {
+  /** node `type` → render template. A type with no template renders as a `<type>` placeholder. */
+  templates: Record<string, SyntaxTemplatePart[]>;
+  /** Operator string → precedence, used for parenthesising binary/logical operands. */
+  operatorPrecedence?: Record<string, number>;
+  /** Node `type` → precedence, used for parenthesising sub-expressions. */
+  expressionPrecedence?: Record<string, number>;
+}
+
+/* -------------------------------------------------------------------------- */
 /*                              Channel protocol                              */
 /* -------------------------------------------------------------------------- */
 
@@ -82,6 +141,11 @@ export interface SerializedStepperStep {
 export interface StepperStepsMessage {
   type: "steps";
   steps: SerializedStepperStep[];
+  /**
+   * The language's rendering rules. Optional and run-level (the same for every step). When absent,
+   * the host renders with its default (Source/JavaScript) syntax. See {@link SyntaxProfile}.
+   */
+  profile?: SyntaxProfile;
 }
 
 /** Runner → host: stepping failed (e.g. a parse error). */

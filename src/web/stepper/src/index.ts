@@ -1,4 +1,4 @@
-// Conductor's external-plugin loader imports the bundle and reads its `plugin` export, so the host
-// plugin class must be exported under that name.
-export { StepperHostPlugin as plugin } from "./StepperHostPlugin";
-export type { PluginTab } from "./StepperHostPlugin";
+// The host's external-plugin loader imports the bundle and calls its default export as a factory
+// (`default(requireProvider) => PluginClass`); the build wraps this CommonJS output accordingly (see
+// wrap.mjs). So the entry default-exports the plugin class, which becomes the bundle's `module.exports`.
+export { StepperHostPlugin as default } from "./StepperHostPlugin";

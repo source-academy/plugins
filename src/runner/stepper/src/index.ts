@@ -3,6 +3,7 @@ import {
   STEPPER_CHANNEL_ID,
   type SerializedStepperStep,
   type StepperMessage,
+  type SyntaxProfile,
 } from "@sourceacademy/common-stepper";
 import { IChannel, IConduit, IPlugin } from "@sourceacademy/conductor/conduit";
 
@@ -30,17 +31,28 @@ export abstract class BaseStepperRunnerPlugin<TAst = unknown> implements IPlugin
   /** The steps from the most recent {@link sendSteps} call, replayed on host request. */
   private __lastSteps: SerializedStepperStep[] = [];
 
-  constructor(
-    _conduit: IConduit,
-    [stepperChannel]: IChannel<StepperMessage>[],
-  ) {
+  constructor(_conduit: IConduit, [stepperChannel]: IChannel<StepperMessage>[]) {
     this.__stepperChannel = stepperChannel;
     this.__stepperChannel.subscribe(message => {
       // The host re-opened the stepper tab and wants the latest steps without a re-run.
       if (message.type === "request") {
-        this.__stepperChannel.send({ type: "steps", steps: this.__lastSteps });
+        this.__stepperChannel.send({
+          type: "steps",
+          steps: this.__lastSteps,
+          profile: this.getSyntaxProfile(),
+        });
       }
     });
+  }
+
+  /**
+   * The language's rendering rules, shipped to the host so it can display this language's surface
+   * syntax with no per-language host code. The default returns `undefined`, leaving the host on its
+   * built-in (Source/JavaScript) renderer; a concrete language overrides this to return its profile.
+   * See `SyntaxProfile`.
+   */
+  protected getSyntaxProfile(): SyntaxProfile | undefined {
+    return undefined;
   }
 
   /**
@@ -64,7 +76,7 @@ export abstract class BaseStepperRunnerPlugin<TAst = unknown> implements IPlugin
     try {
       const steps = await this.getSteps(ast);
       this.__lastSteps = steps;
-      this.__stepperChannel.send({ type: "steps", steps });
+      this.__stepperChannel.send({ type: "steps", steps, profile: this.getSyntaxProfile() });
     } catch (error) {
       this.__stepperChannel.send({
         type: "error",
