@@ -11,6 +11,9 @@ module.exports = {
       },
     ],
   },
-  testPathIgnorePatterns: [".*?dist/"],
+  transformIgnorePatterns: [
+    "node_modules/(?!(py-slang)/)"
+  ],
+  testPathIgnorePatterns: ["/dist/"],
   coverageReporters: ["lcov"],
 };
