@@ -7,5 +7,6 @@ export default defineConfig({
       reporter: "lcov",
       exclude: ["**/dist"],
     },
+    include: ["src/**/*.test.ts"],
   },
 });
