@@ -1,7 +1,7 @@
 {
   "name": "@sourceacademy/web-stepper",
   "version": "0.0.1",
-  "packageManager": "yarn@4.6.0",
+  "packageManager": "yarn@4.17.0",
   "description": "Host (web) plugin for the Source Academy stepper: renders evaluation steps",
   "scripts": {
     "build": "rollup -c && node wrap.mjs",

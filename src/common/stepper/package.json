@@ -1,7 +1,7 @@
 {
   "name": "@sourceacademy/common-stepper",
   "version": "0.0.1",
-  "packageManager": "yarn@4.6.0",
+  "packageManager": "yarn@4.17.0",
   "description": "Shared, language-agnostic protocol for the Source Academy stepper plugin pair",
   "scripts": {
     "build": "rollup -c",

@@ -1,7 +1,7 @@
 {
   "name": "@sourceacademy/common-tabs",
   "version": "0.0.1",
-  "packageManager": "yarn@4.6.0",
+  "packageManager": "yarn@4.17.0",
   "description": "Common utilities for tab loading in Source Academy",
   "scripts": {
     "build": "rollup -c",
