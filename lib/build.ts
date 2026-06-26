@@ -80,6 +80,9 @@ async function generateManifest() {
 async function spawnPromise(...args: Parameters<typeof spawn>) {
   return new Promise<void>((resolve, reject) => {
     const child = spawn(...args);
+    child.on("error", err => {
+      reject(err);
+    });
     child.on("close", code => {
       if (code === 0) {
         resolve();
