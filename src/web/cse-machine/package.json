@@ -1,7 +1,7 @@
 {
   "name": "@sourceacademy/web-cse-machine",
   "version": "1.0.0",
-  "packageManager": "yarn@4.6.0",
+  "packageManager": "yarn@4.17.0",
   "description": "The web/host-side CSE machine plugin: receives evaluation snapshots for rendering",
   "scripts": {
     "build": "rollup -c",

@@ -1,7 +1,7 @@
 {
   "name": "@sourceacademy/runner-cse-machine",
   "version": "1.0.0",
-  "packageManager": "yarn@4.6.0",
+  "packageManager": "yarn@4.17.0",
   "description": "The runner-side CSE machine plugin: sends evaluation snapshots to the host",
   "scripts": {
     "build": "rollup -c",
