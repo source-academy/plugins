@@ -2,7 +2,7 @@ import { CHANNEL_ID, RUNNER_ID, type PySlangMessage } from "@sourceacademy/commo
 import type { IPlugin, IChannel, IConduit } from "@sourceacademy/conductor/conduit";
 import { EV3Engine } from "py-slang/src/engines/ev3/EV3Engine";
 
-export class remoteRunnerPlugin implements IPlugin {
+export class RemoteRunnerPlugin implements IPlugin {
   readonly id: string = RUNNER_ID;
   static readonly channelAttach = [CHANNEL_ID];
   private readonly __channel: IChannel<PySlangMessage>;
@@ -15,9 +15,16 @@ export class remoteRunnerPlugin implements IPlugin {
 
     this.__channel.subscribe(async message => {
       if (message.type === "run") {
-        const result = await this.engine.execute(message.code);
-        console.log("Engine response:", result);
-        this.__channel.send({ type: "result", output: JSON.stringify(result) });
+        try {
+          const result = await this.engine.execute(message.code);
+          console.log("Engine response:", result);
+          this.__channel.send({ type: "result", output: JSON.stringify(result) });
+        } catch (error: any) {
+          this.__channel.send({
+            type: "error",
+            message: error?.message ?? String(error)
+          });
+        }
       }
     });
   }
