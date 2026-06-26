@@ -5,7 +5,7 @@ import {
   type StepperMessage,
   type SyntaxProfile,
 } from "@sourceacademy/common-stepper";
-import { IChannel, IConduit, IPlugin } from "@sourceacademy/conductor/conduit";
+import type { IChannel, IConduit, IPlugin } from "@sourceacademy/conductor/conduit";
 
 /**
  * The language-agnostic runner half of the stepper.

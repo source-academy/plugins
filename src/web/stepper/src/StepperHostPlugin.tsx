@@ -59,14 +59,13 @@ export class StepperHostPlugin implements IPlugin {
     // Ask the runner to replay any steps it already computed (e.g. tab opened after a run).
     this.__stepperChannel.send({ type: "request" });
 
-    const plugin = this;
+    const subscribe = (listener: () => void) => this.subscribe(listener);
+    const getSteps = () => this.getSteps();
+    const getProfile = () => this.getProfile();
     function StepperTab() {
-      const steps = useSyncExternalStore(
-        listener => plugin.subscribe(listener),
-        () => plugin.getSteps(),
-      );
+      const steps = useSyncExternalStore(subscribe, getSteps);
       // The profile updates together with the steps (same message), so reading it here is current.
-      return createElement(StepperView, { content: steps, profile: plugin.getProfile() });
+      return createElement(StepperView, { content: steps, profile: getProfile() });
     }
 
     const tab: Tab = {

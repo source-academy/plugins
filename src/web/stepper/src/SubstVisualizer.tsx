@@ -27,6 +27,7 @@ import { injectStepperStyles } from "./styles";
  * language-specific fields (e.g. `left`, `operator`, `params`) without per-node typing, exactly as
  * the original (class-based) renderer did after casting.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- language-specific AST fields are read untyped, exactly as the original class-based renderer did after casting
 type StepperNode = SerializedStepperNode & Record<string, any>;
 
 function SubstDefaultText() {
@@ -238,7 +239,12 @@ const TOKEN_CLASS: Record<string, string> = {
 
 /** Reads a node property by a (possibly dotted, e.g. `"id.name"`) path, for profile `prop` parts. */
 function readNodeProp(node: StepperNode, path: string): unknown {
-  return path.split(".").reduce<any>((value, key) => (value == null ? value : value[key]), node);
+  return path
+    .split(".")
+    .reduce<unknown>(
+      (value, key) => (value == null ? value : (value as Record<string, unknown>)[key]),
+      node,
+    );
 }
 
 type StyleWrapper = (node: StepperNode) => (preformatted: React.ReactNode) => React.ReactNode;
@@ -352,8 +358,8 @@ function renderNode(
   const popoverDepth = renderContext.popoverDepth ?? 0;
   const renderers = {
     Literal(node: StepperNode) {
-      const stringifyLiteralValue = (value: any) =>
-        typeof value === "string" ? '"' + value + '"' : value !== null ? value.toString() : "null";
+      const stringifyLiteralValue = (value: unknown) =>
+        typeof value === "string" ? '"' + value + '"' : value !== null ? String(value) : "null";
       return (
         <span className="stepper-literal">
           {node.raw ? node.raw : stringifyLiteralValue(node.value)}
@@ -913,7 +919,6 @@ function CustomASTRenderer(
 ): React.ReactNode {
   const getDisplayedNode = useCallback((): React.ReactNode => {
     function markerStyleWrapper(node: StepperNode) {
-      // eslint-disable-next-line react/display-name
       return (rendered: React.ReactNode) => {
         if (props.markers === undefined) {
           return rendered;
