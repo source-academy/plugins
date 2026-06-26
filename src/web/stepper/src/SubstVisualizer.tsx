@@ -11,6 +11,7 @@ import {
 } from "@blueprintjs/core";
 import { getHotkeyHandler, type HotkeyItem } from "@mantine/hooks";
 import type {
+  FunctionValueRule,
   SerializedStepperNode,
   SerializedStepperStep,
   SyntaxProfile,
@@ -219,6 +220,12 @@ interface RenderContext {
    * used. Threaded so a whole tree renders in one language.
    */
   profile?: SyntaxProfile;
+  /**
+   * Forces a named function value to render its full body (its template) rather than collapsing to a
+   * mu-term. Set only when rendering the contents of a function-definition popover, so the popover
+   * shows the body while every other occurrence stays collapsed. See {@link SyntaxProfile.functionValues}.
+   */
+  expandFunctionValue?: boolean;
 }
 
 /** Maps a profile token class to the stepper's CSS colour class. */
@@ -285,6 +292,46 @@ function FunctionDefinitionPopoverContent({
             {renderNode(node.body, {
               styleWrapper: styleWrapper ?? (_node => p => p),
               popoverDepth: popoverDepth + 1,
+            })}
+          </code>
+        </pre>
+      </div>
+    </div>
+  );
+}
+
+interface ProfileFunctionDefinitionPopoverProps {
+  node: StepperNode;
+  wrapper: StyleWrapper | undefined;
+  popoverDepth: number;
+  profile?: SyntaxProfile;
+}
+
+/**
+ * The popover body for a profile-rendered (e.g. Python) function value: the function's full
+ * definition, rendered from its own template (forced-expanded), inside the same chrome the built-in
+ * popover uses. This is a **component** (not an eagerly-computed node) so React renders it lazily —
+ * only when the popover actually opens — which keeps a *recursive* function's nested popovers from
+ * expanding forever at render time (each level renders on hover, exactly like the built-in popover).
+ */
+function ProfileFunctionDefinitionPopover({
+  node,
+  wrapper,
+  popoverDepth,
+  profile,
+}: ProfileFunctionDefinitionPopoverProps) {
+  return (
+    <div className={classNames("stepper-popover", Classes.DARK)}>
+      <div className="stepper-display">
+        <Icon icon="code" />
+        <span>{" Function definition"}</span>
+        <pre className={Classes.CODE_BLOCK}>
+          <code>
+            {renderNode(node, {
+              styleWrapper: wrapper ?? (_n => p => p),
+              popoverDepth: popoverDepth + 1,
+              profile,
+              expandFunctionValue: true,
             })}
           </code>
         </pre>
@@ -752,11 +799,71 @@ function renderNode(
     return <span>{template.map((part, i) => renderPart(part, i))}</span>;
   };
 
-  // Entry point of rendering. With a language profile, render the node generically from its
-  // template; otherwise fall back to the built-in Source/JavaScript renderers above.
+  // Profile-driven function *values* (mu-term + popover), mirroring the built-in
+  // ArrowFunctionExpression behaviour for any language that declares its function-value node types
+  // (see SyntaxProfile.functionValues). A named function value collapses to its name with a hover
+  // popover showing its full definition; an anonymous one renders inline from its template.
+  const functionValueRuleFor = (type: string): FunctionValueRule | undefined =>
+    renderContext.profile?.functionValues?.find(rule => rule.type === type);
+
+  // Renders a named function value collapsed as its name, with a hover popover showing its body. The
+  // popover content is a component element (lazily rendered), never an eagerly-computed node, so a
+  // recursive function's nested popovers do not expand forever at render time.
+  const renderProfileFunctionValue = (funcNode: StepperNode, funcName: string): React.ReactNode => {
+    // Recursive hovering: identifiers in the body that refer back to this function (by name) are
+    // themselves wrapped in the same popover, so a recursive definition stays explorable.
+    const muTermWrapper: StyleWrapper = (targetNode: StepperNode) =>
+      targetNode.type === "Identifier" && targetNode.name === funcName
+        ? (preprocessed: React.ReactNode) => (
+            <span className="stepper-mu-term">
+              <Popover
+                interactionKind="hover"
+                placement="bottom"
+                usePortal={popoverDepth === 0}
+                lazy
+                popoverClassName="stepper-popover"
+                content={
+                  <ProfileFunctionDefinitionPopover
+                    node={funcNode}
+                    wrapper={composeStyleWrapper(styleWrapper, muTermWrapper)}
+                    popoverDepth={popoverDepth}
+                    profile={renderContext.profile}
+                  />
+                }
+              >
+                {preprocessed}
+              </Popover>
+            </span>
+          )
+        : (preprocessed: React.ReactNode) => preprocessed;
+
+    return (
+      <span className="stepper-mu-term">
+        <Popover
+          interactionKind="hover"
+          placement="bottom"
+          usePortal={popoverDepth === 0}
+          lazy
+          content={
+            <ProfileFunctionDefinitionPopover
+              node={funcNode}
+              wrapper={composeStyleWrapper(styleWrapper, muTermWrapper)}
+              popoverDepth={popoverDepth}
+              profile={renderContext.profile}
+            />
+          }
+        >
+          {funcName}
+        </Popover>
+      </span>
+    );
+  };
+
+  // Entry point of rendering. With a language profile, render the node generically from its template
+  // (collapsing a named function value to a mu-term); otherwise fall back to the built-in
+  // Source/JavaScript renderers above.
   const profile = renderContext.profile;
-  const template = profile?.templates[currentNode.type];
-  const isParenthesis = expressionNeedsParenthesis(
+  let isParenthesis = expressionNeedsParenthesis(
     currentNode,
     renderContext.parentNode,
     renderContext.isRight,
@@ -764,8 +871,17 @@ function renderNode(
   );
   let result: React.ReactNode;
   if (profile) {
-    // A profile is authoritative: never fall back to JS syntax for an unmapped node type.
-    result = template ? renderTemplate(currentNode, template) : `<${currentNode.type}>`;
+    const functionRule = functionValueRuleFor(currentNode.type);
+    const funcName = functionRule ? readNodeProp(currentNode, functionRule.nameProp) : undefined;
+    if (functionRule && funcName != null && funcName !== "" && !renderContext.expandFunctionValue) {
+      // A named function value: collapse to a mu-term. It is atomic, so never parenthesised.
+      result = renderProfileFunctionValue(currentNode, String(funcName));
+      isParenthesis = false;
+    } else {
+      // A profile is authoritative: never fall back to JS syntax for an unmapped node type.
+      const template = profile.templates[currentNode.type];
+      result = template ? renderTemplate(currentNode, template) : `<${currentNode.type}>`;
+    }
   } else {
     const renderer = (
       renderers as unknown as Record<string, (node: StepperNode) => React.ReactNode>

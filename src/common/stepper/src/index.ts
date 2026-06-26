@@ -121,6 +121,27 @@ export type SyntaxTemplatePart =
   | { when: string; parts: SyntaxTemplatePart[] };
 
 /**
+ * Declares a node type as a "function value" in the substitution model and where to read its name.
+ *
+ * A function value that carries a name is rendered collapsed as that name — a bold "mu-term" — with
+ * a hover popover showing its full definition (the node's own template); an anonymous one is rendered
+ * inline from its template. This mirrors Source's stepper, where a named (possibly recursive) function
+ * shows as just its name and you hover to reveal the body, so a substituted function never expands its
+ * whole body inline at every use. The host implements this generically from these rules, so any
+ * language gets the behaviour by listing its function-value node types — no per-language host code.
+ */
+export interface FunctionValueRule {
+  /** The node `type` this applies to, e.g. `"ArrowFunctionExpression"` or `"FunctionDeclaration"`. */
+  type: string;
+  /**
+   * Dotted path to the property holding the mu-term name (e.g. `"name"`, or `"id.name"` for a node
+   * whose name is on a child `id`). When the path resolves to an empty value the function is treated
+   * as anonymous and rendered inline.
+   */
+  nameProp: string;
+}
+
+/**
  * A language's complete rendering rules: a per-node-type template table plus the precedence maps the
  * host uses to insert parentheses generically. Authored once per language and shipped by its runner.
  */
@@ -131,6 +152,11 @@ export interface SyntaxProfile {
   operatorPrecedence?: Record<string, number>;
   /** Node `type` → precedence, used for parenthesising sub-expressions. */
   expressionPrecedence?: Record<string, number>;
+  /**
+   * Node types that are function values in the substitution model. A named one renders as a
+   * collapsed mu-term + hover popover instead of expanding its body inline. See {@link FunctionValueRule}.
+   */
+  functionValues?: FunctionValueRule[];
 }
 
 /* -------------------------------------------------------------------------- */
