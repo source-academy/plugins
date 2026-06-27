@@ -9,7 +9,11 @@ import {
 import type { IChannel, IConduit } from "@sourceacademy/conductor/conduit";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const makeChannel = () => ({ send: vi.fn() }) as unknown as IChannel<any>;
+const makeChannel = () => {
+  const send = vi.fn();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return { send } as unknown as IChannel<any> & { send: typeof send };
+};
 const makePlugin = (ch = makeChannel()) => new CseMachinePlugin({} as IConduit, [ch]);
 
 const minimalSnapshot = (): CseSnapshot => ({
@@ -56,9 +60,7 @@ describe("sendSnapshots", () => {
     const channel = makeChannel();
     const plugin = makePlugin(channel);
     plugin.sendSnapshots([minimalSnapshot()]);
-    expect((channel.send as ReturnType<typeof vi.fn>).mock.calls[0][0].type).toBe(
-      CSE_MESSAGE_TYPE_SNAPSHOTS,
-    );
+    expect(channel.send.mock.calls[0][0].type).toBe(CSE_MESSAGE_TYPE_SNAPSHOTS);
   });
 
   test("sends snapshots unchanged", () => {
@@ -66,9 +68,7 @@ describe("sendSnapshots", () => {
     const plugin = makePlugin(channel);
     const snapshots = [minimalSnapshot()];
     plugin.sendSnapshots(snapshots);
-    expect((channel.send as ReturnType<typeof vi.fn>).mock.calls[0][0].snapshots).toEqual(
-      snapshots,
-    );
+    expect(channel.send.mock.calls[0][0].snapshots).toEqual(snapshots);
   });
 
   test("sets totalSteps to the length of the snapshots array", () => {
@@ -76,7 +76,7 @@ describe("sendSnapshots", () => {
     const plugin = makePlugin(channel);
     const snapshots = [minimalSnapshot(), { ...minimalSnapshot(), stepIndex: 1 }];
     plugin.sendSnapshots(snapshots);
-    expect((channel.send as ReturnType<typeof vi.fn>).mock.calls[0][0].totalSteps).toBe(2);
+    expect(channel.send.mock.calls[0][0].totalSteps).toBe(2);
   });
 
   test("calls channel.send exactly once per sendSnapshots call", () => {
@@ -98,7 +98,7 @@ describe("sendSnapshots", () => {
     const channel = makeChannel();
     const plugin = makePlugin(channel);
     plugin.sendSnapshots([]);
-    expect((channel.send as ReturnType<typeof vi.fn>).mock.calls[0][0]).toEqual({
+    expect(channel.send.mock.calls[0][0]).toEqual({
       type: CSE_MESSAGE_TYPE_SNAPSHOTS,
       snapshots: [],
       totalSteps: 0,
@@ -113,7 +113,7 @@ describe("sendSnapshots", () => {
       stepIndex: i,
     }));
     plugin.sendSnapshots(snapshots);
-    expect((channel.send as ReturnType<typeof vi.fn>).mock.calls[0][0].totalSteps).toBe(50);
+    expect(channel.send.mock.calls[0][0].totalSteps).toBe(50);
   });
 
   test("preserves snapshot fields including currentLine and metadata", () => {
@@ -127,6 +127,6 @@ describe("sendSnapshots", () => {
       currentLine: 7,
     };
     plugin.sendSnapshots([snap]);
-    expect((channel.send as ReturnType<typeof vi.fn>).mock.calls[0][0].snapshots[0]).toEqual(snap);
+    expect(channel.send.mock.calls[0][0].snapshots[0]).toEqual(snap);
   });
 });

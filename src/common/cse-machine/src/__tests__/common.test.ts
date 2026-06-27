@@ -155,13 +155,14 @@ describe("CseSnapshot optional fields", () => {
   });
 
   it("stepIndex is preserved across multiple steps", () => {
-    const steps = [0, 1, 2, 10, 99].map(i => ({
+    const indices = [0, 1, 2, 10, 99];
+    const steps = indices.map(i => ({
       stepIndex: i,
       control: [],
       stash: [],
       environments: [],
     }));
-    steps.forEach((s, i) => expect(s.stepIndex).toBe([0, 1, 2, 10, 99][i]));
+    steps.forEach((s, i) => expect(s.stepIndex).toBe(indices[i]));
   });
 });
 
