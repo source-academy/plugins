@@ -66,7 +66,9 @@ describe("sendSnapshots", () => {
     const plugin = makePlugin(channel);
     const snapshots = [minimalSnapshot()];
     plugin.sendSnapshots(snapshots);
-    expect((channel.send as ReturnType<typeof vi.fn>).mock.calls[0][0].snapshots).toEqual(snapshots);
+    expect((channel.send as ReturnType<typeof vi.fn>).mock.calls[0][0].snapshots).toEqual(
+      snapshots,
+    );
   });
 
   test("sets totalSteps to the length of the snapshots array", () => {
@@ -106,7 +108,10 @@ describe("sendSnapshots", () => {
   test("handles a large batch of snapshots", () => {
     const channel = makeChannel();
     const plugin = makePlugin(channel);
-    const snapshots = Array.from({ length: 50 }, (_, i) => ({ ...minimalSnapshot(), stepIndex: i }));
+    const snapshots = Array.from({ length: 50 }, (_, i) => ({
+      ...minimalSnapshot(),
+      stepIndex: i,
+    }));
     plugin.sendSnapshots(snapshots);
     expect((channel.send as ReturnType<typeof vi.fn>).mock.calls[0][0].totalSteps).toBe(50);
   });

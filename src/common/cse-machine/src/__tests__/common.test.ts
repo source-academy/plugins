@@ -57,7 +57,9 @@ describe("structured-clone safety", () => {
   it("a fully-populated snapshot survives structuredClone", () => {
     const snap: CseSnapshot = {
       stepIndex: 2,
-      control: [{ displayText: "call f", tag: "app", metadata: { instrType: "Application", numOfArgs: 1 } }],
+      control: [
+        { displayText: "call f", tag: "app", metadata: { instrType: "Application", numOfArgs: 1 } },
+      ],
       stash: [{ displayValue: "42", label: "number", tag: "int", metadata: { raw: 42 } }],
       environments: [
         {
@@ -198,7 +200,12 @@ describe("CseSerializedInstruction", () => {
       displayText: "call f",
       metadata: { instrType: "Application", numOfArgs: 2, startLine: 4, endLine: 4 },
     };
-    expect(instr.metadata).toEqual({ instrType: "Application", numOfArgs: 2, startLine: 4, endLine: 4 });
+    expect(instr.metadata).toEqual({
+      instrType: "Application",
+      numOfArgs: 2,
+      startLine: 4,
+      endLine: 4,
+    });
   });
 });
 

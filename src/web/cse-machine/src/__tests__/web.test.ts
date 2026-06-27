@@ -11,7 +11,9 @@ import type { IChannel, IConduit } from "@sourceacademy/conductor/conduit";
 const makeChannel = () => {
   let subscriber: ((msg: unknown) => void) | undefined;
   const channel = {
-    subscribe: (fn: (msg: unknown) => void) => { subscriber = fn; },
+    subscribe: (fn: (msg: unknown) => void) => {
+      subscriber = fn;
+    },
     emit: (msg: unknown) => subscriber?.(msg),
   };
   return channel as unknown as IChannel<unknown> & { emit: (msg: unknown) => void };
