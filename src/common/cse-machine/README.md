@@ -80,7 +80,7 @@ A single value on the stash or bound in an environment frame.
 | `displayValue` | `string` | Pre-rendered string shown in the visualizer |
 | `label` | `string` | Coarse type tag, e.g. `"number"`, `"closure"`, `"list"` |
 | `tag` | `string \| undefined` | Optional fine-grained tag for the visualizer |
-| `metadata` | `unknown` | Language-specific extras (e.g. closure frame id, array element refs) |
+| `metadata` | `unknown \| undefined` | Language-specific extras (e.g. closure frame id, array element refs) |
 
 ### `CseSerializedInstruction`
 A single item on the control stack.
@@ -89,7 +89,7 @@ A single item on the control stack.
 |-------|------|-------------|
 | `displayText` | `string` | Pre-rendered text shown on the control stack |
 | `tag` | `string \| undefined` | Optional fine-grained tag for the visualizer |
-| `metadata` | `unknown` | Typed info used for animation dispatch (e.g. `instrType`, `numOfArgs`, `startLine`) |
+| `metadata` | `unknown \| undefined` | Typed info used for animation dispatch (e.g. `instrType`, `numOfArgs`, `startLine`) |
 
 ### `CseSerializedEnvFrame`
 A single environment frame.
