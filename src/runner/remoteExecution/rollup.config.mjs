@@ -2,9 +2,12 @@ import nodeResolve from "@rollup/plugin-node-resolve";
 import terser from "@rollup/plugin-terser";
 import typescript from "@rollup/plugin-typescript";
 
-/** @type {import('rollup').RollupOptions} */
+/**
+ * @type {import('rollup').RollupOptions}
+ */
 export default {
   input: "src/index.ts",
+  external: id => id.includes("py-slang"),
   output: [
     {
       file: "dist/index.cjs",

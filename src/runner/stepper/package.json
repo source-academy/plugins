@@ -1,11 +1,13 @@
 {
-  "name": "@sourceacademy/runner-test",
+  "name": "@sourceacademy/runner-stepper",
   "version": "0.0.1",
-  "packageManager": "yarn@4.12.0",
-  "description": "The test runner plugin for the plugins repository",
+  "packageManager": "yarn@4.6.0",
+  "description": "Language-agnostic runner plugin for the Source Academy stepper",
   "scripts": {
     "build": "rollup -c",
-    "prepack": "yarn build"
+    "prepack": "yarn build",
+    "test": "jest",
+    "test-coverage": "jest --coverage"
   },
   "license": "ISC",
   "files": [
@@ -28,16 +30,13 @@
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-terser": "^1.0.0",
     "@rollup/plugin-typescript": "^12.3.0",
-    "@sourceacademy/common-test": "workspace:*",
+    "@sourceacademy/common-stepper": "workspace:*",
     "@sourceacademy/conductor": ">=0.3.0",
-    "@sourceacademy/runner-remote-execution": "workspace:*",
-    "@vitest/coverage-istanbul": "^4.1.9",
+    "@types/jest": "^30.0.0",
+    "jest": "^30.4.2",
     "rollup": "^4.60.2",
+    "ts-jest": "^29.4.11",
     "tslib": "^2.8.1",
-    "typescript": "^6.0.3",
-    "vitest": "^4.1.9"
-  },
-  "dependencies": {
-    "py-slang": "github:proto-aiken-13/py-slang#branch-ev3-engine"
+    "typescript": "^6.0.3"
   }
 }
