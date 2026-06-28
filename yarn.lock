@@ -1712,7 +1712,7 @@ __metadata:
     i18next: "npm:^26.3.1"
     konva: "npm:^10.3.0"
     react: "npm:^19.2.4"
-    react-dom: "npm:^19.2.4"
+    react-dom: "npm:^19.2.7"
     react-i18next: "npm:^17.0.8"
     react-konva: "npm:^19.0.7"
     rollup: "npm:^4.60.2"
@@ -4377,7 +4377,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:^19.2.4":
+"react-dom@npm:*, react-dom@npm:^19.2.7":
   version: 19.2.7
   resolution: "react-dom@npm:19.2.7"
   dependencies:
