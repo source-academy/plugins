@@ -1,4 +1,4 @@
-import type { Data } from "../dataVisualizerTypes";
+import type { Data } from "@sourceacademy/common-data-display";
 import { TreeNode } from "./BaseTreeNode";
 
 /**

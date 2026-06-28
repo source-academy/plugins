@@ -1,9 +1,9 @@
 import Konva from "konva";
 import { Layer, Stage, Text } from "react-konva";
 
-import { Config } from "../Config";
-import DataVisualizer from "../dataVisualizer";
-import { toText } from "../dataVisualizerUtils";
+import { Config } from "../utils/Config";
+import DataVisualizer from "../DataVisualizer";
+import { toText } from "../utils/utils";
 import { ArrowDrawable, BackwardArrowDrawable } from "../drawable/Drawable";
 import { AlreadyParsedTreeNode } from "./AlreadyParsedTreeNode";
 import { OriginalDrawer } from "./OriginalDrawer";

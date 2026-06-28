@@ -1,9 +1,10 @@
 import { expect, test } from "vitest";
 import makeDataVisualizerTabFrom from "../SideContentDataVisualizer";
 import { render } from "@testing-library/react";
+import type { Data } from "@sourceacademy/common-data-display";
 import { Children, isValidElement, type ReactElement, type ReactNode } from "react";
-import DataVisualizer from "../dataVisualizer";
-import type { Data, Step } from "../dataVisualizerTypes";
+import DataVisualizer from "../DataVisualizer";
+import type { Step } from "../DataVisualizerTypes";
 
 const MOCK_CONFIG = {
   sicpTextbookName: "SICP JS Section 2.2",
@@ -162,10 +163,23 @@ test("actual konva drawables", async () => {
         resolve(steps);
       }
     });
-    DataVisualizer.drawData([["1", "2"]]);
-    DataVisualizer.drawData([[null]]);
-    const arr: Data[] = [1, 2];
-    arr[1] = arr;
+    DataVisualizer.drawData([
+      {
+        type: "array",
+        value: [
+          { type: "string", value: "1" },
+          { type: "string", value: "2" },
+        ],
+      },
+    ]);
+    DataVisualizer.drawData([
+      {
+        type: "array",
+        value: [{ type: "null" }],
+      },
+    ]);
+    const arr: Data = { type: "array", value: [{ type: "string", value: "1" }] };
+    arr.value[1] = arr;
     DataVisualizer.drawData([arr]);
   });
   const drawables = result.map(step => step.map(snapshotDrawingDrawables));

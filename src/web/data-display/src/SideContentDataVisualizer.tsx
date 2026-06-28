@@ -16,8 +16,8 @@ import i18n from "i18next";
 import { useEffect, useState } from "react";
 
 import { Trans, initReactI18next, useTranslation } from "react-i18next";
-import DataVisualizer from "./dataVisualizer";
-import type { Step } from "./dataVisualizerTypes";
+import DataVisualizer from "./DataVisualizer";
+import type { Step } from "./DataVisualizerTypes";
 import type { Config } from "@sourceacademy/common-data-display";
 import React from "react";
 

@@ -1,6 +1,5 @@
-import DataVisualizer from "../dataVisualizer";
-import type { Data } from "../dataVisualizerTypes";
-import { isArray, isFunction } from "../dataVisualizerUtils";
+import DataVisualizer from "../DataVisualizer";
+import { DataVizMode } from "../DataVisualizerTypes";
 import { AlreadyParsedTreeNode } from "./AlreadyParsedTreeNode";
 import { BinaryTreeDrawer } from "./BinaryTreeDrawer";
 import { GeneralTreeDrawer } from "./GeneralTreeDrawer";
@@ -12,7 +11,7 @@ import {
   FunctionTreeNode,
   TreeNode,
 } from "./TreeNode";
-
+import { type ArrayValue, type Data, type FunctionValue } from "@sourceacademy/common-data-display";
 /**
  *  A tree object built based on the given Data, Function or Array of
  *  data/functions/arrays.
@@ -48,16 +47,17 @@ export class Tree {
 
   static fromSourceStructure(tree: Data): Tree {
     let nodeCount = 0;
-    const genTreeChecker = DataVisualizer.getTreeMode();
-    const binTreeChecker = DataVisualizer.getBinTreeMode();
+    const mode = DataVisualizer.getMode();
+    const genTreeChecker = mode === DataVizMode.GENERAL_TREE;
+    const binTreeChecker = mode === DataVizMode.BINARY_TREE;
     function constructNode(structure: Data): TreeNode {
       const alreadyDrawnNode = visitedStructures.get(structure);
       if (alreadyDrawnNode !== undefined) {
         return new AlreadyParsedTreeNode(alreadyDrawnNode);
       }
-      return isArray(structure)
+      return structure.type === "array"
         ? constructTree(structure)
-        : isFunction(structure)
+        : structure.type === "function"
           ? constructFunction(structure)
           : constructData(structure);
     }
@@ -68,7 +68,7 @@ export class Tree {
      * pair appears multiple times in the data structure.
      * @param tree The Source tree to construct a node for.
      */
-    function constructTree(tree: Array<Data>) {
+    function constructTree(tree: ArrayValue): TreeNode {
       const node = new ArrayTreeNode();
       visitedStructures.set(tree, node);
       treeNodes[nodeCount] = node;
@@ -82,7 +82,7 @@ export class Tree {
         node.nodeColor = DataVisualizer.colorMap.get(tree) ?? 0;
       }
 
-      node.children = tree.map(constructNode);
+      node.children = tree.value.map(constructNode);
 
       return node;
     }
@@ -93,7 +93,7 @@ export class Tree {
      * function appears multiple times in the data structure.
      * @param func The function to construct a node for.
      */
-    function constructFunction(func: (...args: unknown[]) => unknown) {
+    function constructFunction(func: FunctionValue): TreeNode {
       const node = new FunctionTreeNode();
 
       // memoise current function
@@ -125,12 +125,13 @@ export class Tree {
   }
 
   draw(): OriginalDrawer | BinaryTreeDrawer | GeneralTreeDrawer {
-    if (DataVisualizer.getBinTreeMode()) {
-      return new BinaryTreeDrawer(this);
-    } else if (DataVisualizer.getTreeMode()) {
-      return new GeneralTreeDrawer(this);
-    } else {
-      return new OriginalDrawer(this);
+    switch (DataVisualizer.getMode()) {
+      case DataVizMode.BINARY_TREE:
+        return new BinaryTreeDrawer(this);
+      case DataVizMode.GENERAL_TREE:
+        return new GeneralTreeDrawer(this);
+      case DataVizMode.NORMAL:
+        return new OriginalDrawer(this);
     }
   }
 }

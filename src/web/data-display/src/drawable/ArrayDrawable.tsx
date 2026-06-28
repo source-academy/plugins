@@ -1,11 +1,12 @@
 import { PureComponent } from "react";
 import { Group, Line, Rect, Text } from "react-konva";
 
-import { Config } from "../Config";
-import DataVisualizer from "../dataVisualizer";
-import { isEmptyList, isList, toText } from "../dataVisualizerUtils";
+import { Config } from "../utils/Config";
+import DataVisualizer from "../DataVisualizer";
+import { toText } from "../utils/utils";
 import { DataTreeNode, TreeNode } from "../tree/TreeNode";
 import { NullDrawable } from "./Drawable";
+import { is_list } from "../utils/list";
 
 type ArrayProps = {
   nodes: TreeNode[];
@@ -21,7 +22,7 @@ class ArrayDrawable extends PureComponent<ArrayProps> {
   render() {
     const createChildText = (node: DataTreeNode, index: number) => {
       const nodeValue = node.data;
-      if (!isList(nodeValue)) {
+      if (!is_list(nodeValue)) {
         const textValue: string | undefined = toText(nodeValue);
         const textToDisplay = textValue ?? "*" + DataVisualizer.displaySpecialContent(node);
         return (
@@ -37,7 +38,7 @@ class ArrayDrawable extends PureComponent<ArrayProps> {
             preventDefault={false}
           />
         );
-      } else if (isEmptyList(nodeValue)) {
+      } else if (nodeValue.type == "null") {
         const props = {
           x: index * Config.BoxWidth,
           y: 0,

@@ -1,8 +1,8 @@
 import { memo } from "react";
 import { Arrow } from "react-konva";
 
-import { Config } from "../Config";
-import DataVisualizer from "../dataVisualizer";
+import { Config } from "../utils/Config";
+import DataVisualizer from "../DataVisualizer";
 
 type Props = {
   from: { x: number; y: number };

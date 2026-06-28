@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { Arrow } from "react-konva";
 
-import { Config } from "../Config";
+import { Config } from "../utils/Config";
 
 type Props = {
   from: { x: number; y: number };

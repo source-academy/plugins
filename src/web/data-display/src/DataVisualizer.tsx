@@ -1,8 +1,9 @@
-import type { Data } from "./dataVisualizerTypes";
-import { Config } from "./Config";
-import type { Step } from "./dataVisualizerTypes";
+import type { ArrayValue, Data } from "@sourceacademy/common-data-display";
+import { Config } from "./utils/Config";
+import { type Step, DataVizMode } from "./DataVisualizerTypes";
 import { Tree } from "./tree/Tree";
 import { DataTreeNode } from "./tree/TreeNode";
+import { is_list, length_list, reduce_list } from "./utils/list";
 
 /**
  * The data visualizer class.
@@ -15,20 +16,18 @@ import { DataTreeNode } from "./tree/TreeNode";
 export default class DataVisualizer {
   private static empty() {}
   private static setSteps: (step: Step[]) => void = DataVisualizer.empty;
-  public static dataRecords: Data[] = [];
+  public static dataRecords: Data[][] = [];
   public static isRedraw = false;
   private static _instance = new DataVisualizer();
-  public static treeMode = false;
-  public static BinTreeMode = false;
-  public static normalMode = true;
+  public static mode: DataVizMode = DataVizMode.NORMAL;
   public static TreeDepth = 0;
   public static isBinTree = false;
   public static isGenTree = false;
   public static nodeCount: number[] = [];
   public static nodeColor: number[] = [];
   public static longestNodePos: number = 0;
-  public static colorMap: WeakMap<Array<Data>, number> = new WeakMap();
-  public static posMap: WeakMap<Data[], number> = new WeakMap();
+  public static colorMap: WeakMap<ArrayValue, number> = new WeakMap();
+  public static posMap: WeakMap<ArrayValue, number> = new WeakMap();
 
   private steps: Step[] = [];
   private nodeLabel = 0;
@@ -36,86 +35,49 @@ export default class DataVisualizer {
 
   private constructor() {}
 
-  public static isBinaryTree(structures: Data[], data: unknown): boolean {
-    if (structures == null) {
+  public static isBinaryTree(structures: Data, type: string | null = null): boolean {
+    if (structures.type === "null") {
       return true;
     }
-    if (!(structures instanceof Array)) {
+    if (!is_list(structures) || length_list(structures) !== 3) {
       return false;
     }
-    if (structures[0] === null) {
-      return true;
-    }
-    if (structures.length != 2 || !(structures[1] instanceof Array)) {
-      return false;
-    }
-    if (data != null && !(structures[0] instanceof Array) && typeof structures[0] != typeof data) {
-      return false;
-    }
-    let next = structures[1];
-    data = structures[0];
 
-    let ans = false;
-    let count = 0;
-    while (next instanceof Array) {
-      if (!(next[0] instanceof Array) && typeof next[0] == typeof structures[0]) {
-        return false;
-      }
-      count++;
-      next = next[1];
+    if (type === null) {
+      type = structures.value[0].type;
     }
-    if (count == 2) {
-      ans = true;
-    }
-    // further checks to ensure that the left and right subtrees are also binary trees and structures can be accessed
-    const left = structures[1];
-    const right = structures[1][1];
-    if (left instanceof Array && right instanceof Array) {
-      return ans && this.isBinaryTree(left[0], data) && this.isBinaryTree(right[0], data);
-    } else {
+    if (structures.value[0].type !== type) {
       return false;
     }
+
+    return reduce_list((acc, x) => acc && this.isBinaryTree(x, type), true, structures.value[1]);
   }
 
-  public static isGeneralTree(structures: Data[], data: unknown): boolean {
-    if (structures == null) {
+  public static isGeneralTree(structures: Data): boolean {
+    if (structures.type === "null") {
       return true;
     }
-    if (
-      data != null &&
-      !(structures[0] instanceof Array) &&
-      typeof structures[0] != typeof data &&
-      structures[0] != null
-    ) {
+    if (!is_list(structures)) {
       return false;
     }
-    if (structures.length == 2 && structures[1] == null) {
-      if (structures[0] instanceof Array) {
-        return this.isGeneralTree(structures[0], data);
-      }
-      return true;
-    }
-    if (!(structures[0] instanceof Array) && structures[1] != null) {
-      data = structures[0];
-      return this.isGeneralTree(structures[1], data);
-    }
-    if (structures.length != 2 || (!(structures[1] instanceof Array) && structures[1] != null)) {
-      return false;
-    }
-    return this.isGeneralTree(structures[1], data) && this.isGeneralTree(structures[0], data);
+    return reduce_list(
+      (acc, x) => acc && (!is_list(x) || this.isGeneralTree(x)),
+      true,
+      structures.value[1],
+    );
   }
 
   public static initializeTreeMetaData(
-    structures: Data[],
+    structures: Data,
     depth: number,
     nodePos: number,
     newNode: boolean,
   ): number {
-    if (!(structures instanceof Array)) {
+    if (structures.type !== "array") {
       return 0;
     }
     // nodeCount keeps track of the current index of nodes at each depth
-    if (this.getTreeMode()) {
+    if (this.getMode() === DataVizMode.GENERAL_TREE) {
       if (this.nodeCount[depth] === undefined) {
         this.nodeCount[depth] = 0;
       }
@@ -125,7 +87,7 @@ export default class DataVisualizer {
       }
       this.nodeCount[depth]++;
     }
-    if (this.getBinTreeMode() || this.getTreeMode()) {
+    if (this.getMode() === DataVizMode.BINARY_TREE || this.getMode() === DataVizMode.GENERAL_TREE) {
       if (this.nodeColor[depth] === undefined) {
         this.nodeColor[depth] = depth;
       }
@@ -136,8 +98,8 @@ export default class DataVisualizer {
     }
 
     this.TreeDepth = Math.max(this.TreeDepth, depth);
-    this.initializeTreeMetaData(structures[0], depth + 1, 0, true);
-    this.initializeTreeMetaData(structures[1], depth, nodePos + 1, false);
+    this.initializeTreeMetaData(structures.value[0], depth + 1, 0, true);
+    this.initializeTreeMetaData(structures.value[1], depth, nodePos + 1, false);
     return depth;
   }
 
@@ -150,48 +112,23 @@ export default class DataVisualizer {
    * Set the visualization mode. This ensures only one mode is active at a time.
    * @param mode - 'normal' for original view, 'binTree' for binary tree, 'tree' for general tree
    */
-  public static setMode(mode: "normal" | "binTree" | "tree"): void {
-    DataVisualizer.normalMode = mode === "normal";
-    DataVisualizer.BinTreeMode = mode === "binTree";
-    DataVisualizer.treeMode = mode === "tree";
+  public static setMode(mode: DataVizMode): void {
+    DataVisualizer.mode = mode;
   }
 
-  // RenderBinaryTree
-  public static toggleBinTreeMode(): void {
-    DataVisualizer.BinTreeMode = !DataVisualizer.BinTreeMode;
+  public static getMode(): DataVizMode {
+    return DataVisualizer.mode;
   }
 
-  // RenderGeneralTree
-  public static toggleTreeMode(): void {
-    DataVisualizer.treeMode = !DataVisualizer.treeMode;
-  }
-
-  // OriginalView
-  public static toggleNormalMode(): void {
-    DataVisualizer.normalMode = !DataVisualizer.normalMode;
-  }
-
-  public static getBinTreeMode(): boolean {
-    return DataVisualizer.BinTreeMode;
-  }
-
-  public static getTreeMode(): boolean {
-    return DataVisualizer.treeMode;
-  }
-
-  public static getNormalMode(): boolean {
-    return DataVisualizer.normalMode;
-  }
-
-  public static hasCycle(structures: Data, visited: WeakSet<object> = new WeakSet()): boolean {
-    if (!(structures instanceof Array)) {
+  public static hasCycle(structures: Data, visited: WeakSet<ArrayValue> = new WeakSet()): boolean {
+    if (structures.type !== "array") {
       return false;
     }
     if (visited.has(structures)) {
       return true;
     }
     visited.add(structures);
-    return this.hasCycle(structures[0], visited) || this.hasCycle(structures[1], visited);
+    return structures.value.some(x => this.hasCycle(x, visited));
   }
 
   public static drawData(structures: Data[]): void {
@@ -212,8 +149,8 @@ export default class DataVisualizer {
       DataVisualizer.isBinTree = false;
       DataVisualizer.isGenTree = false;
     } else {
-      DataVisualizer.isBinTree = this.isBinaryTree(root, null);
-      DataVisualizer.isGenTree = this.isGeneralTree(root, null);
+      DataVisualizer.isBinTree = this.isBinaryTree(root);
+      DataVisualizer.isGenTree = this.isGeneralTree(root);
       if (DataVisualizer.isBinTree || DataVisualizer.isGenTree) {
         this.initializeTreeMetaData(root, 0, 0, false);
       }
@@ -271,7 +208,7 @@ export default class DataVisualizer {
     this.isRedraw = true;
     this.clear();
     try {
-      return DataVisualizer.dataRecords.map(structures => this.drawData(structures));
+      DataVisualizer.dataRecords.forEach(this.drawData);
     } finally {
       this.isRedraw = false;
     }

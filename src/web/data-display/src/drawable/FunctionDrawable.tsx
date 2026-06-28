@@ -1,7 +1,7 @@
 import { PureComponent } from "react";
 import { Circle, Group } from "react-konva";
 
-import { Config } from "../Config";
+import { Config } from "../utils/Config";
 
 type FunctionProps = {
   x: number;

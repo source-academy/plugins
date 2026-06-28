@@ -1,6 +1,6 @@
 import { Group } from "react-konva";
 
-import { Config } from "../Config";
+import { Config } from "../utils/Config";
 import { ArrowDrawable, FunctionDrawable } from "../drawable/Drawable";
 import { DrawableTreeNode } from "./DrawableTreeNode";
 
