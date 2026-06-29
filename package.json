@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "@changesets/cli": "^2.31.0",
-    "@sourceacademy/conductor": "^0.3.0",
+    "@sourceacademy/conductor": "^0.5.0",
     "@sourceacademy/plugin-directory": "source-academy/plugin-directory#main",
     "@types/node": "^25.9.1",
     "@vitest/coverage-istanbul": "^4.1.9",
