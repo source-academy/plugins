@@ -1961,6 +1961,20 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@sourceacademy/common-module-loader@workspace:*, @sourceacademy/common-module-loader@workspace:src/common/module-loader":
+  version: 0.0.0-use.local
+  resolution: "@sourceacademy/common-module-loader@workspace:src/common/module-loader"
+  dependencies:
+    "@rollup/plugin-node-resolve": "npm:^16.0.3"
+    "@rollup/plugin-terser": "npm:^1.0.0"
+    "@rollup/plugin-typescript": "npm:^12.3.0"
+    rollup: "npm:^4.60.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^6.0.3"
+    vitest: "npm:^4.1.9"
+  languageName: unknown
+  linkType: soft
+
 "@sourceacademy/common-stepper@workspace:*, @sourceacademy/common-stepper@workspace:src/common/stepper":
   version: 0.0.0-use.local
   resolution: "@sourceacademy/common-stepper@workspace:src/common/stepper"
@@ -2050,6 +2064,26 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@sourceacademy/runner-module-loader@workspace:src/runner/module-loader":
+  version: 0.0.0-use.local
+  resolution: "@sourceacademy/runner-module-loader@workspace:src/runner/module-loader"
+  dependencies:
+    "@rollup/plugin-node-resolve": "npm:^16.0.3"
+    "@rollup/plugin-terser": "npm:^1.0.0"
+    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@sourceacademy/common-module-loader": "workspace:*"
+    "@sourceacademy/conductor": "npm:>=0.3.0"
+    "@sourceacademy/runner-remote-execution": "workspace:*"
+    "@vitest/coverage-istanbul": "npm:^4.1.9"
+    rollup: "npm:^4.60.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^6.0.3"
+    vitest: "npm:^4.1.9"
+  peerDependencies:
+    "@sourceacademy/conductor": ">=0.3.0"
+  languageName: unknown
+  linkType: soft
+
 "@sourceacademy/runner-remote-execution@workspace:*, @sourceacademy/runner-remote-execution@workspace:src/runner/remoteExecution":
   version: 0.0.0-use.local
   resolution: "@sourceacademy/runner-remote-execution@workspace:src/runner/remoteExecution"
@@ -2134,6 +2168,26 @@ __metadata:
     vitest: "npm:^4.1.9"
   peerDependencies:
     "@sourceacademy/common-cse-machine": ">=0.1.0"
+    "@sourceacademy/conductor": ">=0.3.0"
+  languageName: unknown
+  linkType: soft
+
+"@sourceacademy/web-module-loader@workspace:src/web/module-loader":
+  version: 0.0.0-use.local
+  resolution: "@sourceacademy/web-module-loader@workspace:src/web/module-loader"
+  dependencies:
+    "@rollup/plugin-commonjs": "npm:^29.0.3"
+    "@rollup/plugin-node-resolve": "npm:^16.0.3"
+    "@rollup/plugin-terser": "npm:^1.0.0"
+    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@sourceacademy/common-module-loader": "workspace:*"
+    "@sourceacademy/common-tabs": "workspace:^"
+    "@sourceacademy/conductor": "npm:>=0.3.0"
+    rollup: "npm:^4.60.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^6.0.3"
+    vitest: "npm:^4.1.9"
+  peerDependencies:
     "@sourceacademy/conductor": ">=0.3.0"
   languageName: unknown
   linkType: soft
