@@ -3,6 +3,7 @@ import { Arrow } from "react-konva";
 
 import { Config } from "../utils/Config";
 import DataVisualizer from "../DataVisualizer";
+import { DataVizMode } from "../DataVisualizerTypes";
 
 type Props = {
   from: { x: number; y: number };
@@ -15,7 +16,10 @@ type Props = {
  * Used with ArrayDrawable and FunctionDrawable.
  */
 function ArrowDrawable(props: Props) {
-  if (DataVisualizer.getBinTreeMode() || DataVisualizer.getTreeMode()) {
+  if (
+    DataVisualizer.getMode() === DataVizMode.BINARY_TREE ||
+    DataVisualizer.getMode() === DataVizMode.GENERAL_TREE
+  ) {
     // Binary Tree View and General Tree View
     return (
       <Arrow

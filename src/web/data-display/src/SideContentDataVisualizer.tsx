@@ -17,7 +17,7 @@ import { useEffect, useState } from "react";
 
 import { Trans, initReactI18next, useTranslation } from "react-i18next";
 import DataVisualizer from "./DataVisualizer";
-import type { Step } from "./DataVisualizerTypes";
+import { DataVizMode, type Step } from "./DataVisualizerTypes";
 import type { Config } from "@sourceacademy/common-data-display";
 import React from "react";
 
@@ -178,7 +178,7 @@ function SideContentDataVisualizer({ workspaceLocation, config }: Props) {
                   justifyContent: "center",
                 }}
                 onMouseUp={() => {
-                  DataVisualizer.setMode("normal");
+                  DataVisualizer.setMode(DataVizMode.NORMAL);
                   DataVisualizer.redraw();
                   onViewModeClick(currentStep);
                 }}
@@ -186,7 +186,7 @@ function SideContentDataVisualizer({ workspaceLocation, config }: Props) {
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <Icon icon="grid-view" />
                   <Checkbox
-                    checked={DataVisualizer.getNormalMode()}
+                    checked={DataVisualizer.getMode() === DataVizMode.NORMAL}
                     style={{ marginTop: 7 }}
                     tabIndex={-1}
                     aria-hidden="true"
@@ -206,7 +206,7 @@ function SideContentDataVisualizer({ workspaceLocation, config }: Props) {
                 marginLeft: 10,
               }}
               onMouseUp={() => {
-                DataVisualizer.setMode("binTree");
+                DataVisualizer.setMode(DataVizMode.BINARY_TREE);
                 DataVisualizer.redraw();
                 onViewModeClick(currentStep);
               }}
@@ -214,7 +214,7 @@ function SideContentDataVisualizer({ workspaceLocation, config }: Props) {
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <Icon icon="one-to-many" style={{ transform: "rotate(90deg)", marginLeft: 6 }} />
                 <Checkbox
-                  checked={DataVisualizer.getBinTreeMode()}
+                  checked={DataVisualizer.getMode() === DataVizMode.BINARY_TREE}
                   style={{ marginTop: 7 }}
                   tabIndex={-1}
                   aria-hidden="true"
@@ -232,7 +232,7 @@ function SideContentDataVisualizer({ workspaceLocation, config }: Props) {
                 marginLeft: 10,
               }}
               onMouseUp={() => {
-                DataVisualizer.setMode("tree");
+                DataVisualizer.setMode(DataVizMode.GENERAL_TREE);
                 DataVisualizer.redraw();
                 onViewModeClick(currentStep);
               }}
@@ -240,7 +240,7 @@ function SideContentDataVisualizer({ workspaceLocation, config }: Props) {
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <Icon icon="diagram-tree" />
                 <Checkbox
-                  checked={DataVisualizer.getTreeMode()}
+                  checked={DataVisualizer.getMode() === DataVizMode.GENERAL_TREE}
                   style={{ marginTop: 7 }}
                   tabIndex={-1}
                   aria-hidden="true"

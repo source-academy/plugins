@@ -19,7 +19,7 @@ export default class DataVisualizer {
   public static dataRecords: Data[][] = [];
   public static isRedraw = false;
   private static _instance = new DataVisualizer();
-  public static mode: DataVizMode = DataVizMode.NORMAL;
+  private static mode: DataVizMode = DataVizMode.NORMAL;
   public static TreeDepth = 0;
   public static isBinTree = false;
   public static isGenTree = false;
