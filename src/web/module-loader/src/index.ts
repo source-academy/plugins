@@ -1,22 +1,25 @@
-import { CHANNEL_ID, ModuleLoaderMessageType, WEB_ID, type ModuleLoaderMessage } from "@sourceacademy/common-module-loader";
+import {
+  CHANNEL_ID,
+  ModuleLoaderMessageType,
+  WEB_ID,
+  type ModuleLoaderMessage,
+} from "@sourceacademy/common-module-loader";
 import {
   type IPlugin,
   type IChannel,
   type IConduit,
   checkIsPluginClass,
-  type PluginClass,
 } from "@sourceacademy/conductor/conduit";
 
-
 type ModuleDirectoryBundle = {
-  tabs: string[]
+  tabs: string[];
 };
 type ModuleDirectory = Record<string, ModuleDirectoryBundle>;
 export class ModuleLoaderWebPlugin implements IPlugin {
   readonly id: string = WEB_ID;
   static readonly channelAttach = [CHANNEL_ID];
   private readonly __moduleRequestChannel: IChannel<ModuleLoaderMessage>;
-  
+
   static instance: ModuleLoaderWebPlugin | null = null;
   private moduleDirectoryURL: string | null = null;
   private moduleDirectory: ModuleDirectory | null = null;
@@ -24,7 +27,7 @@ export class ModuleLoaderWebPlugin implements IPlugin {
   constructor(
     _conduit: IConduit,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    [moduleRequestChannel]: IChannel<any>[]
+    [moduleRequestChannel]: IChannel<any>[],
   ) {
     this.__moduleRequestChannel = moduleRequestChannel;
     ModuleLoaderWebPlugin.instance = this;
@@ -48,17 +51,20 @@ export class ModuleLoaderWebPlugin implements IPlugin {
           error: `Invalid module name: ${message.moduleName}`,
         });
       }
-      const moduleBaseUrl = this.moduleDirectoryURL.slice(0, this.moduleDirectoryURL.lastIndexOf("/") + 1);
+      const moduleBaseUrl = this.moduleDirectoryURL.slice(
+        0,
+        this.moduleDirectoryURL.lastIndexOf("/") + 1,
+      );
       return this.__moduleRequestChannel.send({
         type: ModuleLoaderMessageType.MODULE_RESPONSE,
         moduleURL: moduleBaseUrl + "bundles/" + message.moduleName + ".js",
-        tabs: this.moduleDirectory[message.moduleName].tabs
-      })
-    })
+        tabs: this.moduleDirectory[message.moduleName].tabs,
+      });
+    });
   }
 
   onModuleDirectoryURLChange(newURL: string): void {
-    if (newURL === this.moduleDirectoryURL) {
+    if (newURL === this.moduleDirectoryURL && this.moduleDirectory) {
       return;
     }
     this.moduleDirectoryURL = newURL;
@@ -75,12 +81,14 @@ export class ModuleLoaderWebPlugin implements IPlugin {
     }
     for (const moduleName in this.moduleDirectory) {
       if (this.moduleDirectory[moduleName].tabs.includes(tabName)) {
-        const moduleBaseUrl = this.moduleDirectoryURL.slice(0, this.moduleDirectoryURL.lastIndexOf("/") + 1);
+        const moduleBaseUrl = this.moduleDirectoryURL.slice(
+          0,
+          this.moduleDirectoryURL.lastIndexOf("/") + 1,
+        );
         return moduleBaseUrl + "tabs/" + tabName + ".js";
       }
     }
     return null;
   }
-
 }
 checkIsPluginClass(ModuleLoaderWebPlugin);
