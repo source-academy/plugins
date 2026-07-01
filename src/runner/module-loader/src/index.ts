@@ -35,24 +35,30 @@ export class ModuleLoaderRunnerPlugin implements IPlugin {
   async requestModule(moduleName: string): Promise<IModulePlugin> {
     return new Promise((resolve, reject) => {
       const handleResponse = async (msg: ModuleLoaderMessage) => {
-        this.__moduleRequestChannel.unsubscribe(handleResponse);
-        if (msg.type === ModuleLoaderMessageType.MODULE_RESPONSE) {
-          const plugin = await import(msg.moduleURL).then(module => {
-            return module.default(() => {}).default;
-          });
-          const pluginObj = this.__conductor.registerPlugin(plugin, this.__evaluator, {
-            tabs: msg.tabs,
-            loadTab: (tabName: string) => {
-              if (!msg.tabs.includes(tabName)) {
-                throw new Error(`Tab ${tabName} not found in module ${moduleName}`);
-              }
-              this.__conductor.hostLoadPlugin(tabName);
-            },
-          }) as IModulePlugin;
-          await pluginObj?.initialise();
-          resolve(pluginObj);
-        } else if (msg.type === ModuleLoaderMessageType.MODULE_ERROR) {
-          reject(new Error(msg.error));
+        try {
+          if (msg.moduleName !== moduleName) return;
+          this.__moduleRequestChannel.unsubscribe(handleResponse);
+          if (msg.type === ModuleLoaderMessageType.MODULE_RESPONSE) {
+            const plugin = await import(msg.moduleURL).then(module => {
+              return module.default(() => {}).default;
+            });
+            const pluginObj = this.__conductor.registerPlugin(plugin, this.__evaluator, {
+              tabs: msg.tabs,
+              loadTab: (tabName: string) => {
+                if (!msg.tabs.includes(tabName)) {
+                  throw new Error(`Tab ${tabName} not found in module ${moduleName}`);
+                }
+                this.__conductor.hostLoadPlugin(tabName);
+              },
+            }) as IModulePlugin;
+            await pluginObj?.initialise();
+            resolve(pluginObj);
+          } else if (msg.type === ModuleLoaderMessageType.MODULE_ERROR) {
+            reject(new Error(msg.error));
+          }
+        } catch (error) {
+          this.__moduleRequestChannel.unsubscribe(handleResponse);
+          reject(error);
         }
       };
       this.__moduleRequestChannel.subscribe(handleResponse);

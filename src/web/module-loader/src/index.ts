@@ -36,18 +36,21 @@ export class ModuleLoaderWebPlugin implements IPlugin {
       if (this.moduleDirectory === null || this.moduleDirectoryURL === null) {
         return this.__moduleRequestChannel.send({
           type: ModuleLoaderMessageType.MODULE_ERROR,
+          moduleName: message.moduleName,
           error: "Module directory not loaded yet",
         });
       }
       if (!(message.moduleName in this.moduleDirectory)) {
         return this.__moduleRequestChannel.send({
           type: ModuleLoaderMessageType.MODULE_ERROR,
+          moduleName: message.moduleName,
           error: `Module not found: ${message.moduleName}`,
         });
       }
-      if (!/[a-zA-Z0-9_-]+/.test(message.moduleName)) {
+      if (!/^[a-zA-Z0-9_-]+$/.test(message.moduleName)) {
         return this.__moduleRequestChannel.send({
           type: ModuleLoaderMessageType.MODULE_ERROR,
+          moduleName: message.moduleName,
           error: `Invalid module name: ${message.moduleName}`,
         });
       }
@@ -57,6 +60,7 @@ export class ModuleLoaderWebPlugin implements IPlugin {
       );
       return this.__moduleRequestChannel.send({
         type: ModuleLoaderMessageType.MODULE_RESPONSE,
+        moduleName: message.moduleName,
         moduleURL: moduleBaseUrl + "bundles/" + message.moduleName + ".js",
         tabs: this.moduleDirectory[message.moduleName].tabs,
       });
@@ -72,6 +76,9 @@ export class ModuleLoaderWebPlugin implements IPlugin {
       .then(response => response.json())
       .then(data => {
         this.moduleDirectory = data;
+      })
+      .catch(error => {
+        console.error("Failed to load module directory:", error);
       });
   }
 

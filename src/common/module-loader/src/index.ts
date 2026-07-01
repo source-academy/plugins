@@ -16,10 +16,12 @@ export type ModuleLoaderMessage =
     }
   | {
       type: ModuleLoaderMessageType.MODULE_RESPONSE;
+      moduleName: string;
       moduleURL: string;
       tabs: string[];
     }
   | {
       type: ModuleLoaderMessageType.MODULE_ERROR;
+      moduleName: string;
       error: string;
     };

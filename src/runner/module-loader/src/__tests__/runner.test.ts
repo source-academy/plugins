@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, test, vi, type Mock } from "vitest";
+import { afterEach, describe, expect, test, vi, type Mock, type MockedFunction } from "vitest";
 import { ModuleLoaderRunnerPlugin } from "..";
 import {
   CHANNEL_ID,
@@ -8,11 +8,8 @@ import {
 } from "@sourceacademy/common-module-loader";
 import type { IChannel, IConduit } from "@sourceacademy/conductor/conduit";
 import type { IModulePlugin } from "@sourceacademy/conductor/module";
-import type {
-  IInterfacableEvaluator,
-  IRunnerPlugin,
-} from "@sourceacademy/conductor/runner";
-
+import type { IInterfacableEvaluator, IRunnerPlugin } from "@sourceacademy/conductor/runner";
+import type { PluginClass } from "@sourceacademy/conductor/conduit";
 type ChannelSubscriber = (msg: ModuleLoaderMessage) => void | Promise<void>;
 
 type TestChannel = IChannel<ModuleLoaderMessage> & {
@@ -56,7 +53,13 @@ const makeChannel = (
 const makeConductor = () => {
   const initialise = vi.fn<() => Promise<void>>().mockResolvedValue(undefined);
   const pluginObj = { initialise } as unknown as IModulePlugin;
-  const registerPlugin = vi.fn(() => pluginObj);
+  const registerPlugin: MockedFunction<
+    (
+      pluginClass: PluginClass<unknown[]>,
+      evaluator: IInterfacableEvaluator,
+      options: { tabs: string[]; loadTab: (tabName: string) => void },
+    ) => IModulePlugin
+  > = vi.fn(() => pluginObj);
   const hostLoadPlugin = vi.fn();
   const conductor = {
     registerPlugin,
@@ -68,12 +71,7 @@ const makeConductor = () => {
 const makePlugin = (channel = makeChannel()) => {
   const evaluator = {} as IInterfacableEvaluator;
   const { conductor, registerPlugin, hostLoadPlugin, initialise, pluginObj } = makeConductor();
-  const plugin = new ModuleLoaderRunnerPlugin(
-    {} as IConduit,
-    [channel],
-    conductor,
-    evaluator,
-  );
+  const plugin = new ModuleLoaderRunnerPlugin({} as IConduit, [channel], conductor, evaluator);
   return {
     plugin,
     channel,
@@ -113,6 +111,7 @@ describe("requestModule", () => {
       }
       return {
         type: ModuleLoaderMessageType.MODULE_RESPONSE,
+        moduleName: msg.moduleName,
         moduleURL: mockBundleURL,
         tabs,
       };
@@ -143,6 +142,7 @@ describe("requestModule", () => {
       }
       return {
         type: ModuleLoaderMessageType.MODULE_RESPONSE,
+        moduleName: msg.moduleName,
         moduleURL: mockBundleURL,
         tabs: ["ChartTab"],
       };
@@ -150,15 +150,11 @@ describe("requestModule", () => {
     const { plugin, registerPlugin, hostLoadPlugin } = makePlugin(channel);
 
     await plugin.requestModule("chart");
-    const options = registerPlugin.mock.calls[0][2] as {
-      loadTab: (tabName: string) => void;
-    };
+    const options = registerPlugin.mock.calls[0][2];
 
     options.loadTab("ChartTab");
     expect(hostLoadPlugin).toHaveBeenCalledWith("ChartTab");
-    expect(() => options.loadTab("MissingTab")).toThrow(
-      "Tab MissingTab not found in module chart",
-    );
+    expect(() => options.loadTab("MissingTab")).toThrow("Tab MissingTab not found in module chart");
   });
 
   test("rejects when the mocked web side returns a module error", async () => {
@@ -168,6 +164,7 @@ describe("requestModule", () => {
       }
       return {
         type: ModuleLoaderMessageType.MODULE_ERROR,
+        moduleName: msg.moduleName,
         error: "Module not found: missing",
       };
     });

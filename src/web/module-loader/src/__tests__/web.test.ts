@@ -112,6 +112,7 @@ describe("request handling", () => {
 
     expect(channel.send).toHaveBeenCalledWith({
       type: ModuleLoaderMessageType.MODULE_ERROR,
+      moduleName: "chart",
       error: "Module directory not loaded yet",
     });
   });
@@ -128,6 +129,7 @@ describe("request handling", () => {
 
     expect(channel.send).toHaveBeenCalledWith({
       type: ModuleLoaderMessageType.MODULE_RESPONSE,
+      moduleName: "chart",
       moduleURL: "/mock/bundles/chart.js",
       tabs: ["ChartTab", "SettingsTab"],
     });
@@ -145,6 +147,7 @@ describe("request handling", () => {
 
     expect(channel.send).toHaveBeenCalledWith({
       type: ModuleLoaderMessageType.MODULE_ERROR,
+      moduleName: "missing",
       error: "Module not found: missing",
     });
   });
@@ -161,6 +164,7 @@ describe("request handling", () => {
 
     expect(channel.send).toHaveBeenCalledWith({
       type: ModuleLoaderMessageType.MODULE_ERROR,
+      moduleName: "!!!",
       error: "Invalid module name: !!!",
     });
   });
@@ -170,6 +174,7 @@ describe("request handling", () => {
 
     channel.emit({
       type: ModuleLoaderMessageType.MODULE_RESPONSE,
+      moduleName: "chart",
       moduleURL: "/mock/bundles/chart.js",
       tabs: [],
     });
