@@ -167,7 +167,7 @@ describe("requestModule", () => {
     expect(() => options.loadTab("MissingTab")).toThrow("Tab MissingTab not found in module chart");
   });
 
-  test("rejects when the plugin is invalid", async () => {
+  test("rejects when the plugin is invalid", () => {
     // mock the import function
     vi.mock("module", () => ({}));
     const channel = makeChannel(msg => {
@@ -178,6 +178,7 @@ describe("requestModule", () => {
         type: ModuleLoaderMessageType.MODULE_RESPONSE,
         moduleName: msg.moduleName,
         moduleURL: "module",
+        tabs: ["Tab1"],
       };
     });
     const { plugin } = makePlugin(channel);
@@ -196,11 +197,13 @@ describe("requestModule", () => {
           type: ModuleLoaderMessageType.MODULE_RESPONSE,
           moduleName: "module2",
           moduleURL: mockBundleURL2,
+          tabs: ["Tab2"],
         },
         {
           type: ModuleLoaderMessageType.MODULE_RESPONSE,
           moduleName: "module",
           moduleURL: mockBundleURL,
+          tabs: ["Tab1"],
         },
       ];
     });
