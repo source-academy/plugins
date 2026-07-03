@@ -67,12 +67,12 @@ export class ModuleLoaderWebPlugin implements IPlugin {
     });
   }
 
-  onModuleDirectoryURLChange(newURL: string): void {
+  async onModuleDirectoryURLChange(newURL: string): Promise<void> {
     if (newURL === this.moduleDirectoryURL && this.moduleDirectory) {
       return;
     }
     this.moduleDirectoryURL = newURL;
-    fetch(newURL)
+    await fetch(newURL)
       .then(response => response.json())
       .then(data => {
         this.moduleDirectory = data;

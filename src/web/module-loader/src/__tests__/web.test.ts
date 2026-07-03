@@ -181,6 +181,12 @@ describe("request handling", () => {
 
     expect(channel.send).not.toHaveBeenCalled();
   });
+
+  test("invalid directory doesn't error out", async () => {
+    const { plugin } = makePlugin();
+    await plugin.onModuleDirectoryURLChange("sgsafghfa/sdgsafgsdaf");
+    expect(plugin.getModuleTabLocation("ChartTab")).toBeNull();
+  });
 });
 
 describe("tab locations", () => {

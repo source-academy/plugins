@@ -22,15 +22,25 @@ const mockBundleURL = `data:text/javascript;charset=utf-8,${encodeURIComponent(`
 class MockModulePlugin {}
 export default () => ({ default: MockModulePlugin });
 `)}`;
+const mockBundleURL2 = `data:text/javascript;charset=utf-8,${encodeURIComponent(`
+class MockModulePlugin2 {}
+export default () => ({ default: MockModulePlugin2 });
+`)}`;
 
 const makeChannel = (
-  getResponse?: (msg: ModuleLoaderMessage) => ModuleLoaderMessage | undefined,
+  getResponse?: (
+    msg: ModuleLoaderMessage,
+  ) => ModuleLoaderMessage[] | ModuleLoaderMessage | undefined,
 ): TestChannel => {
   let subscriber: ChannelSubscriber | undefined;
   const send = vi.fn((msg: ModuleLoaderMessage) => {
     const response = getResponse?.(msg);
     if (response) {
-      queueMicrotask(() => subscriber?.(response));
+      if (response instanceof Array) {
+        response.forEach(r => queueMicrotask(() => subscriber?.(r)));
+      } else {
+        queueMicrotask(() => subscriber?.(response));
+      }
     }
   });
   const subscribe = vi.fn((handler: ChannelSubscriber) => {
@@ -155,6 +165,57 @@ describe("requestModule", () => {
     options.loadTab("ChartTab");
     expect(hostLoadPlugin).toHaveBeenCalledWith("ChartTab");
     expect(() => options.loadTab("MissingTab")).toThrow("Tab MissingTab not found in module chart");
+  });
+
+  test("rejects when the plugin is invalid", async () => {
+    // mock the import function
+    vi.mock("module", () => ({}));
+    const channel = makeChannel(msg => {
+      if (msg.type !== ModuleLoaderMessageType.REQUEST_MODULE) {
+        return undefined;
+      }
+      return {
+        type: ModuleLoaderMessageType.MODULE_RESPONSE,
+        moduleName: msg.moduleName,
+        moduleURL: "module",
+      };
+    });
+    const { plugin } = makePlugin(channel);
+    plugin.requestModule("module").catch(err => {
+      expect(err).toBeInstanceOf(Error);
+    });
+  });
+
+  test("out of order responses are ignored", async () => {
+    const channel = makeChannel(msg => {
+      if (msg.type !== ModuleLoaderMessageType.REQUEST_MODULE) {
+        return undefined;
+      }
+      return [
+        {
+          type: ModuleLoaderMessageType.MODULE_RESPONSE,
+          moduleName: "module2",
+          moduleURL: mockBundleURL2,
+        },
+        {
+          type: ModuleLoaderMessageType.MODULE_RESPONSE,
+          moduleName: "module",
+          moduleURL: mockBundleURL,
+        },
+      ];
+    });
+    const { plugin, pluginObj, registerPlugin } = makePlugin(channel);
+    await expect(plugin.requestModule("module")).resolves.toBe(pluginObj);
+
+    expect(channel.subscribe).toHaveBeenCalledOnce();
+    expect(channel.send).toHaveBeenCalledWith({
+      type: ModuleLoaderMessageType.REQUEST_MODULE,
+      moduleName: "module",
+    });
+    expect(channel.unsubscribe).toHaveBeenCalledOnce();
+    expect(registerPlugin).toHaveBeenCalledOnce();
+    const [pluginClass] = registerPlugin.mock.calls[0];
+    expect(pluginClass.name).toBe("MockModulePlugin");
   });
 
   test("rejects when the mocked web side returns a module error", async () => {
