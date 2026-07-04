@@ -19,13 +19,14 @@ type TestChannel = IChannel<ModuleLoaderMessage> & {
 };
 
 const mockBundleURL = `data:text/javascript;charset=utf-8,${encodeURIComponent(`
-class MockModulePlugin {}
-export default () => ({ default: MockModulePlugin });
-`)}`;
+  class MockModulePlugin {}
+  export default () => ({ default: MockModulePlugin });
+  `)}`;
 const mockBundleURL2 = `data:text/javascript;charset=utf-8,${encodeURIComponent(`
-class MockModulePlugin2 {}
-export default () => ({ default: MockModulePlugin2 });
-`)}`;
+    class MockModulePlugin2 {}
+    export default () => ({ default: MockModulePlugin2 });
+    `)}`;
+vi.mock("module", () => ({}));
 
 const makeChannel = (
   getResponse?: (
@@ -63,13 +64,20 @@ const makeChannel = (
 const makeConductor = () => {
   const initialise = vi.fn<() => Promise<void>>().mockResolvedValue(undefined);
   const pluginObj = { initialise } as unknown as IModulePlugin;
+  const loadedPlugins = new Map<string, IModulePlugin>();
   const registerPlugin: MockedFunction<
     (
       pluginClass: PluginClass<unknown[]>,
       evaluator: IInterfacableEvaluator,
       options: { tabs: string[]; loadTab: (tabName: string) => void },
     ) => IModulePlugin
-  > = vi.fn(() => pluginObj);
+  > = vi.fn(pluginClass => {
+    if (loadedPlugins.has(pluginClass.name)) {
+      throw new Error(`Plugin ${pluginClass.name} already registered`);
+    }
+    loadedPlugins.set(pluginClass.name, pluginObj);
+    return pluginObj;
+  });
   const hostLoadPlugin = vi.fn();
   const conductor = {
     registerPlugin,
@@ -169,7 +177,6 @@ describe("requestModule", () => {
 
   test("rejects when the plugin is invalid", () => {
     // mock the import function
-    vi.mock("module", () => ({}));
     const channel = makeChannel(msg => {
       if (msg.type !== ModuleLoaderMessageType.REQUEST_MODULE) {
         return undefined;
@@ -219,6 +226,23 @@ describe("requestModule", () => {
     expect(registerPlugin).toHaveBeenCalledOnce();
     const [pluginClass] = registerPlugin.mock.calls[0];
     expect(pluginClass.name).toBe("MockModulePlugin");
+  });
+
+  test("module requests are cached", async () => {
+    const channel = makeChannel(msg => {
+      if (msg.type !== ModuleLoaderMessageType.REQUEST_MODULE) {
+        return undefined;
+      }
+      return {
+        type: ModuleLoaderMessageType.MODULE_RESPONSE,
+        moduleName: msg.moduleName,
+        moduleURL: mockBundleURL,
+        tabs: ["Tab1"],
+      };
+    });
+    const { plugin, pluginObj, registerPlugin } = makePlugin(channel);
+    await plugin.requestModule("chart");
+    await expect(plugin.requestModule("chart")).resolves.toBe(pluginObj);
   });
 
   test("rejects when the mocked web side returns a module error", async () => {
