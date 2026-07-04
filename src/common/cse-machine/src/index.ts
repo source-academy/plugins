@@ -101,6 +101,12 @@ export interface CseSerializedEnvFrame {
   isActive: boolean;
   /** Whether this frame is currently on the call stack (vs only reachable via a closure). */
   isOnCallStack?: boolean;
+  /**
+   * Names in this frame that resolve to the global frame instead of the usual enclosing-scope
+   * chain (e.g. Python's `global` statement). The web plugin uses this to annotate the frame
+   * and to short-circuit lookup animations straight to the global frame.
+   */
+  globalNames?: string[];
 }
 
 /**
