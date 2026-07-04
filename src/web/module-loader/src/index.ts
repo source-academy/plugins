@@ -40,7 +40,7 @@ export class ModuleLoaderWebPlugin implements IPlugin {
           error: "Module directory not loaded yet",
         });
       }
-      if (!(message.moduleName in this.moduleDirectory)) {
+      if (!Object.hasOwn(this.moduleDirectory, message.moduleName)) {
         return this.__moduleRequestChannel.send({
           type: ModuleLoaderMessageType.MODULE_ERROR,
           moduleName: message.moduleName,
@@ -72,6 +72,7 @@ export class ModuleLoaderWebPlugin implements IPlugin {
       return;
     }
     this.moduleDirectoryURL = newURL;
+    this.moduleDirectory = null;
     await fetch(newURL)
       .then(response => response.json())
       .then(data => {
