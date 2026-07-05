@@ -72,6 +72,15 @@ export interface SerializedStepperStep {
   ast: SerializedStepperNode;
   /** Markers highlighting/explaining the redex(es) involved in reaching the next step. */
   markers?: SerializedMarker[];
+  /**
+   * The program's cumulative textual output (e.g. everything `print` has written) from the start of
+   * evaluation up to and including this step. Unlike a marker's {@link SerializedMarker.explanation}
+   * (which describes only this one step), this accumulates: each successive step repeats all earlier
+   * output plus whatever this step produced, so a host can show a running output panel that grows as
+   * the slider advances. Absent/empty when nothing has been output yet. Runners that produce no output
+   * may omit it entirely.
+   */
+  output?: string;
 }
 
 /* -------------------------------------------------------------------------- */
