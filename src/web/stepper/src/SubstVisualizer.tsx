@@ -189,7 +189,7 @@ export default function StepperView(props: StepperViewProps) {
   const getOutput = useCallback(
     (value: number): string => {
       const contIndex = value <= lastStepValue ? value - 1 : 0;
-      return props.content[contIndex].output ?? "";
+      return props.content[contIndex]?.output ?? "";
     },
     [lastStepValue, props.content],
   );
