@@ -75,6 +75,26 @@ function SubstCodeDisplay(props: { content: string }) {
   );
 }
 
+/** The program-output panel: same card/formatting as the explanation box above, but its text is the
+ * orange used for printed output in the main workspace's REPL (`.log-output`, #dd8c60). Shows the run's
+ * cumulative output up to the current step (see {@link SerializedStepperStep.output}).
+ *
+ * The colour is set inline, not via the injected `.stepper-output` rule, on purpose: when the Host runs
+ * inside the main frontend, that app's own (legacy substituter) stylesheet carries an id-scoped
+ * `#…workspace … .sa-substituter pre` colour rule whose specificity outranks the injected
+ * class selector, so a stylesheet colour would be silently overridden to the default (white). An inline
+ * style beats any external selector, guaranteeing the orange regardless of the embedding app's CSS. The
+ * `stepper-output` class still supplies the (non-colour) formatting that matches the explanation box. */
+function SubstOutputDisplay(props: { content: string }) {
+  return (
+    <Card>
+      <Pre className="stepper-output" style={{ color: "#dd8c60" }}>
+        {props.content}
+      </Pre>
+    </Card>
+  );
+}
+
 type StepperViewProps = {
   content: SerializedStepperStep[];
   /** The active language's rendering rules; when absent, the default (Source) syntax is used. */
@@ -166,6 +186,14 @@ export default function StepperView(props: StepperViewProps) {
     [lastStepValue, props.content],
   );
 
+  const getOutput = useCallback(
+    (value: number): string => {
+      const contIndex = value <= lastStepValue ? value - 1 : 0;
+      return props.content[contIndex].output ?? "";
+    },
+    [lastStepValue, props.content],
+  );
+
   return (
     <div
       className={classNames("sa-substituter", Classes.DARK)}
@@ -198,6 +226,9 @@ export default function StepperView(props: StepperViewProps) {
         <SubstDefaultText />
       )}
       {hasRunCode ? <SubstCodeDisplay content={getExplanation(stepValue)} /> : null}
+      {/* Output panel, directly below the explanation box; always shown once code has run (empty until
+          the program prints). Shows cumulative output up to the current step. */}
+      {hasRunCode ? <SubstOutputDisplay content={getOutput(stepValue)} /> : null}
     </div>
   );
 }
