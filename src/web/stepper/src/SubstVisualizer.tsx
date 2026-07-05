@@ -86,6 +86,9 @@ function SubstCodeDisplay(props: { content: string }) {
  * style beats any external selector, guaranteeing the orange regardless of the embedding app's CSS. The
  * `stepper-output` class still supplies the (non-colour) formatting that matches the explanation box. */
 function SubstOutputDisplay(props: { content: string }) {
+  if (!props.content) {
+    return null;
+  }
   return (
     <Card>
       <Pre className="stepper-output" style={{ color: "#dd8c60" }}>
