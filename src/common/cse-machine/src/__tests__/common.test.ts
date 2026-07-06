@@ -71,6 +71,7 @@ describe("structured-clone safety", () => {
           isActive: true,
           isOnCallStack: true,
           closureFrameId: "g",
+          globalNames: ["x"],
         },
         { id: "g", name: "global", parentId: null, bindings: [], isActive: false },
       ],
@@ -246,6 +247,19 @@ describe("CseSerializedEnvFrame", () => {
     expect(frame.heapObjects).toBeUndefined();
     expect(frame.isOnCallStack).toBeUndefined();
     expect(frame.closureFrameId).toBeUndefined();
+    expect(frame.globalNames).toBeUndefined();
+  });
+
+  it("globalNames carries names that resolve via the global frame instead of the enclosing-scope chain", () => {
+    const frame: CseSerializedEnvFrame = {
+      id: "e1",
+      name: "f",
+      parentId: "g",
+      bindings: [],
+      isActive: true,
+      globalNames: ["x", "y"],
+    };
+    expect(frame.globalNames).toEqual(["x", "y"]);
   });
 
   it("heapObjects carries anonymous closures not bound to a name", () => {
