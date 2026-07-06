@@ -58,7 +58,7 @@ export class ModuleLoaderRunnerPlugin implements IPlugin {
                   this.__conductor.hostLoadPlugin(tabName);
                 },
               }) as IModulePlugin;
-              await pluginObj?.initialise();
+              await pluginObj.initialise();
               resolve(pluginObj);
             } else if (msg.type === ModuleLoaderMessageType.MODULE_ERROR) {
               throw Error(msg.error);
