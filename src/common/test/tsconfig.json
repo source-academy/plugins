@@ -1,7 +1,7 @@
 {
   "extends": "../../tsconfig.json",
   "exclude": ["./dist"],
-  "include": ["./src"],
+  "include": ["./src", "../../runner/test/src/__tests__/runner.test.ts"],
   "compilerOptions": {
     "declaration": true,
     "outDir": "./dist",
