@@ -33,7 +33,13 @@ jobs:
         uses: changesets/action@v1
         with:
           publish: yarn changeset publish
-          version: yarn changeset version
+          # changeset version only rewrites package.json/CHANGELOG.md — it never re-runs
+          # install, so a peerDependency range bump (e.g. common-cse-machine >=0.1.0 -> >=0.2.0
+          # in a dependent's package.json) can leave yarn.lock stale. That stale lockfile then
+          # fails CI's immutable install on the resulting "Version Packages" PR. Re-running
+          # install here keeps the lockfile in sync in the same commit; it's a no-op when
+          # nothing changed.
+          version: yarn changeset version && yarn install
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Upload artifacts
