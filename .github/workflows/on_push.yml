@@ -42,6 +42,10 @@ jobs:
           version: yarn changeset version && yarn install
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # changesets/action's own README recommends this for the yarn-install-after-version
+          # pattern: without it, this install could itself run in an immutable/frozen mode and
+          # fail instead of regenerating the lockfile.
+          YARN_ENABLE_IMMUTABLE_INSTALLS: false
       - name: Upload artifacts
         id: deployment
         uses: actions/upload-pages-artifact@v5
