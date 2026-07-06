@@ -1,5 +1,11 @@
 # @sourceacademy/common-cse-machine
 
+## 0.2.0
+
+### Minor Changes
+
+- 372c5c9: Add optional `globalNames` field to `CseSerializedEnvFrame`, letting an evaluator (e.g. py-slang) mark names in a call frame that resolve via the global frame instead of the usual enclosing-scope chain (e.g. Python's `global` statement).
+
 ## 0.1.0
 
 ### Minor Changes

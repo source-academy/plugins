@@ -1,5 +1,12 @@
 # @sourceacademy/web-cse-machine
 
+## 2.0.0
+
+### Patch Changes
+
+- Updated dependencies [372c5c9]
+  - @sourceacademy/common-cse-machine@0.2.0
+
 ## 1.0.0
 
 ### Minor Changes
