@@ -36,8 +36,9 @@ export abstract class CseMachineHostPlugin implements IPlugin {
   /**
    * Called by the plugin with each received batch of snapshots.
    * Implement this in the host app to wire snapshots into the visualization layer.
+   * @param breakpointSteps 0-based step indices where a breakpoint sits on top of the control.
    */
-  abstract receiveSnapshots(snapshots: CseSnapshot[]): void;
+  abstract receiveSnapshots(snapshots: CseSnapshot[], breakpointSteps: number[]): void;
 
   constructor(
     _conduit: IConduit,
@@ -53,7 +54,10 @@ export abstract class CseMachineHostPlugin implements IPlugin {
         Array.isArray(message.snapshots) &&
         message.totalSteps === message.snapshots.length
       ) {
-        this.receiveSnapshots(message.snapshots);
+        this.receiveSnapshots(
+          message.snapshots,
+          Array.isArray(message.breakpointSteps) ? message.breakpointSteps : [],
+        );
       }
     });
   }
