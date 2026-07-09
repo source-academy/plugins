@@ -39,7 +39,14 @@ jobs:
           # fails CI's immutable install on the resulting "Version Packages" PR. Re-running
           # install here keeps the lockfile in sync in the same commit; it's a no-op when
           # nothing changed.
-          version: yarn changeset version && yarn install
+          #
+          # changesets/action runs this command directly (not through a shell), splitting it on
+          # spaces and exec'ing the first token with the rest as literal argv — so a bare
+          # `yarn changeset version && yarn install` sends `&&`, `yarn`, `install` to the
+          # changeset CLI itself as extra positional args, which it rejects ("Too many arguments
+          # passed to changesets"). Wrapping in `bash -c "..."` makes bash the exec'd command and
+          # hands it the whole compound command as one argument, so `&&` is interpreted correctly.
+          version: bash -c "yarn changeset version && yarn install"
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           # changesets/action's own README recommends this for the yarn-install-after-version
