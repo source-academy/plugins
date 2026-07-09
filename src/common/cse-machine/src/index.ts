@@ -141,7 +141,8 @@ export interface CseSnapshotMessage {
   /**
    * 0-based `stepIndex`es, in ascending order, of steps where a breakpoint (e.g. Python's
    * `breakpoint()`, JavaScript's `debugger;`) sits on top of the control. Used by the host's
-   * breakpoint-navigation controls to jump directly between these steps.
+   * breakpoint-navigation controls to jump directly between these steps. Optional so older
+   * runners that predate this field remain valid `CseSnapshotMessage`s.
    */
-  breakpointSteps: number[];
+  breakpointSteps?: number[];
 }

@@ -54,7 +54,10 @@ export abstract class CseMachineHostPlugin implements IPlugin {
         Array.isArray(message.snapshots) &&
         message.totalSteps === message.snapshots.length
       ) {
-        this.receiveSnapshots(message.snapshots, message.breakpointSteps ?? []);
+        this.receiveSnapshots(
+          message.snapshots,
+          Array.isArray(message.breakpointSteps) ? message.breakpointSteps : [],
+        );
       }
     });
   }
