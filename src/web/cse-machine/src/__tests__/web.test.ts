@@ -128,10 +128,7 @@ describe("valid messages", () => {
     const channel = makeChannel();
     const { receive } = makePlugin(channel);
     channel.emit(validMessage([snapshot(), { ...snapshot(), stepIndex: 1 }], [1]));
-    expect(receive).toHaveBeenCalledWith(
-      [snapshot(), { ...snapshot(), stepIndex: 1 }],
-      [1],
-    );
+    expect(receive).toHaveBeenCalledWith([snapshot(), { ...snapshot(), stepIndex: 1 }], [1]);
   });
 
   test("defaults breakpointSteps to an empty array when the field is missing from the message", () => {
