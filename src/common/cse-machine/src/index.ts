@@ -138,4 +138,10 @@ export interface CseSnapshotMessage {
   snapshots: CseSnapshot[];
   /** Convenience count; equals `snapshots.length`. */
   totalSteps: number;
+  /**
+   * 0-based `stepIndex`es, in ascending order, of steps where a breakpoint (e.g. Python's
+   * `breakpoint()`, JavaScript's `debugger;`) sits on top of the control. Used by the host's
+   * breakpoint-navigation controls to jump directly between these steps.
+   */
+  breakpointSteps: number[];
 }

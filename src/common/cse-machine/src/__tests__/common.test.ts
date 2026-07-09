@@ -88,6 +88,7 @@ describe("structured-clone safety", () => {
         { stepIndex: 1, control: [{ displayText: "pop" }], stash: [], environments: [] },
       ],
       totalSteps: 2,
+      breakpointSteps: [1],
     };
     expect(structuredClone(msg)).toEqual(msg);
   });
@@ -106,6 +107,7 @@ describe("CseSnapshotMessage", () => {
       type: CSE_MESSAGE_TYPE_SNAPSHOTS,
       snapshots,
       totalSteps: snapshots.length,
+      breakpointSteps: [],
     };
     expect(msg.totalSteps).toBe(3);
     expect(msg.snapshots.length).toBe(msg.totalSteps);
@@ -116,6 +118,7 @@ describe("CseSnapshotMessage", () => {
       type: CSE_MESSAGE_TYPE_SNAPSHOTS,
       snapshots: [],
       totalSteps: 0,
+      breakpointSteps: [],
     };
     expect(msg.snapshots).toHaveLength(0);
     expect(msg.totalSteps).toBe(0);
@@ -126,8 +129,34 @@ describe("CseSnapshotMessage", () => {
       type: CSE_MESSAGE_TYPE_SNAPSHOTS,
       snapshots: [],
       totalSteps: 0,
+      breakpointSteps: [],
     };
     expect(msg.type).toBe(CSE_MESSAGE_TYPE_SNAPSHOTS);
+  });
+
+  it("breakpointSteps carries the step indices where a breakpoint sits on top of the control", () => {
+    const snapshots: CseSnapshot[] = [
+      { stepIndex: 0, control: [], stash: [], environments: [] },
+      { stepIndex: 1, control: [{ displayText: "breakpoint()" }], stash: [], environments: [] },
+      { stepIndex: 2, control: [], stash: [], environments: [] },
+    ];
+    const msg: CseSnapshotMessage = {
+      type: CSE_MESSAGE_TYPE_SNAPSHOTS,
+      snapshots,
+      totalSteps: snapshots.length,
+      breakpointSteps: [1],
+    };
+    expect(msg.breakpointSteps).toEqual([1]);
+  });
+
+  it("breakpointSteps may be empty when no breakpoint was hit", () => {
+    const msg: CseSnapshotMessage = {
+      type: CSE_MESSAGE_TYPE_SNAPSHOTS,
+      snapshots: [],
+      totalSteps: 0,
+      breakpointSteps: [],
+    };
+    expect(msg.breakpointSteps).toHaveLength(0);
   });
 });
 

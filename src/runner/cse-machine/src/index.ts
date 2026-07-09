@@ -39,12 +39,14 @@ export class CseMachinePlugin implements IPlugin {
   /**
    * Send a full run's worth of snapshots to the host plugin.
    * @param snapshots The serialized evaluation snapshots, in step order.
+   * @param breakpointSteps 0-based step indices where a breakpoint sits on top of the control.
    */
-  sendSnapshots(snapshots: CseSnapshot[]): void {
+  sendSnapshots(snapshots: CseSnapshot[], breakpointSteps: number[] = []): void {
     this.__cseChannel.send({
       type: CSE_MESSAGE_TYPE_SNAPSHOTS,
       snapshots,
       totalSteps: snapshots.length,
+      breakpointSteps,
     });
   }
 }
