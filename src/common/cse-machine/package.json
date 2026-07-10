@@ -1,6 +1,6 @@
 {
   "name": "@sourceacademy/common-cse-machine",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "packageManager": "yarn@4.6.0",
   "description": "Shared protocol/types for the Source Academy CSE machine plugin pair",
   "scripts": {
