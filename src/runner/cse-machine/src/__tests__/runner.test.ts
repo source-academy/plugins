@@ -8,7 +8,6 @@ import {
 } from "@sourceacademy/common-cse-machine";
 import type { IChannel, IConduit } from "@sourceacademy/conductor/conduit";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const makeChannel = () => {
   const send = vi.fn();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
