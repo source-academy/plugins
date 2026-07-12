@@ -34,10 +34,11 @@ const snapshot = (): CseSnapshot => ({
   environments: [{ id: "g", name: "global", parentId: null, bindings: [], isActive: true }],
 });
 
-const validMessage = (snapshots: CseSnapshot[] = [snapshot()]) => ({
+const validMessage = (snapshots: CseSnapshot[] = [snapshot()], breakpointSteps: number[] = []) => ({
   type: CSE_MESSAGE_TYPE_SNAPSHOTS,
   snapshots,
   totalSteps: snapshots.length,
+  breakpointSteps,
 });
 
 // ── Identity / wiring ─────────────────────────────────────────────────────────
@@ -83,7 +84,7 @@ describe("valid messages", () => {
     const { receive } = makePlugin(channel);
     channel.emit(validMessage());
     expect(receive).toHaveBeenCalledOnce();
-    expect(receive).toHaveBeenCalledWith([snapshot()]);
+    expect(receive).toHaveBeenCalledWith([snapshot()], []);
   });
 
   test("receiveSnapshots receives multiple snapshots in order", () => {
@@ -91,7 +92,7 @@ describe("valid messages", () => {
     const { receive } = makePlugin(channel);
     const snaps = [snapshot(), { ...snapshot(), stepIndex: 1 }, { ...snapshot(), stepIndex: 2 }];
     channel.emit(validMessage(snaps));
-    expect(receive).toHaveBeenCalledWith(snaps);
+    expect(receive).toHaveBeenCalledWith(snaps, []);
   });
 
   test("receiveSnapshots is called once per valid message", () => {
@@ -106,7 +107,7 @@ describe("valid messages", () => {
     const channel = makeChannel();
     const { receive } = makePlugin(channel);
     channel.emit(validMessage([]));
-    expect(receive).toHaveBeenCalledWith([]);
+    expect(receive).toHaveBeenCalledWith([], []);
   });
 
   test("preserves snapshot fields passed through the channel", () => {
@@ -120,7 +121,21 @@ describe("valid messages", () => {
       currentLine: 9,
     };
     channel.emit(validMessage([snap]));
-    expect(receive).toHaveBeenCalledWith([snap]);
+    expect(receive).toHaveBeenCalledWith([snap], []);
+  });
+
+  test("receiveSnapshots is called with the breakpointSteps array", () => {
+    const channel = makeChannel();
+    const { receive } = makePlugin(channel);
+    channel.emit(validMessage([snapshot(), { ...snapshot(), stepIndex: 1 }], [1]));
+    expect(receive).toHaveBeenCalledWith([snapshot(), { ...snapshot(), stepIndex: 1 }], [1]);
+  });
+
+  test("defaults breakpointSteps to an empty array when the field is missing from the message", () => {
+    const channel = makeChannel();
+    const { receive } = makePlugin(channel);
+    channel.emit({ type: CSE_MESSAGE_TYPE_SNAPSHOTS, snapshots: [snapshot()], totalSteps: 1 });
+    expect(receive).toHaveBeenCalledWith([snapshot()], []);
   });
 });
 

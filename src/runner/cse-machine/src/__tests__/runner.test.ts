@@ -101,7 +101,23 @@ describe("sendSnapshots", () => {
       type: CSE_MESSAGE_TYPE_SNAPSHOTS,
       snapshots: [],
       totalSteps: 0,
+      breakpointSteps: [],
     });
+  });
+
+  test("defaults breakpointSteps to an empty array when omitted", () => {
+    const channel = makeChannel();
+    const plugin = makePlugin(channel);
+    plugin.sendSnapshots([minimalSnapshot()]);
+    expect(channel.send.mock.calls[0][0].breakpointSteps).toEqual([]);
+  });
+
+  test("forwards the breakpointSteps argument unchanged", () => {
+    const channel = makeChannel();
+    const plugin = makePlugin(channel);
+    const snapshots = [minimalSnapshot(), { ...minimalSnapshot(), stepIndex: 1 }];
+    plugin.sendSnapshots(snapshots, [1]);
+    expect(channel.send.mock.calls[0][0].breakpointSteps).toEqual([1]);
   });
 
   test("handles a large batch of snapshots", () => {
