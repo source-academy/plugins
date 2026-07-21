@@ -48,8 +48,14 @@ async function generateManifest() {
             description: packageJSONFile.description,
             resolutions: {},
           };
+          // Use the plugin's own declared entry point rather than assuming ".js": external
+          // plugins can emit ".mjs" (e.g. the stepper's wrap.mjs produces real ESM for native
+          // `import()`), and a mismatch here silently 404s for anyone resolving the plugin.
+          const entryFile = pathlib.basename(
+            packageJSONFile.main ?? packageJSONFile.module ?? "index.js",
+          );
           pluginDirectory[folderName].resolutions[pluginType] =
-            "./" + pluginType + "/" + folderName + "/index.js";
+            "./" + pluginType + "/" + folderName + "/" + entryFile;
         }
       }
       globalManifest[pluginType] = manifest;
