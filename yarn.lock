@@ -2030,10 +2030,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sourceacademy/conductor@npm:^0.5.0":
-  version: 0.5.0
-  resolution: "@sourceacademy/conductor@npm:0.5.0"
-  checksum: 10c0/e87c54febc0c68498ba4ebb29de79028798fa2d3183e2f4b09ba8d7992f44f8a04600409fa08a7b2e07d38261e23ee300140e6c982181d0a549636c0a944813d
+"@sourceacademy/conductor@npm:^0.8.0":
+  version: 0.8.0
+  resolution: "@sourceacademy/conductor@npm:0.8.0"
+  checksum: 10c0/8b970b1f5fffbcb5242f5c358fb25af8d916cb5af9ca7fa9e0128928fde1783ed65465241858a82002bd8b5f21f5f5b80d3ea57bbd05faed604e6dd1c36600e9
   languageName: node
   linkType: hard
 
@@ -3093,12 +3093,12 @@ __metadata:
   linkType: hard
 
 "brace-expansion@npm:^1.1.7":
-  version: 1.1.15
-  resolution: "brace-expansion@npm:1.1.15"
+  version: 1.1.16
+  resolution: "brace-expansion@npm:1.1.16"
   dependencies:
     balanced-match: "npm:^1.0.0"
     concat-map: "npm:0.0.1"
-  checksum: 10c0/648e273f57cfa9ed67d8a77bdb15b408205465d33da9331808ee3c188d8b55674c9cdbf1f320b65bc562e485e1263360ae62ad355e128e0435891f6430e795d7
+  checksum: 10c0/b2a915bbedbf4e45840d1fb9a4d391bbf26a79475bd134714d3cee34f1f0edb0ce982738028843be5fbaf8039429f71fa487df8c915b6065ced542c83e58fae6
   languageName: node
   linkType: hard
 
@@ -5832,7 +5832,7 @@ __metadata:
   resolution: "plugins@workspace:."
   dependencies:
     "@changesets/cli": "npm:^2.31.0"
-    "@sourceacademy/conductor": "npm:^0.5.0"
+    "@sourceacademy/conductor": "npm:^0.8.0"
     "@sourceacademy/plugin-directory": "source-academy/plugin-directory#main"
     "@types/node": "npm:^25.9.1"
     "@vitest/coverage-istanbul": "npm:^4.1.9"
