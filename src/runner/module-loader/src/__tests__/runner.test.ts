@@ -172,7 +172,9 @@ describe("requestModule", () => {
 
     await options.loadTab("ChartTab");
     expect(hostLoadPlugin).toHaveBeenCalledWith("ChartTab");
-    await expect(() => options.loadTab("MissingTab")).rejects.toThrow("Tab MissingTab not found in module chart");
+    await expect(() => options.loadTab("MissingTab")).rejects.toThrow(
+      "Tab MissingTab not found in module chart",
+    );
   });
 
   test("rejects when the plugin is invalid", () => {
