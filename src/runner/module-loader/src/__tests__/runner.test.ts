@@ -69,7 +69,7 @@ const makeConductor = () => {
     (
       pluginClass: PluginClass<unknown[]>,
       evaluator: IInterfacableEvaluator,
-      options: { tabs: string[]; loadTab: (tabName: string) => void },
+      options: { tabs: string[]; loadTab: (tabName: string) => Promise<void> },
     ) => IModulePlugin
   > = vi.fn(pluginClass => {
     if (loadedPlugins.has(pluginClass.name)) {
@@ -170,9 +170,9 @@ describe("requestModule", () => {
     await plugin.requestModule("chart");
     const options = registerPlugin.mock.calls[0][2];
 
-    options.loadTab("ChartTab");
+    await options.loadTab("ChartTab");
     expect(hostLoadPlugin).toHaveBeenCalledWith("ChartTab");
-    expect(() => options.loadTab("MissingTab")).toThrow("Tab MissingTab not found in module chart");
+    await expect(() => options.loadTab("MissingTab")).rejects.toThrow("Tab MissingTab not found in module chart");
   });
 
   test("rejects when the plugin is invalid", () => {
