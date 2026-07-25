@@ -2031,13 +2031,6 @@ __metadata:
   linkType: hard
 
 "@sourceacademy/conductor@npm:^0.8.0":
-  version: 0.8.0
-  resolution: "@sourceacademy/conductor@npm:0.8.0"
-  checksum: 10c0/8b970b1f5fffbcb5242f5c358fb25af8d916cb5af9ca7fa9e0128928fde1783ed65465241858a82002bd8b5f21f5f5b80d3ea57bbd05faed604e6dd1c36600e9
-  languageName: node
-  linkType: hard
-
-"@sourceacademy/conductor@npm:^0.8.0":
   version: 0.8.1
   resolution: "@sourceacademy/conductor@npm:0.8.1"
   checksum: 10c0/2b63c9ae6a0aaae39d3fee7da1a25345770f5a6c1cdf2c2ab3bf085b02388c7d7968f6e6bc05cb9da79f2e3f11813dfc1640a31ee90a4195199671b1123e86f1
