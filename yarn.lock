@@ -2030,10 +2030,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sourceacademy/conductor@npm:^0.5.0":
-  version: 0.5.0
-  resolution: "@sourceacademy/conductor@npm:0.5.0"
-  checksum: 10c0/e87c54febc0c68498ba4ebb29de79028798fa2d3183e2f4b09ba8d7992f44f8a04600409fa08a7b2e07d38261e23ee300140e6c982181d0a549636c0a944813d
+"@sourceacademy/conductor@npm:^0.8.0":
+  version: 0.8.0
+  resolution: "@sourceacademy/conductor@npm:0.8.0"
+  checksum: 10c0/8b970b1f5fffbcb5242f5c358fb25af8d916cb5af9ca7fa9e0128928fde1783ed65465241858a82002bd8b5f21f5f5b80d3ea57bbd05faed604e6dd1c36600e9
   languageName: node
   linkType: hard
 
@@ -5825,7 +5825,7 @@ __metadata:
   resolution: "plugins@workspace:."
   dependencies:
     "@changesets/cli": "npm:^2.31.0"
-    "@sourceacademy/conductor": "npm:^0.5.0"
+    "@sourceacademy/conductor": "npm:^0.8.0"
     "@sourceacademy/plugin-directory": "source-academy/plugin-directory#main"
     "@types/node": "npm:^25.9.1"
     "@vitest/coverage-istanbul": "npm:^4.1.9"
