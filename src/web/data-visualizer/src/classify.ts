@@ -196,6 +196,8 @@ export interface TreeLayout {
   longestNodePos: number;
   colorByRefId: Map<RefId, number>;
   posByRefId: Map<RefId, number>;
+  /** How many pair-nodes were counted at each depth, indexed by depth. */
+  nodeCountByDepth: number[];
 }
 
 function computeLayout(root: SerializedDataVisualizerNode): TreeLayout {
@@ -233,7 +235,22 @@ function computeLayout(root: SerializedDataVisualizerNode): TreeLayout {
   }
 
   visit(root, 0, false);
-  return { treeDepth, longestNodePos, colorByRefId, posByRefId };
+  return { treeDepth, longestNodePos, colorByRefId, posByRefId, nodeCountByDepth };
+}
+
+/** True if a `"function"` node appears anywhere in the tree. Mirrors the old `Tree.fromSourceStructure`'s
+ * `constructFunction`, which unconditionally forced both tree flags false the moment it built a
+ * function node — a function value disqualifies the whole structure from tree rendering, regardless
+ * of where in the structure it appears. */
+function containsFunction(node: SerializedDataVisualizerNode): boolean {
+  switch (node.type) {
+    case "function":
+      return true;
+    case "array":
+      return node.children.some(containsFunction);
+    default:
+      return false;
+  }
 }
 
 export interface ClassificationResult {
@@ -257,6 +274,10 @@ export function classify(node: SerializedDataVisualizerNode): ClassificationResu
   // would make it a DAG or a graph, not a tree — so skip classification entirely rather than walk a
   // shape isBinaryTreeNode/isGeneralTreeNode were never designed to see a "ref" node.
   if (isCyclic || isSharedStructure) {
+    return { isCyclic, isSharedStructure, isBinaryTree: false, isGeneralTree: false };
+  }
+
+  if (containsFunction(node)) {
     return { isCyclic, isSharedStructure, isBinaryTree: false, isGeneralTree: false };
   }
 
