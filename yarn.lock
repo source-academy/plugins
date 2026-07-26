@@ -1961,6 +1961,22 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@sourceacademy/common-data-visualizer@workspace:src/common/data-visualizer":
+  version: 0.0.0-use.local
+  resolution: "@sourceacademy/common-data-visualizer@workspace:src/common/data-visualizer"
+  dependencies:
+    "@rollup/plugin-node-resolve": "npm:^16.0.3"
+    "@rollup/plugin-terser": "npm:^1.0.0"
+    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@types/jest": "npm:^30.0.0"
+    jest: "npm:^30.4.2"
+    rollup: "npm:^4.60.2"
+    ts-jest: "npm:^29.4.11"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^6.0.3"
+  languageName: unknown
+  linkType: soft
+
 "@sourceacademy/common-module-loader@workspace:*, @sourceacademy/common-module-loader@workspace:src/common/module-loader":
   version: 0.0.0-use.local
   resolution: "@sourceacademy/common-module-loader@workspace:src/common/module-loader"
