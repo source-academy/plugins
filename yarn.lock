@@ -2208,6 +2208,16 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@sourceacademy/web-data-visualizer@workspace:src/web/data-visualizer":
+  version: 0.0.0-use.local
+  resolution: "@sourceacademy/web-data-visualizer@workspace:src/web/data-visualizer"
+  dependencies:
+    "@sourceacademy/common-data-visualizer": "workspace:*"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^6.0.3"
+  languageName: unknown
+  linkType: soft
+
 "@sourceacademy/web-module-loader@workspace:src/web/module-loader":
   version: 0.0.0-use.local
   resolution: "@sourceacademy/web-module-loader@workspace:src/web/module-loader"
