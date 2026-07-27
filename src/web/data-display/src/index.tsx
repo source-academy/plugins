@@ -19,7 +19,7 @@ export default class DisplayDataWebPlugin implements IPlugin {
   id = WEB_ID;
   static channelAttach = [DATA_CHANNEL_ID, CONFIG_CHANNEL_ID];
 
-  private __dataChannel: IChannel<Data>;
+  private __dataChannel: IChannel<Data[]>;
   private __configChannel: IChannel<Config | null>;
 
   constructor(
@@ -32,13 +32,14 @@ export default class DisplayDataWebPlugin implements IPlugin {
     this.__configChannel = configChannel;
     this.__configChannel.subscribe(msg => {
       if (msg === null) return;
+      // "playground" is temporary, it gets changed to the correct workspace location when the tab is registered
       const tab = makeDataVisualizerTabFrom("playground", msg);
       tabService.registerTab(tab);
       tabService.showTab(tab.id);
     });
     this.__configChannel.send(null);
     this.__dataChannel.subscribe(data => {
-      DataVisualizer.drawData([data]);
+      DataVisualizer.drawData(data);
     });
   }
 }

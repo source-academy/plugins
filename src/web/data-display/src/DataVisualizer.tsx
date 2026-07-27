@@ -208,7 +208,7 @@ export default class DataVisualizer {
     this.isRedraw = true;
     this.clear();
     try {
-      DataVisualizer.dataRecords.forEach(this.drawData);
+      DataVisualizer.dataRecords.forEach(this.drawData.bind(this));
     } finally {
       this.isRedraw = false;
     }

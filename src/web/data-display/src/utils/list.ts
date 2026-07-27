@@ -54,7 +54,7 @@ export function tail(xs: Data): Data {
  */
 export function is_list(xs: Data): xs is ArrayValue | EmptyListValue {
   for (; ; xs = tail(xs)) {
-    if (xs === null) {
+    if (xs.type === "null") {
       return true;
     } else if (!is_pair(xs)) {
       return false;

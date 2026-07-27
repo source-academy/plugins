@@ -138,7 +138,7 @@ function SideContentDataVisualizer({ workspaceLocation, config }: Props) {
       ) : null}
       {steps.length > 0 ? (
         <div
-          key={step.length} // To ensure the style refreshes if the step length changes
+          key={currentStep} // To ensure the style refreshes if the step length changes
           style={{
             display: "flex",
             flexDirection: "row",

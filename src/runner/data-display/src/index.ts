@@ -10,7 +10,7 @@ import {
 export abstract class BaseDataDisplayRunnerPlugin<T> implements IPlugin {
   readonly id: string = RUNNER_ID;
   static readonly channelAttach = [DATA_CHANNEL_ID, CONFIG_CHANNEL_ID];
-  private readonly __dataChannel: IChannel<Data>;
+  private readonly __dataChannel: IChannel<Data[]>;
   private readonly __configChannel: IChannel<Config | null>;
 
   constructor(
@@ -28,7 +28,7 @@ export abstract class BaseDataDisplayRunnerPlugin<T> implements IPlugin {
 
   abstract getConfig(): Config;
   abstract serialiseData(data: T): Data;
-  sendData(data: T) {
-    this.__dataChannel.send(this.serialiseData(data));
+  sendData(data: T[]): void {
+    this.__dataChannel.send(data.map(item => this.serialiseData(item)));
   }
 }
