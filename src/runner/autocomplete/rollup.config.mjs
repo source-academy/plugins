@@ -18,4 +18,5 @@ export default {
     },
   ],
   plugins: [nodeResolve(), typescript(), terser()],
+  external: [/^@sourceacademy\/conductor(?:\/|$)/],
 };

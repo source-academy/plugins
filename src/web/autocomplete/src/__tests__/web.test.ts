@@ -1,13 +1,11 @@
-import type {
-  AutoCompleteMessage,
-  ModeRpc,
-  SyntaxHighlightData,
-  SyntaxHighlightMessage,
-} from "@sourceacademy/common-autocomplete";
 import {
   AUTOCOMPLETE_CHANNEL_ID,
   SYNTAX_CHANNEL_ID,
   WEB_PLUGIN_ID,
+  type AutoCompleteMessage,
+  type ModeRpc,
+  type SyntaxHighlightData,
+  type SyntaxHighlightMessage,
 } from "@sourceacademy/common-autocomplete";
 import {
   makeRpc,
@@ -55,74 +53,68 @@ const makeChannelPair = (): [TestChannel<unknown>, TestChannel<unknown>] => {
   return [runner, web];
 };
 
-test("exposes the web plugin identity and channel attachments", () => {
-  const [runnerAutocomplete, webAutocomplete] = makeChannelPair();
+const makeSyntaxData = (id: string) =>
+  ({
+    highlightRules: {},
+    foldingRules: { hookFrom: "ace/mode/folding/cstyle", args: [] },
+    lineCommentStart: "//",
+    pairQuotesAfter: {},
+    indents: { hookFrom: "ace/mode/text" },
+    outdents: { hookFrom: "ace/mode/text" },
+    autoOutdent: { hookFrom: "ace/mode/text" },
+    id,
+  }) as const;
+
+test("exposes its identity and defers mode loading until after subclass initialization", () => {
+  const [, webAutocomplete] = makeChannelPair();
   const [runnerSyntax, webSyntax] = makeChannelPair();
-  runnerSyntax.subscribe(message => {
-    if ((message as SyntaxHighlightMessage).type === "request") {
-      runnerSyntax.send({
-        type: "response",
-        data: {
-          highlightRules: {},
-          foldingRules: { hookFrom: "ace/mode/folding/cstyle", args: [] },
-          lineCommentStart: "//",
-          pairQuotesAfter: {},
-          indents: { hookFrom: "ace/mode/text" },
-          outdents: { hookFrom: "ace/mode/text" },
-          autoOutdent: { hookFrom: "ace/mode/text" },
-          id: "identity-test",
-        },
-      });
-    }
-  });
 
   class TestWeb extends BaseAutoCompleteWebPlugin {
-    loadMode(): void {}
+    private initialized = false;
+    loadedModeId: string | undefined;
+
+    constructor(conduit: IConduit, channels: IChannel<unknown>[]) {
+      super(conduit, channels);
+      this.initialized = true;
+    }
+
+    loadMode(data: SyntaxHighlightData): void {
+      if (!this.initialized) {
+        throw new Error("loadMode called before subclass initialization");
+      }
+      this.loadedModeId = data.id;
+    }
   }
   const plugin = new TestWeb({} as IConduit, [webAutocomplete, webSyntax] as IChannel<unknown>[]);
+  runnerSyntax.send({ type: "response", data: makeSyntaxData("identity-test") });
 
   expect(plugin.id).toBe(WEB_PLUGIN_ID);
+  expect(plugin.loadedModeId).toBe("identity-test");
   expect(BaseAutoCompleteWebPlugin.channelAttach).toEqual([
     AUTOCOMPLETE_CHANNEL_ID,
     SYNTAX_CHANNEL_ID,
   ]);
-  expect(runnerAutocomplete).toBeDefined();
 });
 
-test("forwards autocomplete requests and unsubscribes after the response", () => {
+test("forwards autocomplete requests and unsubscribes after the matching response", () => {
   const [runnerAutocomplete, webAutocomplete] = makeChannelPair();
-  const [runnerSyntax, webSyntax] = makeChannelPair();
-  const requests: AutoCompleteMessage[] = [];
+  const [, webSyntax] = makeChannelPair();
+  const requests: Extract<AutoCompleteMessage, { type: "request" }>[] = [];
   runnerAutocomplete.subscribe(message => {
     const autocompleteMessage = message as AutoCompleteMessage;
     if (autocompleteMessage.type === "request") {
       requests.push(autocompleteMessage);
       runnerAutocomplete.send({
         type: "request",
+        requestId: -1,
         code: "ignored",
         row: 1,
         column: 1,
       });
       runnerAutocomplete.send({
         type: "response",
+        requestId: autocompleteMessage.requestId,
         declarations: [{ name: "answer", meta: "var" }],
-      });
-    }
-  });
-  runnerSyntax.subscribe(message => {
-    if ((message as SyntaxHighlightMessage).type === "request") {
-      runnerSyntax.send({
-        type: "response",
-        data: {
-          highlightRules: {},
-          foldingRules: { hookFrom: "ace/mode/folding/cstyle", args: [] },
-          lineCommentStart: "//",
-          pairQuotesAfter: {},
-          indents: { hookFrom: "ace/mode/text" },
-          outdents: { hookFrom: "ace/mode/text" },
-          autoOutdent: { hookFrom: "ace/mode/text" },
-          id: "autocomplete-test",
-        },
       });
     }
   });
@@ -136,14 +128,76 @@ test("forwards autocomplete requests and unsubscribes after the response", () =>
   plugin.autocomplete("ans", 4, 2, callback);
   runnerAutocomplete.send({
     type: "response",
+    requestId: requests[0].requestId,
     declarations: [{ name: "ignored-second-response", meta: "var" }],
   });
 
-  expect(requests).toEqual([{ type: "request", code: "ans", row: 4, column: 2 }]);
+  expect(requests).toEqual([
+    {
+      type: "request",
+      requestId: expect.any(Number),
+      code: "ans",
+      row: 4,
+      column: 2,
+    },
+  ]);
   expect(callback).toHaveBeenCalledOnce();
   expect(callback).toHaveBeenCalledWith({
     type: "response",
+    requestId: requests[0].requestId,
     declarations: [{ name: "answer", meta: "var" }],
+  });
+});
+
+test("keeps overlapping autocomplete responses correlated with their requests", () => {
+  const [runnerAutocomplete, webAutocomplete] = makeChannelPair();
+  const [, webSyntax] = makeChannelPair();
+  const requests: Extract<AutoCompleteMessage, { type: "request" }>[] = [];
+  runnerAutocomplete.subscribe(message => {
+    const autocompleteMessage = message as AutoCompleteMessage;
+    if (autocompleteMessage.type === "request") {
+      requests.push(autocompleteMessage);
+    }
+  });
+
+  class TestWeb extends BaseAutoCompleteWebPlugin {
+    loadMode(): void {}
+  }
+  const plugin = new TestWeb({} as IConduit, [webAutocomplete, webSyntax] as IChannel<unknown>[]);
+  const firstCallback = vi.fn();
+  const secondCallback = vi.fn();
+
+  plugin.autocomplete("first", 1, 5, firstCallback);
+  plugin.autocomplete("second", 2, 6, secondCallback);
+  expect(requests).toHaveLength(2);
+
+  runnerAutocomplete.send({
+    type: "response",
+    requestId: Math.max(requests[0].requestId, requests[1].requestId) + 1000,
+    declarations: [{ name: "unmatched", meta: "var" }],
+  });
+  runnerAutocomplete.send({
+    type: "response",
+    requestId: requests[1].requestId,
+    declarations: [{ name: "second-result", meta: "var" }],
+  });
+  runnerAutocomplete.send({
+    type: "response",
+    requestId: requests[0].requestId,
+    declarations: [{ name: "first-result", meta: "var" }],
+  });
+
+  expect(firstCallback).toHaveBeenCalledOnce();
+  expect(firstCallback).toHaveBeenCalledWith({
+    type: "response",
+    requestId: requests[0].requestId,
+    declarations: [{ name: "first-result", meta: "var" }],
+  });
+  expect(secondCallback).toHaveBeenCalledOnce();
+  expect(secondCallback).toHaveBeenCalledWith({
+    type: "response",
+    requestId: requests[1].requestId,
+    declarations: [{ name: "second-result", meta: "var" }],
   });
 });
 
@@ -156,23 +210,6 @@ test("hydrates mode functions as RPC calls and preserves hooks", async () => {
     outdents: () => false,
     autoOutdent: (value: unknown) => `outdented:${String(value)}`,
   });
-  runnerSyntax.subscribe(message => {
-    if ((message as SyntaxHighlightMessage).type === "request") {
-      runnerSyntax.send({
-        type: "response",
-        data: {
-          highlightRules: {},
-          foldingRules: { hookFrom: "ace/mode/folding/cstyle", args: [] },
-          lineCommentStart: "//",
-          pairQuotesAfter: {},
-          indents: { rpc: "indents" },
-          outdents: { hookFrom: "ace/mode/text" },
-          autoOutdent: { rpc: "autoOutdent" },
-          id: "rpc-test",
-        },
-      });
-    }
-  });
 
   let loadedMode: SyntaxHighlightData | undefined;
   class TestWeb extends BaseAutoCompleteWebPlugin {
@@ -182,6 +219,14 @@ test("hydrates mode functions as RPC calls and preserves hooks", async () => {
   }
 
   new TestWeb({} as IConduit, [webAutocomplete, webSyntax] as IChannel<unknown>[]);
+  runnerSyntax.send({
+    type: "response",
+    data: {
+      ...makeSyntaxData("rpc-test"),
+      indents: { rpc: "indents" },
+      autoOutdent: { rpc: "autoOutdent" },
+    },
+  });
 
   expect(loadedMode).toBeDefined();
   expect(loadedMode?.outdents).toEqual({ hookFrom: "ace/mode/text" });
@@ -222,16 +267,7 @@ test("acknowledges and loads only the first syntax response", () => {
   }
   new TestWeb({} as IConduit, [webAutocomplete, webSyntax] as IChannel<unknown>[]);
 
-  const data = {
-    highlightRules: {},
-    foldingRules: { hookFrom: "ace/mode/folding/cstyle", args: [] },
-    lineCommentStart: "//",
-    pairQuotesAfter: {},
-    indents: { hookFrom: "ace/mode/text" },
-    outdents: { hookFrom: "ace/mode/text" },
-    autoOutdent: { hookFrom: "ace/mode/text" },
-    id: "first-mode",
-  } as const;
+  const data = makeSyntaxData("first-mode");
   runnerSyntax.send({ type: "request" });
   runnerSyntax.send({ type: "ack" });
   runnerSyntax.send({ type: "response", data });

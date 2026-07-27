@@ -125,18 +125,21 @@ test("responds to autocomplete requests over its Conductor channel", () => {
   });
   webAutocomplete.send({
     type: "request",
+    requestId: 17,
     code: "res",
     row: 2,
     column: 3,
   });
   webAutocomplete.send({
     type: "response",
+    requestId: 99,
     declarations: [],
   });
 
   expect(plugin.autocompleteCalls).toEqual([["res", 2, 3]]);
   expect(response).toEqual({
     type: "response",
+    requestId: 17,
     declarations: [{ name: "result", meta: "var" }],
   });
 });

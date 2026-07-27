@@ -29,6 +29,8 @@ export enum CompletionItemKind {
 
 export interface AutoCompleteRequest {
   type: "request";
+  /** Correlates this request with its response. */
+  requestId: number;
   /** The current code in the editor */
   code: string;
   /** The current row of the cursor in the editor (1-indexed) */
@@ -39,6 +41,8 @@ export interface AutoCompleteRequest {
 
 export interface AutoCompleteResponse {
   type: "response";
+  /** The ID of the request that produced this response. */
+  requestId: number;
   /** A list of autocomplete entries relevant to the current cursor position in the code */
   declarations: AutoCompleteEntry[];
 }

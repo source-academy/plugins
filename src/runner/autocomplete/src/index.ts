@@ -87,10 +87,11 @@ export abstract class BaseAutoCompleteRunnerPlugin implements IPlugin {
     });
     this.__autoCompleteChannel.subscribe((message: AutoCompleteMessage) => {
       if (message.type === "request") {
-        const { code, row, column } = message;
+        const { requestId, code, row, column } = message;
         const entries = this.autocomplete(code, row, column);
         this.__autoCompleteChannel.send({
           type: "response",
+          requestId,
           declarations: entries,
         });
       }

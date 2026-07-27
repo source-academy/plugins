@@ -20,6 +20,8 @@ import {
   type TransferredSyntaxHighlightData,
 } from "@sourceacademy/common-autocomplete";
 
+let nextAutoCompleteRequestId = 0;
+
 export abstract class BaseAutoCompleteWebPlugin implements IPlugin {
   static readonly channelAttach = [AUTOCOMPLETE_CHANNEL_ID, SYNTAX_CHANNEL_ID];
   readonly id: string = WEB_PLUGIN_ID; // Should be migrated to an ID in v0.3.0
@@ -41,8 +43,9 @@ export abstract class BaseAutoCompleteWebPlugin implements IPlugin {
     column: number,
     callback: (suggestions: AutoCompleteResponse) => void,
   ) {
+    const requestId = nextAutoCompleteRequestId++;
     const handler = (message: AutoCompleteMessage) => {
-      if (message.type === "response") {
+      if (message.type === "response" && message.requestId === requestId) {
         this.__autoCompleteChannel.unsubscribe(handler);
         callback(message);
       }
@@ -50,6 +53,7 @@ export abstract class BaseAutoCompleteWebPlugin implements IPlugin {
     this.__autoCompleteChannel.subscribe(handler);
     this.__autoCompleteChannel.send({
       type: "request",
+      requestId,
       code,
       row,
       column,
