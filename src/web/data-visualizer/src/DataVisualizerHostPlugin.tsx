@@ -20,10 +20,10 @@ const TAB_ID = 'data-visualizer';
  *
  * The plugin is entirely language-agnostic — it only knows the serialized row protocol from
  * `@sourceacademy/common-data-visualizer`, plus the standard tab-service contract from
- * `@sourceacademy/common-tabs`. All cycle-detection, pair/list/tree classification, and rendering
- * (in `classify.ts` and `tree/`) lives here too, shared across every language — see this package's
- * sibling `runner-data-visualizer` package for why that logic is not duplicated per language. It is
- * loaded dynamically by the host (no per-language frontend code).
+ * `@sourceacademy/common-tabs`. Cycle/shared-structure handling and rendering (in `tree/`) lives
+ * here too, shared across every language — see this package's sibling `runner-data-visualizer`
+ * package for why that logic is not duplicated per language. It is loaded dynamically by the host
+ * (no per-language frontend code).
  */
 export class DataVisualizerHostPlugin implements IPlugin {
   static readonly channelAttach = [DATA_VISUALIZER_CHANNEL_ID];
@@ -54,11 +54,15 @@ export class DataVisualizerHostPlugin implements IPlugin {
     const tab: Tab = {
       id: TAB_ID,
       label: 'Data Visualizer',
-      iconName: 'diagram-tree',
+      iconName: 'eye-open',
       body: createElement(DataVisualizerTab),
     };
     tabService.registerTab(tab);
-    tabService.showTab(tab.id);
+    // Reveal, don't show: this plugin loads as soon as the language starts (before the student has
+    // called draw_data), so it must not steal focus from whichever tab is already selected (e.g. the
+    // welcome/introduction tab) - it should just become available in the tab bar for the student to
+    // click into on their own.
+    tabService.revealTab(tab.id);
   }
 
   /** The most recently received rows. */
