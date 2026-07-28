@@ -10,13 +10,16 @@ import type { IChannel, IConduit, IPlugin } from "@sourceacademy/conductor/condu
 
 /**
  * Assigns each distinct compound runtime value (by reference) a stable {@link RefId} the first time
- * it's seen while serializing one row, so a language adapter's `toNode` can answer "have I already
- * emitted this value in this row?" without knowing anything about *why* that matters — cycle
- * detection and shared-structure classification are entirely the host's job, not the adapter's.
+ * it's seen while serializing one `draw_data(...)` argument, so a language adapter's `toNode` can
+ * answer "have I already emitted this value in this argument?" without knowing anything about *why*
+ * that matters — cycle detection and shared-structure classification are entirely the host's job,
+ * not the adapter's.
  *
- * Scoped to a single row: {@link BaseDataVisualizerRunnerPlugin.sendDrawing} creates a fresh
- * allocator for every call, so ids are only comparable within the row they were produced for (see
- * `RefId`'s doc comment in `@sourceacademy/common-data-visualizer`).
+ * Scoped to a single argument, not a single row: {@link BaseDataVisualizerRunnerPlugin.sendDrawing}
+ * creates a fresh allocator for *each argument* of the call, so ids are only comparable within the
+ * one argument they were produced for (see `RefId`'s doc comment in
+ * `@sourceacademy/common-data-visualizer`) — the host renders each argument as an independent Konva
+ * `Stage`, so there is no way to resolve, let alone draw, a ref pointing across arguments.
  */
 export interface RefIdAllocator {
   /**
@@ -92,7 +95,7 @@ export abstract class BaseDataVisualizerRunnerPlugin<TValue> implements IPlugin 
    * recursing — as soon as `alreadySeen` comes back `true`. See {@link RefIdAllocator}.
    *
    * @param value One argument from a `draw_data(...)` call.
-   * @param refs Row-scoped identity tracking, fresh for this call to {@link sendDrawing}.
+   * @param refs Identity tracking scoped to this one argument, fresh for each call to {@link toNode}.
    */
   protected abstract toNode(value: TValue, refs: RefIdAllocator): SerializedDataVisualizerNode;
 
@@ -100,10 +103,22 @@ export abstract class BaseDataVisualizerRunnerPlugin<TValue> implements IPlugin 
    * Serializes `values` (the arguments of one `draw_data(...)` call) into a new row, appends it to
    * this run's accumulated rows, and pushes the full, updated row list to the host. Call this from
    * the `draw_data` builtin's implementation itself.
+   *
+   * Each argument gets its own fresh {@link RefIdAllocator}, not one shared across the whole call —
+   * matching the old pre-Conductor frontend's `Tree.fromSourceStructure`, whose `visitedStructures`
+   * identity map was likewise always fresh per top-level argument, never shared across arguments of
+   * one `draw_data(...)` call. This isn't just fidelity to the old behavior: the host renders each
+   * argument as its own independent Konva `Stage` (a separate `<canvas>`), so a "ref" node pointing
+   * at a value that only got fully expanded in a *different* argument's tree can never be resolved —
+   * there is no such thing as an arrow from one canvas into another. A row-scoped allocator would
+   * make the wire format collapse a cross-argument-shared value down to a bare ref the host can't
+   * resolve, silently losing that data (it falls back to rendering as an empty/None node). Scoping
+   * per argument instead means a value shared *across* arguments is simply serialized in full each
+   * time (matching legacy exactly); only sharing *within* one argument's own structure collapses to
+   * a ref, which the host can always resolve because that whole subtree lives in one Stage.
    */
   async sendDrawing(values: TValue[]): Promise<void> {
-    const refs = createRefIdAllocator();
-    const row: SerializedDataVisualizerRow = values.map(value => this.toNode(value, refs));
+    const row: SerializedDataVisualizerRow = values.map(value => this.toNode(value, createRefIdAllocator()));
     this.__rows = [...this.__rows, row];
     this.__channel.send({ type: "rows", rows: this.__rows });
   }

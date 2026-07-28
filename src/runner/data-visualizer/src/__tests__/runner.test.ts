@@ -134,6 +134,46 @@ test("a self-referential value terminates via a ref node instead of recursing fo
   });
 });
 
+test("a value shared across two arguments of one call is fully re-serialized in each, not collapsed to an unresolvable ref", async () => {
+  // The host renders each argument of a draw_data(...) call as its own independent Konva Stage
+  // (a separate <canvas>), so a "ref" node can only ever be resolved against other nodes already
+  // built within that SAME argument's tree — there is no way to draw, or even resolve, an arrow
+  // pointing into a different argument's canvas. sendDrawing must therefore give each argument its
+  // own fresh RefIdAllocator, so a value shared *across* arguments is serialized in full both times
+  // (matching the old pre-Conductor frontend's per-argument `visitedStructures` scoping) rather than
+  // silently collapsing the second occurrence into a ref the host can never resolve.
+  const channel = new FakeChannel();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const plugin = new ArrayDataVisualizer({} as any, [channel as any]);
+  const shared: TestValue[] = [1];
+
+  await plugin.sendDrawing([shared, [shared, 2]]);
+
+  const message = channel.sent[0] as { rows: SerializedDataVisualizerNode[][] };
+  const [firstArg, secondArg] = message.rows[0];
+  // First argument's own allocator sees `shared` first, so it claims refId 1.
+  expect(firstArg).toEqual({
+    type: "array",
+    refId: 1,
+    children: [{ type: "leaf", displayValue: "1", label: "number" }],
+  });
+  // Second argument gets its own fresh allocator: its outer wrapper array (a distinct object from
+  // `shared`) is visited first and claims refId 1 for *this* argument; `shared` is then a new value
+  // as far as this allocator is concerned, and claims refId 2 — fully expanded, not a "ref".
+  expect(secondArg).toEqual({
+    type: "array",
+    refId: 1,
+    children: [
+      {
+        type: "array",
+        refId: 2,
+        children: [{ type: "leaf", displayValue: "1", label: "number" }],
+      },
+      { type: "leaf", displayValue: "2", label: "number" },
+    ],
+  });
+});
+
 test("createRefIdAllocator assigns the same id to the same reference and different ids otherwise", () => {
   const refs = createRefIdAllocator();
   const a = {};

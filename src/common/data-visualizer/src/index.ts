@@ -35,12 +35,13 @@ export const WEB_ID = "__web_data_visualizer";
 export const DATA_VISUALIZER_DIRECTORY_ID = "data-visualizer";
 
 /**
- * Identifies one distinct compound value (a pair/array or a function) within a single
- * {@link SerializedDataVisualizerRow}. Assigned by the runner's `RefIdAllocator` on first encounter
- * of a given runtime value (by reference, language-side); only unique **within the row it appears
- * in** — a `RefIdAllocator` is created fresh for each `sendDrawing()` call (one row), so a different
- * row may reuse the same numeric id for a completely unrelated value. Never compare or reuse a
- * `refId` across two different rows of the same message.
+ * Identifies one distinct compound value (a pair/array or a function) within a single top-level
+ * argument of one `draw_data(...)` call (one element of a {@link SerializedDataVisualizerRow}, not
+ * the whole row). Assigned by the runner's `RefIdAllocator` on first encounter of a given runtime
+ * value (by reference, language-side); only unique **within the argument it appears in** — a
+ * `RefIdAllocator` is created fresh for *each argument*, not once per row, so a different argument
+ * (even in the same row) may reuse the same numeric id for a completely unrelated value. Never
+ * compare or reuse a `refId` across two different elements of a row, or across two different rows.
  *
  * This is what lets the host detect shared structure and cycles within one row without ever seeing a
  * live reference: a runtime value already seen earlier in the same `sendDrawing()` call is re-emitted
