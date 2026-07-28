@@ -1,13 +1,8 @@
 import type { RefId, SerializedDataVisualizerNode } from '@sourceacademy/common-data-visualizer';
 
-import { classify, type ClassificationResult } from '../classify';
 import { AlreadyParsedTreeNode } from './AlreadyParsedTreeNode';
-import { BinaryTreeDrawer } from './BinaryTreeDrawer';
-import { GeneralTreeDrawer } from './GeneralTreeDrawer';
 import { OriginalDrawer } from './OriginalDrawer';
 import { ArrayTreeNode, DataTreeNode, DrawableTreeNode, FunctionTreeNode, TreeNode } from './TreeNode';
-
-export type ViewMode = 'original' | 'binaryTree' | 'generalTree';
 
 /**
  *  A tree object built from one serialized data-visualizer node (one drawn argument of one
@@ -16,18 +11,15 @@ export type ViewMode = 'original' | 'binaryTree' | 'generalTree';
 export class Tree {
   private _rootNode: TreeNode;
   private nodes: DrawableTreeNode[];
-  private classification: ClassificationResult;
 
   /**
-   * Constructs a tree given a root node, a list of nodes, and the node's classification.
+   * Constructs a tree given a root node and a list of nodes.
    * @param rootNode The root node of the tree.
    * @param nodes The memoized nodes of the tree in list form.
-   * @param classification The root node's classification (cycles, sharing, tree shape).
    */
-  constructor(rootNode: TreeNode, nodes: DrawableTreeNode[], classification: ClassificationResult) {
+  constructor(rootNode: TreeNode, nodes: DrawableTreeNode[]) {
     this._rootNode = rootNode;
     this.nodes = nodes;
-    this.classification = classification;
   }
 
   /**
@@ -46,9 +38,6 @@ export class Tree {
   }
 
   static fromSerializedNode(node: SerializedDataVisualizerNode): Tree {
-    const classification = classify(node);
-    const layout = classification.layout;
-
     let nodeCount = 0;
     const treeNodes: DrawableTreeNode[] = [];
     // Detects cycles and shared structure — a "ref" wire node re-uses whatever tree node was
@@ -74,10 +63,6 @@ export class Tree {
           refToTreeNode.set(node.refId, treeNode);
           treeNodes[nodeCount] = treeNode;
           nodeCount++;
-
-          treeNode.nodeColor = layout?.colorByRefId.get(node.refId) ?? 0;
-          treeNode.nodePos = layout?.posByRefId.get(node.refId) ?? 0;
-
           treeNode.children = node.children.map(constructNode);
           return treeNode;
         }
@@ -92,17 +77,10 @@ export class Tree {
     }
 
     const rootNode = constructNode(node);
-    return new Tree(rootNode, treeNodes, classification);
+    return new Tree(rootNode, treeNodes);
   }
 
-  draw(viewMode: ViewMode): OriginalDrawer | BinaryTreeDrawer | GeneralTreeDrawer {
-    switch (viewMode) {
-      case 'binaryTree':
-        return new BinaryTreeDrawer(this, this.classification);
-      case 'generalTree':
-        return new GeneralTreeDrawer(this, this.classification);
-      default:
-        return new OriginalDrawer(this);
-    }
+  draw(x: number, y: number, key: number): React.ReactElement {
+    return new OriginalDrawer(this).draw(x, y, key);
   }
 }
