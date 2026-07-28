@@ -1,7 +1,7 @@
 {
   "name": "@sourceacademy/web-data-visualizer",
   "version": "0.0.1",
-  "packageManager": "yarn@4.6.0",
+  "packageManager": "yarn@4.12.0",
   "description": "Host (web) plugin for the Source Academy data visualizer: classifies and renders drawn structures",
   "scripts": {
     "build": "rollup -c && node wrap.mjs",

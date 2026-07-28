@@ -1,7 +1,7 @@
 {
   "name": "@sourceacademy/common-data-visualizer",
   "version": "0.0.1",
-  "packageManager": "yarn@4.6.0",
+  "packageManager": "yarn@4.12.0",
   "description": "Shared, language-agnostic protocol for the Source Academy data visualizer plugin pair",
   "scripts": {
     "build": "rollup -c",
