@@ -117,7 +117,7 @@ export abstract class BaseDataVisualizerRunnerPlugin<TValue> implements IPlugin 
    * time (matching legacy exactly); only sharing *within* one argument's own structure collapses to
    * a ref, which the host can always resolve because that whole subtree lives in one Stage.
    */
-  async sendDrawing(values: TValue[]): Promise<void> {
+  sendDrawing(values: TValue[]): void {
     const row: SerializedDataVisualizerRow = values.map(value =>
       this.toNode(value, createRefIdAllocator()),
     );
@@ -131,7 +131,7 @@ export abstract class BaseDataVisualizerRunnerPlugin<TValue> implements IPlugin 
    * equivalent of the old pre-Conductor frontend's `DataVisualizer.clearWithData()` on every Run
    * press.
    */
-  async resetRun(): Promise<void> {
+  resetRun(): void {
     this.__rows = [];
     this.__channel.send({ type: "rows", rows: this.__rows });
   }
