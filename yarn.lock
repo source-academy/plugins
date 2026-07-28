@@ -1695,6 +1695,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@rollup/plugin-replace@npm:^6.0.3":
+  version: 6.0.3
+  resolution: "@rollup/plugin-replace@npm:6.0.3"
+  dependencies:
+    "@rollup/pluginutils": "npm:^5.0.1"
+    magic-string: "npm:^0.30.3"
+  peerDependencies:
+    rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
+  peerDependenciesMeta:
+    rollup:
+      optional: true
+  checksum: 10c0/93217c52fe86b03363bc534b5f07963ac4fd6b91f19f6070a66809b0c65a036b3b234624a65a8bfcc01a8dc0e42838feae03c021b0d1e5e91753c503c4d70cd6
+  languageName: node
+  linkType: hard
+
 "@rollup/plugin-terser@npm:^1.0.0":
   version: 1.0.0
   resolution: "@rollup/plugin-terser@npm:1.0.0"
@@ -1961,6 +1976,22 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@sourceacademy/common-data-visualizer@workspace:*, @sourceacademy/common-data-visualizer@workspace:src/common/data-visualizer":
+  version: 0.0.0-use.local
+  resolution: "@sourceacademy/common-data-visualizer@workspace:src/common/data-visualizer"
+  dependencies:
+    "@rollup/plugin-node-resolve": "npm:^16.0.3"
+    "@rollup/plugin-terser": "npm:^1.0.0"
+    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@types/jest": "npm:^30.0.0"
+    jest: "npm:^30.4.2"
+    rollup: "npm:^4.60.2"
+    ts-jest: "npm:^29.4.11"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^6.0.3"
+  languageName: unknown
+  linkType: soft
+
 "@sourceacademy/common-module-loader@workspace:*, @sourceacademy/common-module-loader@workspace:src/common/module-loader":
   version: 0.0.0-use.local
   resolution: "@sourceacademy/common-module-loader@workspace:src/common/module-loader"
@@ -2060,6 +2091,26 @@ __metadata:
     vitest: "npm:^4.1.9"
   peerDependencies:
     "@sourceacademy/common-cse-machine": ">=0.3.0"
+    "@sourceacademy/conductor": ">=0.3.0"
+  languageName: unknown
+  linkType: soft
+
+"@sourceacademy/runner-data-visualizer@workspace:src/runner/data-visualizer":
+  version: 0.0.0-use.local
+  resolution: "@sourceacademy/runner-data-visualizer@workspace:src/runner/data-visualizer"
+  dependencies:
+    "@rollup/plugin-node-resolve": "npm:^16.0.3"
+    "@rollup/plugin-terser": "npm:^1.0.0"
+    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@sourceacademy/common-data-visualizer": "workspace:*"
+    "@sourceacademy/conductor": "npm:>=0.3.0"
+    "@types/jest": "npm:^30.0.0"
+    jest: "npm:^30.4.2"
+    rollup: "npm:^4.60.2"
+    ts-jest: "npm:^29.4.11"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^6.0.3"
+  peerDependencies:
     "@sourceacademy/conductor": ">=0.3.0"
   languageName: unknown
   linkType: soft
@@ -2169,6 +2220,37 @@ __metadata:
   peerDependencies:
     "@sourceacademy/common-cse-machine": ">=0.3.0"
     "@sourceacademy/conductor": ">=0.3.0"
+  languageName: unknown
+  linkType: soft
+
+"@sourceacademy/web-data-visualizer@workspace:src/web/data-visualizer":
+  version: 0.0.0-use.local
+  resolution: "@sourceacademy/web-data-visualizer@workspace:src/web/data-visualizer"
+  dependencies:
+    "@blueprintjs/core": "npm:^6.0.0"
+    "@blueprintjs/icons": "npm:^6.0.0"
+    "@rollup/plugin-commonjs": "npm:^28.0.0"
+    "@rollup/plugin-node-resolve": "npm:^16.0.3"
+    "@rollup/plugin-replace": "npm:^6.0.3"
+    "@rollup/plugin-terser": "npm:^1.0.0"
+    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@sourceacademy/common-data-visualizer": "workspace:*"
+    "@sourceacademy/common-tabs": "workspace:^"
+    "@sourceacademy/conductor": "npm:>=0.3.0"
+    "@types/react": "npm:^19.0.0"
+    konva: "npm:^9.3.0"
+    react: "npm:^19.0.0"
+    react-dom: "npm:^19.0.0"
+    react-konva: "npm:^19.0.0"
+    rollup: "npm:^4.60.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^6.0.3"
+  peerDependencies:
+    "@blueprintjs/core": ">=5"
+    konva: ">=9"
+    react: ">=18"
+    react-dom: ">=18"
+    react-konva: ">=18"
   languageName: unknown
   linkType: soft
 
@@ -2403,6 +2485,24 @@ __metadata:
   dependencies:
     undici-types: "npm:>=7.24.0 <7.24.7"
   checksum: 10c0/9a04682842bebbcf21a1779dfeab9aa733d7bd7bbc0a0edb641ab3a9a3d43eac543225acf669c334f458f1956443ebc072bc3c72840c543b8b356cab5c82d456
+  languageName: node
+  linkType: hard
+
+"@types/react-reconciler@npm:^0.28.9":
+  version: 0.28.9
+  resolution: "@types/react-reconciler@npm:0.28.9"
+  peerDependencies:
+    "@types/react": "*"
+  checksum: 10c0/9fe71fa856aab2cd4742fe0416bdd4f5c82ecc05ef6451ee7fcb65a5efdf5fa588f5820fbe2a665b15371b0da3bfc4097f28bb6d450b9a834af2d0fc00f403bd
+  languageName: node
+  linkType: hard
+
+"@types/react-reconciler@npm:^0.33.0":
+  version: 0.33.0
+  resolution: "@types/react-reconciler@npm:0.33.0"
+  peerDependencies:
+    "@types/react": "*"
+  checksum: 10c0/190c203d93c0df9a42fabd693ce059dbdf6c53e15eb14502d9e5b946c981231c5846b867de15522ff61368e9218a8508a9db5476f3e47b5d664bbb2c84b31ac7
   languageName: node
   linkType: hard
 
@@ -4494,6 +4594,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"its-fine@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "its-fine@npm:2.0.0"
+  dependencies:
+    "@types/react-reconciler": "npm:^0.28.9"
+  peerDependencies:
+    react: ^19.0.0
+  checksum: 10c0/1ff1ff3257c0c7eb115c9c26cf0506eb84162edc1a63d3136780d146f7c7833298b240d0fcb46888909773f1a7d16539e0c03f2482cff1a5a502d6436686fe21
+  languageName: node
+  linkType: hard
+
 "jackspeak@npm:^3.1.2":
   version: 3.4.3
   resolution: "jackspeak@npm:3.4.3"
@@ -5046,6 +5157,13 @@ __metadata:
   dependencies:
     json-buffer: "npm:3.0.1"
   checksum: 10c0/aa52f3c5e18e16bb6324876bb8b59dd02acf782a4b789c7b2ae21107fab95fab3890ed448d4f8dba80ce05391eeac4bfabb4f02a20221342982f806fa2cf271e
+  languageName: node
+  linkType: hard
+
+"konva@npm:^9.3.0":
+  version: 9.3.22
+  resolution: "konva@npm:9.3.22"
+  checksum: 10c0/d9bdaaffec95381e5f4225485a102b14971a3a8f6fd691a78ac55bf88104654cca876714265999eceb3bbb4fc50d1f34b0385e5876d6b918739456c2d7de37fa
   languageName: node
   linkType: hard
 
@@ -6005,6 +6123,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-konva@npm:^19.0.0":
+  version: 19.2.5
+  resolution: "react-konva@npm:19.2.5"
+  dependencies:
+    "@types/react-reconciler": "npm:^0.33.0"
+    its-fine: "npm:^2.0.0"
+    react-reconciler: "npm:0.33.0"
+    scheduler: "npm:0.27.0"
+  peerDependencies:
+    konva: ^8.0.1 || ^7.2.5 || ^9.0.0 || ^10.0.0
+    react: ^19.2.0
+    react-dom: ^19.2.0
+  checksum: 10c0/6f222c47cc4c105a3f4b662a9a86a31983c77bf254aebac9ca21c4e0bf7d3f78a6c2b0c6c2cf23d44fbded1260c69e2a90766ef4eeec85d19457f8aebd978ad1
+  languageName: node
+  linkType: hard
+
 "react-popper@npm:^2.3.0":
   version: 2.3.0
   resolution: "react-popper@npm:2.3.0"
@@ -6016,6 +6150,17 @@ __metadata:
     react: ^16.8.0 || ^17 || ^18
     react-dom: ^16.8.0 || ^17 || ^18
   checksum: 10c0/23f93540537ca4c035425bb8d5e51b11131fbc921d7ac1d041d0ae557feac8c877f3a012d36b94df8787803f52ed81e6df9257ac9e58719875f7805518d6db3f
+  languageName: node
+  linkType: hard
+
+"react-reconciler@npm:0.33.0":
+  version: 0.33.0
+  resolution: "react-reconciler@npm:0.33.0"
+  dependencies:
+    scheduler: "npm:^0.27.0"
+  peerDependencies:
+    react: ^19.2.0
+  checksum: 10c0/3f7b27ea8d0ff4c8bf0e402a285e1af9b7d0e6f4c1a70a28f4384938bc1130bc82a90a31df0b79ef5e380e2e55e2598bd90b4dbf802b1203d735ba0355817d3a
   languageName: node
   linkType: hard
 
@@ -6282,7 +6427,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"scheduler@npm:^0.27.0":
+"scheduler@npm:0.27.0, scheduler@npm:^0.27.0":
   version: 0.27.0
   resolution: "scheduler@npm:0.27.0"
   checksum: 10c0/4f03048cb05a3c8fddc45813052251eca00688f413a3cee236d984a161da28db28ba71bd11e7a3dd02f7af84ab28d39fb311431d3b3772fed557945beb00c452
