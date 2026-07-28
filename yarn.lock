@@ -2247,8 +2247,10 @@ __metadata:
     typescript: "npm:^6.0.3"
   peerDependencies:
     "@blueprintjs/core": ">=5"
+    konva: ">=9"
     react: ">=18"
     react-dom: ">=18"
+    react-konva: ">=18"
   languageName: unknown
   linkType: soft
 
