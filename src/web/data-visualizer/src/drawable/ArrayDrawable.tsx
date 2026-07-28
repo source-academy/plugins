@@ -1,10 +1,10 @@
-import { PureComponent } from 'react';
-import { Group, Line, Rect, Text } from 'react-konva';
+import { PureComponent } from "react";
+import { Group, Line, Rect, Text } from "react-konva";
 
-import { Config } from '../Config';
-import { formatLeaf } from '../format';
-import { DataTreeNode, TreeNode } from '../tree/TreeNode';
-import { NullDrawable } from './Drawable';
+import { Config } from "../Config";
+import { formatLeaf } from "../format";
+import { DataTreeNode, TreeNode } from "../tree/TreeNode";
+import { NullDrawable } from "./Drawable";
 
 type ArrayProps = {
   nodes: TreeNode[];
@@ -29,7 +29,7 @@ class ArrayDrawable extends PureComponent<ArrayProps> {
       const textToDisplay = formatLeaf(node.displayValue!, node.label!);
       return (
         <Text
-          key={'' + node.displayValue + index}
+          key={"" + node.displayValue + index}
           text={textToDisplay}
           align="center"
           width={Config.BoxWidth}
@@ -58,7 +58,7 @@ class ArrayDrawable extends PureComponent<ArrayProps> {
           Array.from(Array(this.props.nodes.length - 1), (e, i) => {
             return (
               <Line
-                key={'line' + i}
+                key={"line" + i}
                 points={[Config.BoxWidth * (i + 1), 0, Config.BoxWidth * (i + 1), Config.BoxHeight]}
                 strokeWidth={Config.StrokeWidth}
                 stroke={Config.Stroke}

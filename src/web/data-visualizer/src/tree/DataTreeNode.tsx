@@ -1,4 +1,4 @@
-import { TreeNode } from './BaseTreeNode';
+import { TreeNode } from "./BaseTreeNode";
 
 /**
  * Represents a node corresponding to a leaf value (a `"leaf"` wire node) or the empty terminator (a

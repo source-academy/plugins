@@ -3,15 +3,20 @@ import {
   WEB_ID,
   type DataVisualizerMessage,
   type SerializedDataVisualizerRow,
-} from '@sourceacademy/common-data-visualizer';
-import type { ITabService, Tab } from '@sourceacademy/common-tabs';
-import { checkIsPluginClass, type IChannel, type IConduit, type IPlugin } from '@sourceacademy/conductor/conduit';
-import { createElement, useSyncExternalStore } from 'react';
+} from "@sourceacademy/common-data-visualizer";
+import type { ITabService, Tab } from "@sourceacademy/common-tabs";
+import {
+  checkIsPluginClass,
+  type IChannel,
+  type IConduit,
+  type IPlugin,
+} from "@sourceacademy/conductor/conduit";
+import { createElement, useSyncExternalStore } from "react";
 
-import DataVisualizerView from './DataVisualizerView';
+import DataVisualizerView from "./DataVisualizerView";
 
 /** The side-content tab id used by the host to show/hide the data visualizer tab. */
-const TAB_ID = 'data-visualizer';
+const TAB_ID = "data-visualizer";
 
 /**
  * The host (browser-side) half of the data visualizer. It listens on the data visualizer channel
@@ -33,16 +38,20 @@ export class DataVisualizerHostPlugin implements IPlugin {
   private __rows: SerializedDataVisualizerRow[] = [];
   private readonly __listeners = new Set<() => void>();
 
-  constructor(_conduit: IConduit, [channel]: IChannel<DataVisualizerMessage>[], tabService: ITabService) {
+  constructor(
+    _conduit: IConduit,
+    [channel]: IChannel<DataVisualizerMessage>[],
+    tabService: ITabService,
+  ) {
     this.__channel = channel;
     this.__channel.subscribe(message => {
-      if (message.type === 'rows') {
+      if (message.type === "rows") {
         this.__rows = message.rows;
         this.__emit();
       }
     });
     // Ask the runner to replay the rows it last computed (e.g. tab opened after a run).
-    this.__channel.send({ type: 'request' });
+    this.__channel.send({ type: "request" });
 
     const subscribe = (listener: () => void) => this.subscribe(listener);
     const getRows = () => this.getRows();
@@ -53,8 +62,8 @@ export class DataVisualizerHostPlugin implements IPlugin {
 
     const tab: Tab = {
       id: TAB_ID,
-      label: 'Data Visualizer',
-      iconName: 'eye-open',
+      label: "Data Visualizer",
+      iconName: "eye-open",
       body: createElement(DataVisualizerTab),
     };
     tabService.registerTab(tab);

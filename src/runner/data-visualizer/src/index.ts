@@ -118,7 +118,9 @@ export abstract class BaseDataVisualizerRunnerPlugin<TValue> implements IPlugin 
    * a ref, which the host can always resolve because that whole subtree lives in one Stage.
    */
   async sendDrawing(values: TValue[]): Promise<void> {
-    const row: SerializedDataVisualizerRow = values.map(value => this.toNode(value, createRefIdAllocator()));
+    const row: SerializedDataVisualizerRow = values.map(value =>
+      this.toNode(value, createRefIdAllocator()),
+    );
     this.__rows = [...this.__rows, row];
     this.__channel.send({ type: "rows", rows: this.__rows });
   }

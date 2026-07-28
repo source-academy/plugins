@@ -65,10 +65,14 @@ test("sendDrawing serializes one row and pushes the full row list", async () => 
       rows: [
         [
           { type: "leaf", displayValue: "1", label: "number" },
-          { type: "array", refId: 1, children: [
-            { type: "leaf", displayValue: "2", label: "number" },
-            { type: "leaf", displayValue: "3", label: "number" },
-          ] },
+          {
+            type: "array",
+            refId: 1,
+            children: [
+              { type: "leaf", displayValue: "2", label: "number" },
+              { type: "leaf", displayValue: "3", label: "number" },
+            ],
+          },
         ],
       ],
     },

@@ -1,4 +1,4 @@
-import { Config } from './Config';
+import { Config } from "./Config";
 
 /**
  * Formats a leaf's display value for showing inside a box: quotes and truncates strings (mirroring
@@ -7,9 +7,9 @@ import { Config } from './Config';
  * passed through as-is — the adapter already produced a reasonable display string for them.
  */
 export function formatLeaf(displayValue: string, label: string): string {
-  if (label === 'string') {
+  if (label === "string") {
     const truncated = displayValue.substring(0, Config.MaxTextLength);
-    const suffix = displayValue.length > Config.MaxTextLength ? '...' : '';
+    const suffix = displayValue.length > Config.MaxTextLength ? "..." : "";
     return `"${truncated}${suffix}"`;
   }
   return displayValue;

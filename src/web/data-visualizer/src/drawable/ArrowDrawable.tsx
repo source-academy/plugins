@@ -1,7 +1,7 @@
-import { memo } from 'react';
-import { Arrow } from 'react-konva';
+import { memo } from "react";
+import { Arrow } from "react-konva";
 
-import { Config } from '../Config';
+import { Config } from "../Config";
 
 type Props = {
   from: { x: number; y: number };
@@ -16,7 +16,7 @@ type Props = {
 function ArrowDrawable(props: Props) {
   return (
     <Arrow
-      key={props + ''}
+      key={props + ""}
       points={[
         props.from.x,
         props.from.y,

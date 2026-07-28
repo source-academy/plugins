@@ -1,8 +1,14 @@
-import type { RefId, SerializedDataVisualizerNode } from '@sourceacademy/common-data-visualizer';
+import type { RefId, SerializedDataVisualizerNode } from "@sourceacademy/common-data-visualizer";
 
-import { AlreadyParsedTreeNode } from './AlreadyParsedTreeNode';
-import { OriginalDrawer } from './OriginalDrawer';
-import { ArrayTreeNode, DataTreeNode, DrawableTreeNode, FunctionTreeNode, TreeNode } from './TreeNode';
+import { AlreadyParsedTreeNode } from "./AlreadyParsedTreeNode";
+import { OriginalDrawer } from "./OriginalDrawer";
+import {
+  ArrayTreeNode,
+  DataTreeNode,
+  DrawableTreeNode,
+  FunctionTreeNode,
+  TreeNode,
+} from "./TreeNode";
 
 /**
  *  A tree object built from one serialized data-visualizer node (one drawn argument of one
@@ -47,18 +53,18 @@ export class Tree {
 
     function constructNode(node: SerializedDataVisualizerNode): TreeNode {
       switch (node.type) {
-        case 'ref': {
+        case "ref": {
           const already = refToTreeNode.get(node.refId);
           // Should always be present — the runner never emits a "ref" before the value it refers
           // to. Falling back to empty rather than throwing keeps a malformed message from crashing
           // the whole tab.
           return already ? new AlreadyParsedTreeNode(already) : DataTreeNode.empty();
         }
-        case 'empty':
+        case "empty":
           return DataTreeNode.empty();
-        case 'leaf':
+        case "leaf":
           return DataTreeNode.leaf(node.displayValue, node.label);
-        case 'array': {
+        case "array": {
           const treeNode = new ArrayTreeNode();
           refToTreeNode.set(node.refId, treeNode);
           treeNodes[nodeCount] = treeNode;
@@ -66,7 +72,7 @@ export class Tree {
           treeNode.children = node.children.map(constructNode);
           return treeNode;
         }
-        case 'function': {
+        case "function": {
           const treeNode = new FunctionTreeNode();
           refToTreeNode.set(node.refId, treeNode);
           treeNodes[nodeCount] = treeNode;
