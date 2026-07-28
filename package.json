@@ -23,6 +23,7 @@
     "@sourceacademy/plugin-directory": "source-academy/plugin-directory#main",
     "@types/node": "^25.9.1",
     "@vitest/coverage-istanbul": "^4.1.9",
+    "@yarnpkg/types": "^4.0.1",
     "commander": "^15.0.0",
     "eslint": "^10.0.3",
     "eslint-config-prettier": "^10.1.8",

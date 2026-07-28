@@ -3,6 +3,11 @@
   "version": "0.0.1",
   "packageManager": "yarn@4.12.0",
   "description": "Host (web) plugin for the Source Academy stepper: renders evaluation steps",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/source-academy/plugins",
+    "directory": "src/web/stepper"
+  },
   "scripts": {
     "build": "rollup -c && node wrap.mjs",
     "prepack": "yarn build"

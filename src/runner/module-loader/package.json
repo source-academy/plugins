@@ -3,6 +3,11 @@
   "version": "0.1.0",
   "packageManager": "yarn@4.12.0",
   "description": "The runner plugin for the module loader in Source Academy",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/source-academy/plugins",
+    "directory": "src/runner/module-loader"
+  },
   "scripts": {
     "build": "rollup -c",
     "prepack": "yarn build"

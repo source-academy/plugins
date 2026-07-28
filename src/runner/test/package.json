@@ -3,6 +3,11 @@
   "version": "0.0.1",
   "packageManager": "yarn@4.12.0",
   "description": "The test runner plugin for the plugins repository",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/source-academy/plugins",
+    "directory": "src/runner/test"
+  },
   "scripts": {
     "build": "rollup -c",
     "prepack": "yarn build"

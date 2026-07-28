@@ -3,7 +3,6 @@
     "**/.yarn": true,
     "**/.pnp.*": true
   },
-  "typescript.tsdk": ".yarn/sdks/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "js/ts.enablePromptUseWorkspaceTsdk": true,
   "js/ts.tsdk.path": ".yarn/sdks/typescript/lib"
 }
