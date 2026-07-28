@@ -1,6 +1,6 @@
 {
   "name": "@sourceacademy/runner-module-loader",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "packageManager": "yarn@4.6.0",
   "description": "The runner plugin for the module loader in Source Academy",
   "scripts": {
