@@ -124,9 +124,10 @@ describe("BinaryTreeDrawer", () => {
 
 describe("GeneralTreeDrawer", () => {
   test("a non-general-tree structure draws the fixed-size warning box instead of a tree", () => {
-    // A binary-tree-shaped input still isn't a *general* tree by this format's definition (its
-    // children slot must be a proper list of children, not a fixed left/right pair).
-    const tree = Tree.fromSerializedNode(binaryNode(1, binaryNode(2), binaryNode(3)));
+    // An *improper* list (here, a bare 2-tuple whose second slot is a leaf rather than another pair
+    // or the empty terminator) is the only shape General Tree View actually rejects — a binary-tree-
+    // shaped input is itself a valid (proper-list) general tree, see classify.test.ts.
+    const tree = Tree.fromSerializedNode(pair(leaf(1), leaf(2)));
     const drawer = tree.draw("generalTree") as GeneralTreeDrawer;
     const element = drawer.draw(0, 0, 0) as React.ReactElement<{
       width: number;
@@ -161,6 +162,20 @@ describe("GeneralTreeDrawer", () => {
     ).draw("generalTree") as GeneralTreeDrawer;
     expect(() => four.draw(0, 0, 1)).not.toThrow();
     expect(four.width).toBeGreaterThan(two.width);
+  });
+
+  test("a flat llist-style general tree (label directly followed by compound children) draws without throwing", () => {
+    // llist(1, llist(2, None, None), llist(3, None, None)) — see classify.test.ts for why this is a
+    // valid general tree despite not using the nested-children-list encoding `generalNode` builds.
+    const leafTree = (n: number): SerializedDataVisualizerNode =>
+      pair(leaf(n), pair(empty(), pair(empty(), empty())));
+    const tree = Tree.fromSerializedNode(
+      pair(leaf(1), pair(leafTree(2), pair(leafTree(3), empty()))),
+    );
+    const drawer = tree.draw("generalTree") as GeneralTreeDrawer;
+    expect(() => drawer.draw(0, 0, 0)).not.toThrow();
+    expect(drawer.width).toBeGreaterThan(0);
+    expect(drawer.height).toBeGreaterThan(0);
   });
 });
 

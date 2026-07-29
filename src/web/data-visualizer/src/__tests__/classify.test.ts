@@ -112,3 +112,26 @@ test("a childless general tree node is valid on its own", () => {
   const result = classify(generalNode(1));
   expect(result.isGeneralTree).toBe(true);
 });
+
+test("a flat llist-style general tree (label followed directly by compound children, not a nested children-list) is classified as a general tree", () => {
+  // llist(1, llist(2, None, None), llist(3, None, None)) => [1, [ [2,[None,[None,None]]], [ [3,[None,[None,None]]], <end> ] ]]
+  const leafTree = (n: number): SerializedDataVisualizerNode =>
+    pair(leaf(n), pair(empty(), pair(empty(), empty())));
+  const tree = pair(leaf(1), pair(leafTree(2), pair(leafTree(3), empty())));
+  const result = classify(tree);
+  expect(result.isCyclic).toBe(false);
+  expect(result.isSharedStructure).toBe(false);
+  expect(result.isGeneralTree).toBe(true);
+});
+
+test("a flat list of plain leaves with no compound elements is a general tree", () => {
+  const flatList = pair(leaf(1), pair(leaf(2), pair(leaf(3), empty())));
+  expect(classify(flatList).isGeneralTree).toBe(true);
+});
+
+test("a valid binary tree is also a valid general tree — Binary Tree View is a strict subset, not a disjoint shape", () => {
+  const tree = binaryNode(2, binaryNode(1), binaryNode(3));
+  const result = classify(tree);
+  expect(result.isBinaryTree).toBe(true);
+  expect(result.isGeneralTree).toBe(true);
+});

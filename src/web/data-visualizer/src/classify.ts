@@ -142,18 +142,34 @@ function isBinaryTreeNode(node: SerializedDataVisualizerNode, rootLabel: string 
 }
 
 /**
- * A pair-chain node is a general tree node when it is the empty terminator, or a pair
- * `[data, tail]` where `tail` is either the empty terminator (a childless node) or itself a pair
- * `[childrenList, <end>]` whose `childrenList` is a valid {@link isSiblingChain | sibling chain}.
+ * A pair-chain node is a general tree node when it is the empty terminator, or a *proper* list
+ * `[e0, [e1, [e2, ... <end>]]]` where every element that is itself compound (an `"array"` node) is,
+ * recursively, also a valid general tree. Plain leaves/functions may appear at any position in the
+ * chain unrestricted — only compound elements are checked recursively. A chain whose tail is neither
+ * another pair nor the empty terminator (an *improper* list, e.g. a bare 2-tuple) is never a general
+ * tree, since the recursive call on that non-pair, non-empty tail falls through to `!isPairNode` and
+ * returns `false`.
  *
- * This is a clean structural re-derivation of the old `isGeneralTree`, not a line-for-line port: the
- * original overloaded a single function for two different roles — "is this one tree node" vs. "is
- * this a list of sibling nodes" — distinguished only by which recursive branch called it, and leaned
- * on several JavaScript loose-equality/out-of-bounds-indexing quirks (e.g. `undefined != null` being
- * `false`) that have no clean equivalent on a typed node representation. Splitting the two roles into
- * mutually-recursive functions is both easier to verify and behaviourally clearer. Unlike
- * {@link isBinaryTreeNode}, this does not enforce data-label homogeneity across siblings — flagged as
- * a deliberate simplification: a general tree's data payloads are not required to share one type.
+ * Re-derived from the old `isGeneralTree` by tracing its actual behavior against worked examples
+ * (not from its structure — the original conflated "is this one node" and "is this a sibling list"
+ * into one function, distinguished only by which recursive branch called it, and leaned on several
+ * JavaScript loose-equality/out-of-bounds-indexing quirks with no clean equivalent on a typed node
+ * representation). The result is deliberately permissive: it does not single out "the first element
+ * is the label, the second is a nested children-list" as a distinct shape — every position in the
+ * chain is checked identically. This is intentional, confirmed by hand-tracing the old algorithm, and
+ * accepts every general-tree encoding SICPy actually produces:
+ *  - SICP-textbook `list(label, list-of-branches)` — the branches list is itself compound, so it
+ *    recurses into this same check.
+ *  - A flat `llist(label, child1, child2, ...)` — each child is checked identically to the label; no
+ *    slot is special-cased.
+ *  - A flat list with no compound elements at all (e.g. `llist(1, 2, 3)`) — every element trivially
+ *    passes since only compound elements are recursively checked.
+ * It also means a valid {@link isBinaryTreeNode | binary tree} is always also a valid general tree
+ * (a binary tree is, structurally, just a proper list whose compound elements happen to recurse the
+ * same way) — this is not a bug, it mirrors the old tool's actual behavior; General Tree View is a
+ * strict superset of Binary Tree View, not a disjoint alternative. Unlike {@link isBinaryTreeNode},
+ * this does not enforce data-label homogeneity across siblings — a general tree's data payloads are
+ * not required to share one type.
  */
 function isGeneralTreeNode(node: SerializedDataVisualizerNode): boolean {
   if (node.type === "empty") {
@@ -162,28 +178,11 @@ function isGeneralTreeNode(node: SerializedDataVisualizerNode): boolean {
   if (!isPairNode(node)) {
     return false;
   }
-  const [, tail] = node.children;
-  if (tail.type === "empty") {
-    return true;
-  }
-  if (!isPairNode(tail) || tail.children[1].type !== "empty") {
+  const [data, rest] = node.children;
+  if (data.type === "array" && !isGeneralTreeNode(data)) {
     return false;
   }
-  return isSiblingChain(tail.children[0]);
-}
-
-/** A list of general-tree siblings: the empty terminator, or `[firstChild, restOfChain]` where
- * `firstChild` is itself a valid {@link isGeneralTreeNode | general tree node} and `restOfChain` is
- * a valid sibling chain. */
-function isSiblingChain(node: SerializedDataVisualizerNode): boolean {
-  if (node.type === "empty") {
-    return true;
-  }
-  if (!isPairNode(node)) {
-    return false;
-  }
-  const [firstChild, restOfChain] = node.children;
-  return isGeneralTreeNode(firstChild) && isSiblingChain(restOfChain);
+  return isGeneralTreeNode(rest);
 }
 
 /** Depth/position/color layout bookkeeping for rendering a classified tree, keyed by {@link RefId}
