@@ -5,7 +5,7 @@ import { Config } from "../Config";
 import { formatLeaf } from "../format";
 import { ArrowDrawable, BackwardArrowDrawable } from "../drawable/Drawable";
 import { AlreadyParsedTreeNode } from "./AlreadyParsedTreeNode";
-import { Tree } from "./Tree";
+import type { Tree } from "./Tree";
 import {
   ArrayTreeNode,
   DataTreeNode,
