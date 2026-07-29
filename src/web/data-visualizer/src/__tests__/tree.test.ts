@@ -1,38 +1,65 @@
 import type { SerializedDataVisualizerNode } from "@sourceacademy/common-data-visualizer";
 import { describe, expect, test, vi } from "vitest";
 
-// These tests exercise pure layout arithmetic (getNodeWidth/getNodeHeight, arrow routing), never
-// actually rendering to a canvas — but importing the real `konva`/`react-konva` still runs their
-// module-init code, which detects vitest's Node environment (no `window`) and switches to Konva's
-// server-side build, which unconditionally `require`s the optional `canvas` native package. Mock
-// both so the import graph resolves without needing that dependency; only `Konva.Text` needs any
-// real shape, and only because `OriginalDrawer` references it (unused by the array/pair trees these
-// tests build).
-vi.mock("konva", () => ({ default: { Text: class {} } }));
+// These tests exercise layout arithmetic and presentational branching, never actually rendering
+// to a canvas — but importing the real `konva`/`react-konva` still runs their module-init code,
+// which detects vitest's Node environment (no `window`) and switches to Konva's server-side
+// build, which unconditionally `require`s the optional `canvas` native package. Mock both so the
+// import graph resolves without needing that dependency. Each react-konva primitive gets its own
+// stub function (rather than one shared stub) so tests can assert *which* primitive a component
+// rendered, not just that it rendered something. `Konva.Text` gets a fixed fake size — real text
+// measurement needs a canvas, and these tests only check the arithmetic built on top of it.
+vi.mock("konva", () => ({
+  default: {
+    Text: class {
+      width() {
+        return 40;
+      }
+      height() {
+        return 25;
+      }
+    },
+  },
+}));
 vi.mock("react-konva", () => {
-  const stub = () => null;
+  const stub = (name: string) => {
+    const fn = () => null;
+    Object.defineProperty(fn, "name", { value: name });
+    return fn;
+  };
   return {
-    Stage: stub,
-    Layer: stub,
-    Text: stub,
-    Group: stub,
-    Line: stub,
-    Rect: stub,
-    Circle: stub,
-    Arrow: stub,
+    Stage: stub("Stage"),
+    Layer: stub("Layer"),
+    Text: stub("Text"),
+    Group: stub("Group"),
+    Line: stub("Line"),
+    Rect: stub("Rect"),
+    Circle: stub("Circle"),
+    Arrow: stub("Arrow"),
   };
 });
 
+import { Group, Line, Rect, Text } from "react-konva";
+
 import { Config } from "../Config";
+import { NullDrawable } from "../drawable/Drawable";
+import ArrayDrawable from "../drawable/ArrayDrawable";
+import { formatLeaf } from "../format";
 import { AlreadyParsedTreeNode } from "../tree/AlreadyParsedTreeNode";
 import { OriginalDrawer } from "../tree/OriginalDrawer";
 import { Tree } from "../tree/Tree";
-import { ArrayTreeNode } from "../tree/TreeNode";
+import { ArrayTreeNode, DataTreeNode, FunctionTreeNode } from "../tree/TreeNode";
 
 const leaf = (displayValue: string): SerializedDataVisualizerNode => ({
   type: "leaf",
   displayValue,
   label: "number",
+});
+
+const func = (refId: number): SerializedDataVisualizerNode => ({
+  type: "function",
+  refId,
+  displayValue: "function foo",
 });
 
 describe("Tree.fromSerializedNode", () => {
@@ -46,6 +73,20 @@ describe("Tree.fromSerializedNode", () => {
     const root = tree.rootNode as ArrayTreeNode;
     expect(root).toBeInstanceOf(ArrayTreeNode);
     expect(root.children).toHaveLength(2);
+  });
+
+  test("builds a function node, and two refs to the same function share one instance", () => {
+    const tree = Tree.fromSerializedNode({
+      type: "array",
+      refId: 2,
+      children: [func(1), { type: "ref", refId: 1 }],
+    });
+
+    const root = tree.rootNode as ArrayTreeNode;
+    const [first, second] = root.children!;
+    expect(first).toBeInstanceOf(FunctionTreeNode);
+    expect(second).toBeInstanceOf(AlreadyParsedTreeNode);
+    expect((second as AlreadyParsedTreeNode).actualNode).toBe(first);
   });
 
   test("a self-referential array resolves its own ref to an AlreadyParsedTreeNode wrapping itself", () => {
@@ -102,6 +143,32 @@ describe("OriginalDrawer pixel math", () => {
     expect(drawer.height).toBe(Config.BoxHeight + Config.StrokeWidth);
   });
 
+  test("a bare leaf (no pair/array at all) sizes from the measured text, not the box grid", () => {
+    // e.g. `draw_data(1, 42)` — a value1 with no compound structure takes OriginalDrawer's
+    // separate DataTreeNode-root branch (Konva.Text measurement), not drawNode's box-grid math.
+    const tree = Tree.fromSerializedNode(leaf("42"));
+    const drawer = new OriginalDrawer(tree);
+    // x/y only offset the returned <Stage>'s own width/height props (`this.width + x`), not the
+    // drawer's public `.width`/`.height` fields — same as the compound-tree branch below, where
+    // `.width`/`.height` are `getNodeWidth(root) - minX` with no x/y term either. Passing non-zero
+    // x/y here (rather than the 0/0 every other test uses) makes that distinction observable.
+    drawer.draw(3, 5, 0);
+
+    // Per the mocked Konva.Text above.
+    expect(drawer.width).toBe(40);
+    expect(drawer.height).toBe(25);
+  });
+
+  test("Tree.draw() (the real entry point DataVisualizerView calls) matches drawing via OriginalDrawer directly", () => {
+    const node: SerializedDataVisualizerNode = {
+      type: "array",
+      refId: 1,
+      children: [leaf("1"), leaf("2")],
+    };
+    expect(() => Tree.fromSerializedNode(node).draw(10, 10, 0)).not.toThrow();
+    expect(Tree.fromSerializedNode(node).draw(10, 10, 0)).toBeTruthy();
+  });
+
   test("a self-referential array terminates and routes a backward arrow instead of recursing forever", () => {
     const selfRef: SerializedDataVisualizerNode = { type: "array", refId: 1, children: [] };
     (selfRef as { children: SerializedDataVisualizerNode[] }).children = [
@@ -143,6 +210,15 @@ describe("OriginalDrawer pixel math", () => {
     expect(drawer.height).toBe(2 * Config.BoxHeight + Config.DistanceY / 2 + Config.StrokeWidth);
   });
 
+  test("a function value sizes by its circle radius, not the box grid", () => {
+    const tree = Tree.fromSerializedNode({ type: "array", refId: 1, children: [func(2)] });
+    const drawer = new OriginalDrawer(tree);
+    drawer.draw(0, 0, 0);
+
+    expect(drawer.width).toBe(Config.CircleRadiusLarge * 4 + 2 * Config.StrokeWidth);
+    expect(drawer.height).toBe(2 * Config.BoxHeight + Config.DistanceY / 2 + Config.StrokeWidth);
+  });
+
   test("width grows with sibling count and height grows with nesting depth", () => {
     const two = new OriginalDrawer(
       Tree.fromSerializedNode({ type: "array", refId: 1, children: [leaf("1"), leaf("2")] }),
@@ -172,4 +248,84 @@ describe("OriginalDrawer pixel math", () => {
     nested.draw(0, 0, 1);
     expect(nested.height).toBeGreaterThan(flat.height);
   });
+});
+
+describe("formatLeaf", () => {
+  test("wraps and passes through short strings unchanged apart from quoting", () => {
+    expect(formatLeaf("hi", "string")).toBe('"hi"');
+  });
+
+  test("truncates strings longer than MaxTextLength and appends an ellipsis", () => {
+    const long = "a".repeat(Config.MaxTextLength + 5);
+    const result = formatLeaf(long, "string");
+    expect(result).toBe(`"${"a".repeat(Config.MaxTextLength)}..."`);
+  });
+
+  test("a string exactly at MaxTextLength is not truncated or given an ellipsis", () => {
+    const exact = "a".repeat(Config.MaxTextLength);
+    expect(formatLeaf(exact, "string")).toBe(`"${exact}"`);
+  });
+
+  test("non-string labels pass through as-is, unquoted", () => {
+    expect(formatLeaf("42", "number")).toBe("42");
+    expect(formatLeaf("True", "bool")).toBe("True");
+  });
+});
+
+type ArrayDrawableOutput = React.ReactElement<{
+  children: [
+    React.ReactElement<{ width: number }>, // the outer Rect
+    false | React.ReactElement[], // the vertical separator Lines, if any
+    React.ReactElement<{ text?: string }>[], // one Text (leaf) or NullDrawable (empty) per element
+  ];
+}>;
+
+describe("ArrayDrawable", () => {
+  const render = (nodes: DataTreeNode[]): ArrayDrawableOutput =>
+    new ArrayDrawable({ nodes, x: 0, y: 0, color: "black" }).render() as ArrayDrawableOutput;
+
+  test("a zero-length array (an empty list) clamps to the minimum box width, not zero", () => {
+    // Real, reachable case: `draw_data([])` — a native list with no elements.
+    const [rect] = render([]).props.children;
+    expect(rect.type).toBe(Rect);
+    expect(rect.props.width).toBe(Config.BoxMinWidth);
+  });
+
+  test("draws one fewer separator line than the number of elements, and none for a single element", () => {
+    const [, twoLines] = render([
+      DataTreeNode.leaf("1", "number"),
+      DataTreeNode.leaf("2", "number"),
+    ]).props.children;
+    expect(twoLines).toHaveLength(1);
+    expect((twoLines as React.ReactElement[])[0].type).toBe(Line);
+
+    const [, oneLine] = render([DataTreeNode.leaf("1", "number")]).props.children;
+    expect(oneLine).toBe(false);
+  });
+
+  test("an empty child slot draws NullDrawable's slash, a non-empty slot draws formatted Text", () => {
+    const [, , [emptySlot, leafSlot]] = render([
+      DataTreeNode.empty(),
+      DataTreeNode.leaf("hi", "string"),
+    ]).props.children;
+    expect(emptySlot.type).toBe(NullDrawable);
+    expect(leafSlot.type).toBe(Text);
+    expect(leafSlot.props.text).toBe('"hi"');
+  });
+
+  test("outer rectangle width scales with element count", () => {
+    const [rect] = render([
+      DataTreeNode.leaf("1", "number"),
+      DataTreeNode.leaf("2", "number"),
+      DataTreeNode.leaf("3", "number"),
+    ]).props.children;
+    expect(rect.type).toBe(Rect);
+    expect(rect.props.width).toBe(Config.BoxWidth * 3);
+  });
+});
+
+// Sanity check that the mocked react-konva primitives are distinguishable from each other, since
+// the ArrayDrawable assertions above rely on that to tell Rect/Line/Text/Group apart.
+test("mocked react-konva primitives are distinct", () => {
+  expect(new Set([Group, Line, Rect, Text]).size).toBe(4);
 });
