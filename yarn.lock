@@ -1961,7 +1961,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sourceacademy/common-autocomplete@workspace:*, @sourceacademy/common-autocomplete@workspace:src/common/autocomplete":
+"@sourceacademy/common-autocomplete@npm:^0.0.1, @sourceacademy/common-autocomplete@workspace:src/common/autocomplete":
   version: 0.0.0-use.local
   resolution: "@sourceacademy/common-autocomplete@workspace:src/common/autocomplete"
   dependencies:
@@ -2096,7 +2096,7 @@ __metadata:
     "@rollup/plugin-node-resolve": "npm:^16.0.3"
     "@rollup/plugin-terser": "npm:^1.0.0"
     "@rollup/plugin-typescript": "npm:^12.3.0"
-    "@sourceacademy/common-autocomplete": "workspace:*"
+    "@sourceacademy/common-autocomplete": "npm:^0.0.1"
     "@sourceacademy/conductor": "npm:>=0.3.0"
     rollup: "npm:^4.60.2"
     tslib: "npm:^2.8.1"
@@ -2243,7 +2243,7 @@ __metadata:
     "@rollup/plugin-node-resolve": "npm:^16.0.3"
     "@rollup/plugin-terser": "npm:^1.0.0"
     "@rollup/plugin-typescript": "npm:^12.3.0"
-    "@sourceacademy/common-autocomplete": "workspace:*"
+    "@sourceacademy/common-autocomplete": "npm:^0.0.1"
     "@sourceacademy/conductor": "npm:>=0.3.0"
     rollup: "npm:^4.60.2"
     tslib: "npm:^2.8.1"

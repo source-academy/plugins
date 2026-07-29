@@ -1,6 +1,6 @@
 {
   "name": "@sourceacademy/runner-autocomplete",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "packageManager": "yarn@4.12.0",
   "description": "The runner plugin for the Conductor autocomplete framework",
   "scripts": {
@@ -8,6 +8,9 @@
     "prepack": "yarn build"
   },
   "license": "ISC",
+  "publishConfig": {
+    "access": "public"
+  },
   "files": [
     "dist"
   ],
@@ -25,7 +28,7 @@
     "@sourceacademy/conductor": ">=0.3.0"
   },
   "dependencies": {
-    "@sourceacademy/common-autocomplete": "workspace:*"
+    "@sourceacademy/common-autocomplete": "^0.0.1"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^16.0.3",

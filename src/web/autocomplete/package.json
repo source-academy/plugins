@@ -1,6 +1,6 @@
 {
   "name": "@sourceacademy/web-autocomplete",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "packageManager": "yarn@4.12.0",
   "description": "The web plugin for the Conductor autocomplete framework",
   "scripts": {
@@ -28,7 +28,7 @@
     "@sourceacademy/conductor": ">=0.3.0"
   },
   "dependencies": {
-    "@sourceacademy/common-autocomplete": "workspace:*"
+    "@sourceacademy/common-autocomplete": "^0.0.1"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.3",
