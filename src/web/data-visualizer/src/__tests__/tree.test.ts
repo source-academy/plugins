@@ -159,14 +159,16 @@ describe("OriginalDrawer pixel math", () => {
     expect(drawer.height).toBe(25);
   });
 
-  test("Tree.draw() (the real entry point DataVisualizerView calls) matches drawing via OriginalDrawer directly", () => {
+  test("Tree.draw('original') (the real entry point DataVisualizerView calls) returns an OriginalDrawer", () => {
     const node: SerializedDataVisualizerNode = {
       type: "array",
       refId: 1,
       children: [leaf("1"), leaf("2")],
     };
-    expect(() => Tree.fromSerializedNode(node).draw(10, 10, 0)).not.toThrow();
-    expect(Tree.fromSerializedNode(node).draw(10, 10, 0)).toBeTruthy();
+    const drawer = Tree.fromSerializedNode(node).draw("original");
+    expect(drawer).toBeInstanceOf(OriginalDrawer);
+    expect(() => drawer.draw(10, 10, 0)).not.toThrow();
+    expect(drawer.draw(10, 10, 0)).toBeTruthy();
   });
 
   test("a self-referential array terminates and routes a backward arrow instead of recursing forever", () => {
