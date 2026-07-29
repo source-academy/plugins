@@ -38,6 +38,7 @@ vi.mock("react-konva", () => {
 import { Button } from "@blueprintjs/core";
 
 import DataVisualizerView from "../DataVisualizerView";
+import { Tree } from "../tree/Tree";
 
 // React 19 warns ("The current testing environment is not configured to support act(...)")
 // unless this is set - the standard flag for a hand-rolled (non testing-library) React test setup.
@@ -125,7 +126,11 @@ describe("DataVisualizerView", () => {
     expect(renderer.root.findAllByType("h5")).toHaveLength(0);
   });
 
-  test("clicking a view-mode button makes it active and the previous one inactive", () => {
+  test("clicking a view-mode button makes it active and passes the selected mode through to Tree.draw", () => {
+    // The active-prop assertions alone can't tell a real wiring bug (e.g. the click handler
+    // updating state but DataVisualizerView passing the wrong variable into Tree.draw) from a
+    // correctly-wired toggle - spying on the actual draw() call closes that gap.
+    const drawSpy = vi.spyOn(Tree.prototype, "draw");
     const rows: SerializedDataVisualizerRow[] = [[leaf(1)]];
     const renderer = renderView(rows);
 
@@ -133,11 +138,15 @@ describe("DataVisualizerView", () => {
     const binaryTree = renderer.root.findByProps({ children: "Binary Tree" });
     expect(original.props.active).toBe(true);
     expect(binaryTree.props.active).toBe(false);
+    expect(drawSpy).toHaveBeenLastCalledWith("original");
 
     act(() => binaryTree.props.onClick());
 
     expect(renderer.root.findByProps({ children: "Original" }).props.active).toBe(false);
     expect(renderer.root.findByProps({ children: "Binary Tree" }).props.active).toBe(true);
+    expect(drawSpy).toHaveBeenLastCalledWith("binaryTree");
+
+    drawSpy.mockRestore();
   });
 
   test("a call with more than one argument labels each as a separate Structure", () => {

@@ -190,8 +190,11 @@ describe("OriginalDrawer pixel math", () => {
     };
     const drawer = Tree.fromSerializedNode(node).draw("original");
     expect(drawer).toBeInstanceOf(OriginalDrawer);
-    expect(() => drawer.draw(10, 10, 0)).not.toThrow();
-    expect(drawer.draw(10, 10, 0)).toBeTruthy();
+    let element: React.ReactElement | undefined;
+    expect(() => {
+      element = drawer.draw(10, 10, 0);
+    }).not.toThrow();
+    expect(element).toBeTruthy();
   });
 
   test("a self-referential array terminates and routes a backward arrow instead of recursing forever", () => {

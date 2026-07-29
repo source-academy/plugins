@@ -64,8 +64,11 @@ test("a self-referential list is cyclic, and is neither kind of tree", () => {
 });
 
 test("two branches referencing the same acyclic value are shared but not cyclic", () => {
-  const shared = pair(leaf(9), empty()); // refId 1
-  const sharedRef: SerializedDataVisualizerNode = { type: "ref", refId: 1 };
+  const shared = pair(leaf(9), empty());
+  const sharedRef: SerializedDataVisualizerNode = {
+    type: "ref",
+    refId: (shared as Extract<SerializedDataVisualizerNode, { type: "array" }>).refId,
+  };
   const diamond = pair(shared, pair(sharedRef, empty()));
 
   const result = classify(diamond);
