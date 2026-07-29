@@ -1,7 +1,7 @@
 {
   "name": "@sourceacademy/web-autocomplete",
   "version": "0.0.1",
-  "packageManager": "yarn@4.6.0",
+  "packageManager": "yarn@4.12.0",
   "description": "The web plugin for the Conductor autocomplete framework",
   "scripts": {
     "build": "rollup -c",
