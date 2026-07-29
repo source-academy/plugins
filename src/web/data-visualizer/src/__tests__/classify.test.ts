@@ -135,3 +135,31 @@ test("a valid binary tree is also a valid general tree — Binary Tree View is a
   expect(result.isBinaryTree).toBe(true);
   expect(result.isGeneralTree).toBe(true);
 });
+
+test("a pair whose data slot is the empty terminator is trivially a binary tree node, regardless of its rest slot", () => {
+  // isBinaryTreeNode's `data.type === "empty"` check returns true immediately, before even looking
+  // at `rest` — so this holds even when `rest` is a bare leaf, not a proper 2-link chain. Not a
+  // shape draw_data ever actually produces, but it's real, reachable behavior of the function as
+  // written, and the mirror image of the general-tree case below (same shape, opposite verdict).
+  const result = classify(pair(empty(), leaf(99)));
+  expect(result.isBinaryTree).toBe(true);
+});
+
+test("mismatched data-type labels across sibling binary-tree nodes are rejected", () => {
+  const stringLeaf: SerializedDataVisualizerNode = {
+    type: "leaf",
+    displayValue: "x",
+    label: "string",
+  };
+  const stringChild = pair(stringLeaf, pair(empty(), pair(empty(), empty())));
+  const tree = binaryNode(2, stringChild, binaryNode(1)); // root's data is a "number" leaf
+  const result = classify(tree);
+  expect(result.isBinaryTree).toBe(false);
+});
+
+test("a general tree whose head element is itself an improper (non-general-tree) compound value is rejected", () => {
+  const improperHead = pair(leaf(1), leaf(2)); // bare 2-tuple: not a proper list, not a general tree
+  const tree = pair(improperHead, pair(leaf(3), empty()));
+  const result = classify(tree);
+  expect(result.isGeneralTree).toBe(false);
+});

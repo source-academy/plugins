@@ -48,7 +48,7 @@ import { formatLeaf } from "../format";
 import { AlreadyParsedTreeNode } from "../tree/AlreadyParsedTreeNode";
 import { OriginalDrawer } from "../tree/OriginalDrawer";
 import { Tree } from "../tree/Tree";
-import { ArrayTreeNode, DataTreeNode, FunctionTreeNode } from "../tree/TreeNode";
+import { ArrayTreeNode, DataTreeNode, FunctionTreeNode, TreeNode } from "../tree/TreeNode";
 
 const leaf = (displayValue: string): SerializedDataVisualizerNode => ({
   type: "leaf",
@@ -126,6 +126,29 @@ describe("Tree.fromSerializedNode", () => {
   test("an unresolved ref (malformed message) falls back to empty instead of throwing", () => {
     const tree = Tree.fromSerializedNode({ type: "ref", refId: 999 });
     expect(tree.rootNode).toMatchObject({ isEmpty: true });
+  });
+});
+
+describe("Tree.getNodeById", () => {
+  test("id 0 is always the root array/function node", () => {
+    const tree = Tree.fromSerializedNode({
+      type: "array",
+      refId: 1,
+      children: [leaf("1"), leaf("2")],
+    });
+    expect(tree.getNodeById(0)).toBe(tree.rootNode);
+  });
+
+  test("later ids are assigned to nested array/function nodes in construction order", () => {
+    const tree = Tree.fromSerializedNode({
+      type: "array",
+      refId: 1,
+      children: [{ type: "array", refId: 2, children: [leaf("1")] }, leaf("2")],
+    });
+    const root = tree.rootNode as ArrayTreeNode;
+    // The nested array is the only other array/function node, built (and given id 1) while still
+    // inside the root's own construction — before the root's outer call returns.
+    expect(tree.getNodeById(1)).toBe(root.children![0]);
   });
 });
 
@@ -221,6 +244,46 @@ describe("OriginalDrawer pixel math", () => {
 
     expect(drawer.width).toBe(Config.CircleRadiusLarge * 4 + 2 * Config.StrokeWidth);
     expect(drawer.height).toBe(2 * Config.BoxHeight + Config.DistanceY / 2 + Config.StrokeWidth);
+  });
+
+  test("a node of an unrecognized TreeNode subtype degrades to zero size rather than throwing", () => {
+    // getNodeWidth/getNodeHeight both switch on concrete subtype (DataTreeNode, AlreadyParsedTreeNode,
+    // FunctionTreeNode, ArrayTreeNode) with a final `else` for anything else. Tree.fromSerializedNode
+    // never actually produces a bare TreeNode - the four constructNode branches always pick a
+    // concrete subclass - so this can only happen via direct construction, same as this file's other
+    // white-box tests. Worth pinning anyway: it's the fallback for any *future* subtype this drawer
+    // doesn't know about yet, and "quietly render as zero-size" is the intended degradation, not a bug.
+    const bareNode = new TreeNode();
+    const tree = new Tree(bareNode, [], {
+      isCyclic: false,
+      isSharedStructure: false,
+      isBinaryTree: false,
+      isGeneralTree: false,
+    });
+    const drawer = new OriginalDrawer(tree);
+    expect(() => drawer.draw(0, 0, 0)).not.toThrow();
+    expect(drawer.width).toBe(0);
+    // Not 0: draw() adds Config.StrokeWidth on top of getNodeHeight's result unconditionally, for
+    // every tree regardless of shape - this pins getNodeHeight's own contribution at 0, not the
+    // Stage's total height.
+    expect(drawer.height).toBe(Config.StrokeWidth);
+  });
+
+  test("an ArrayTreeNode constructed without ever assigning .children sizes to zero width", () => {
+    // Tree.fromSerializedNode always assigns .children immediately after constructing an
+    // ArrayTreeNode (see the "array" case in constructNode), so this can only happen via direct
+    // construction - but getNodeWidth's own `node.children != null` check means it's a real,
+    // reachable branch of that method, not dead code, so it's worth pinning the same way.
+    const bareArray = new ArrayTreeNode();
+    const tree = new Tree(bareArray, [], {
+      isCyclic: false,
+      isSharedStructure: false,
+      isBinaryTree: false,
+      isGeneralTree: false,
+    });
+    const drawer = new OriginalDrawer(tree);
+    expect(() => drawer.draw(0, 0, 0)).not.toThrow();
+    expect(drawer.width).toBe(0);
   });
 
   test("width grows with sibling count and height grows with nesting depth", () => {
