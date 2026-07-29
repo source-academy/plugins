@@ -1961,6 +1961,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sourceacademy/common-autocomplete@workspace:*, @sourceacademy/common-autocomplete@workspace:src/common/autocomplete":
+  version: 0.0.0-use.local
+  resolution: "@sourceacademy/common-autocomplete@workspace:src/common/autocomplete"
+  dependencies:
+    "@rollup/plugin-node-resolve": "npm:^16.0.3"
+    "@rollup/plugin-terser": "npm:^1.0.0"
+    "@rollup/plugin-typescript": "npm:^12.3.0"
+    rollup: "npm:^4.60.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^6.0.3"
+    vitest: "npm:^4.1.9"
+  languageName: unknown
+  linkType: soft
+
 "@sourceacademy/common-cse-machine@workspace:*, @sourceacademy/common-cse-machine@workspace:src/common/cse-machine":
   version: 0.0.0-use.local
   resolution: "@sourceacademy/common-cse-machine@workspace:src/common/cse-machine"
@@ -2074,6 +2088,24 @@ __metadata:
   checksum: 10c0/e5d4185ff0ff2d5cca39decd011fb56d6296dc0f9fe37fac444b51e04f3db919a84811baa3852a65cec763fa78c36166b6187b0567ca473e302f26cc14377749
   languageName: node
   linkType: hard
+
+"@sourceacademy/runner-autocomplete@workspace:src/runner/autocomplete":
+  version: 0.0.0-use.local
+  resolution: "@sourceacademy/runner-autocomplete@workspace:src/runner/autocomplete"
+  dependencies:
+    "@rollup/plugin-node-resolve": "npm:^16.0.3"
+    "@rollup/plugin-terser": "npm:^1.0.0"
+    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@sourceacademy/common-autocomplete": "workspace:*"
+    "@sourceacademy/conductor": "npm:>=0.3.0"
+    rollup: "npm:^4.60.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^6.0.3"
+    vitest: "npm:^4.1.9"
+  peerDependencies:
+    "@sourceacademy/conductor": ">=0.3.0"
+  languageName: unknown
+  linkType: soft
 
 "@sourceacademy/runner-cse-machine@workspace:src/runner/cse-machine":
   version: 0.0.0-use.local
@@ -2202,6 +2234,25 @@ __metadata:
   checksum: 10c0/5f86a348c79142c062d5b8b3c45418bc0358ceb2fc4ace0393ea75797b9d66d06ab270c4ec12d304066e0879016db36a017c1696b9f14a62ae59c42d012b47ed
   languageName: node
   linkType: hard
+
+"@sourceacademy/web-autocomplete@workspace:src/web/autocomplete":
+  version: 0.0.0-use.local
+  resolution: "@sourceacademy/web-autocomplete@workspace:src/web/autocomplete"
+  dependencies:
+    "@rollup/plugin-commonjs": "npm:^29.0.3"
+    "@rollup/plugin-node-resolve": "npm:^16.0.3"
+    "@rollup/plugin-terser": "npm:^1.0.0"
+    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@sourceacademy/common-autocomplete": "workspace:*"
+    "@sourceacademy/conductor": "npm:>=0.3.0"
+    rollup: "npm:^4.60.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^6.0.3"
+    vitest: "npm:^4.1.9"
+  peerDependencies:
+    "@sourceacademy/conductor": ">=0.3.0"
+  languageName: unknown
+  linkType: soft
 
 "@sourceacademy/web-cse-machine@workspace:src/web/cse-machine":
   version: 0.0.0-use.local
