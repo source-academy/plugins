@@ -75,7 +75,13 @@ export class StepperHostPlugin implements IPlugin {
       body: createElement(StepperTab),
     };
     tabService.registerTab(tab);
-    tabService.showTab(tab.id);
+    // Reveal, don't show: this plugin loads as soon as a stepping language starts, before the
+    // student has actually stepped through anything — matching the Data Visualizer host plugin's
+    // same reasoning (see its constructor). The tab is still reliably the selected one in the
+    // common case: opening the Stepper tab is what selects this evaluator in the first place (see
+    // frontend's stepperTab.ts), so the tab bar's own selection already points here by the time
+    // this plugin finishes loading — this call only needs to make it visible, not steal focus.
+    tabService.revealTab(tab.id);
   }
 
   /** The most recently received steps. */
