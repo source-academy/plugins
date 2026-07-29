@@ -183,13 +183,15 @@ describe("OriginalDrawer pixel math", () => {
 
     // Hand-traced: a 1-child array box is BoxWidth+StrokeWidth wide and BoxHeight tall before
     // accounting for the arrow; the self-loop is necessarily a *backward* arrow (its target, the
-    // root, is drawn at the same y it points from), which pushes minX/minY out by
-    // ArrowMarginHorizontal/Top + StrokeWidth/2 in the negative direction.
+    // root, is drawn at the same y it points from), which pushes minX out by
+    // ArrowMarginHorizontal+StrokeWidth/2 and minY out by ArrowMarginTop+StrokeWidth/2 (distinct
+    // constants, matching OriginalDrawer's own minX/minY updates) in the negative direction.
     const nodeWidth = Config.BoxWidth + Config.StrokeWidth;
     const nodeHeight = Config.ArrowMarginBottom + Config.BoxHeight;
-    const minShift = Config.ArrowMarginHorizontal + Config.StrokeWidth / 2;
-    expect(drawer.width).toBe(nodeWidth + minShift);
-    expect(drawer.height).toBe(nodeHeight + minShift + Config.StrokeWidth);
+    const minXShift = Config.ArrowMarginHorizontal + Config.StrokeWidth / 2;
+    const minYShift = Config.ArrowMarginTop + Config.StrokeWidth / 2;
+    expect(drawer.width).toBe(nodeWidth + minXShift);
+    expect(drawer.height).toBe(nodeHeight + minYShift + Config.StrokeWidth);
   });
 
   test("a shared-but-acyclic structure draws as a normal forward arrow (no backward-arrow offset)", () => {
