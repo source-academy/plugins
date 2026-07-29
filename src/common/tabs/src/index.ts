@@ -32,9 +32,22 @@ export interface ITabService {
 
   /**
    * The showTab method is used to display a tab that has been registered with the tab service. The tab is identified by its id, which is passed as an argument to the method. When the showTab method is called, the tab service will render the corresponding tab component with the arguments that were passed in when the tab was registered. This allows for dynamic rendering of tabs based on the arguments passed in.
+   *
+   * This also focuses the tab (makes it the currently-selected one) — appropriate when a plugin
+   * decides on its own, mid-session, that the student should be looking at it right now (e.g. a
+   * sound module the moment it starts playing/recording). Use {@link revealTab} instead when a tab
+   * should simply become available in the tab bar without stealing focus from whatever the student
+   * is currently looking at (e.g. when the plugin first loads).
    * @param id The id of the tab to be displayed. This should correspond to the id of a tab that has been registered with the tab service.
    */
   showTab(id: string): void;
+
+  /**
+   * Makes a registered tab visible in the tab bar without changing which tab is currently selected —
+   * the visible-but-unfocused counterpart to {@link showTab}.
+   * @param id The id of the tab to reveal. This should correspond to the id of a tab that has been registered with the tab service.
+   */
+  revealTab(id: string): void;
 
   /**
    * The hideTab method is used to hide a tab that is currently being displayed. The tab is identified by its id, which is passed as an argument to the method. When the hideTab method is called, the tab service will stop rendering the corresponding tab component, effectively hiding it from view. This allows for dynamic hiding of tabs based on user interactions or other events.

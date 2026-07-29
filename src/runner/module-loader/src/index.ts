@@ -51,11 +51,11 @@ export class ModuleLoaderRunnerPlugin implements IPlugin {
               });
               const pluginObj = this.__conductor.registerPlugin(plugin, this.__evaluator, {
                 tabs: msg.tabs,
-                loadTab: (tabName: string) => {
+                loadTab: async (tabName: string) => {
                   if (!msg.tabs.includes(tabName)) {
                     throw new Error(`Tab ${tabName} not found in module ${moduleName}`);
                   }
-                  this.__conductor.hostLoadPlugin(tabName);
+                  await this.__conductor.hostLoadPlugin(tabName);
                 },
               }) as IModulePlugin;
               await pluginObj.initialise();
