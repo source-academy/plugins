@@ -3,8 +3,8 @@ import type { RefId, SerializedDataVisualizerNode } from "@sourceacademy/common-
 import { classify, type ClassificationResult } from "../classify";
 import { AlreadyParsedTreeNode } from "./AlreadyParsedTreeNode";
 import { BinaryTreeDrawer } from "./BinaryTreeDrawer";
+import { ClassicDrawer } from "./ClassicDrawer";
 import { GeneralTreeDrawer } from "./GeneralTreeDrawer";
-import { OriginalDrawer } from "./OriginalDrawer";
 import {
   ArrayTreeNode,
   DataTreeNode,
@@ -13,7 +13,7 @@ import {
   TreeNode,
 } from "./TreeNode";
 
-export type ViewMode = "original" | "binaryTree" | "generalTree";
+export type ViewMode = "classic" | "binaryTree" | "generalTree";
 
 /**
  *  A tree object built from one serialized data-visualizer node (one drawn argument of one
@@ -105,16 +105,16 @@ export class Tree {
    * Picks the drawer for a given view mode. `binaryTree`/`generalTree` still return a drawer even
    * when this tree isn't actually that shape — the drawer itself renders a "not a binary/general
    * tree" warning box in that case (see {@link BinaryTreeDrawer}/{@link GeneralTreeDrawer}), rather
-   * than this method silently falling back to the original view underneath the selected toggle.
+   * than this method silently falling back to the classic view underneath the selected toggle.
    */
-  draw(viewMode: ViewMode): OriginalDrawer | BinaryTreeDrawer | GeneralTreeDrawer {
+  draw(viewMode: ViewMode): ClassicDrawer | BinaryTreeDrawer | GeneralTreeDrawer {
     switch (viewMode) {
       case "binaryTree":
         return new BinaryTreeDrawer(this, this.classification);
       case "generalTree":
         return new GeneralTreeDrawer(this, this.classification);
       default:
-        return new OriginalDrawer(this);
+        return new ClassicDrawer(this);
     }
   }
 }

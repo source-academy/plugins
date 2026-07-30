@@ -118,10 +118,10 @@ describe("DataVisualizerView", () => {
     const rows: SerializedDataVisualizerRow[] = [[leaf(1)]];
     const renderer = renderView(rows);
 
-    // Original/Binary Tree/General Tree, no Previous/Next (only shown when rows.length > 1), no
+    // Classic/Binary Tree/General Tree, no Previous/Next (only shown when rows.length > 1), no
     // "Structure N" headers (only shown when a single call has more than one argument).
     const buttons = renderer.root.findAllByType(Button);
-    expect(buttons.map(b => b.props.children)).toEqual(["Original", "Binary Tree", "General Tree"]);
+    expect(buttons.map(b => b.props.children)).toEqual(["Classic", "Binary Tree", "General Tree"]);
     expect(() => renderer.root.findByProps({ children: "Previous" })).toThrow();
     expect(renderer.root.findAllByType("h5")).toHaveLength(0);
   });
@@ -134,15 +134,15 @@ describe("DataVisualizerView", () => {
     const rows: SerializedDataVisualizerRow[] = [[leaf(1)]];
     const renderer = renderView(rows);
 
-    const original = renderer.root.findByProps({ children: "Original" });
+    const classic = renderer.root.findByProps({ children: "Classic" });
     const binaryTree = renderer.root.findByProps({ children: "Binary Tree" });
-    expect(original.props.active).toBe(true);
+    expect(classic.props.active).toBe(true);
     expect(binaryTree.props.active).toBe(false);
-    expect(drawSpy).toHaveBeenLastCalledWith("original");
+    expect(drawSpy).toHaveBeenLastCalledWith("classic");
 
     act(() => binaryTree.props.onClick());
 
-    expect(renderer.root.findByProps({ children: "Original" }).props.active).toBe(false);
+    expect(renderer.root.findByProps({ children: "Classic" }).props.active).toBe(false);
     expect(renderer.root.findByProps({ children: "Binary Tree" }).props.active).toBe(true);
     expect(drawSpy).toHaveBeenLastCalledWith("binaryTree");
 

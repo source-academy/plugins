@@ -46,7 +46,7 @@ import { NullDrawable } from "../drawable/Drawable";
 import ArrayDrawable from "../drawable/ArrayDrawable";
 import { formatLeaf } from "../format";
 import { AlreadyParsedTreeNode } from "../tree/AlreadyParsedTreeNode";
-import { OriginalDrawer } from "../tree/OriginalDrawer";
+import { ClassicDrawer } from "../tree/ClassicDrawer";
 import { Tree } from "../tree/Tree";
 import { ArrayTreeNode, DataTreeNode, FunctionTreeNode, TreeNode } from "../tree/TreeNode";
 
@@ -152,14 +152,14 @@ describe("Tree.getNodeById", () => {
   });
 });
 
-describe("OriginalDrawer pixel math", () => {
+describe("ClassicDrawer pixel math", () => {
   test("a plain pair of two leaves sizes to two boxes side by side, no arrows", () => {
     const tree = Tree.fromSerializedNode({
       type: "array",
       refId: 1,
       children: [leaf("1"), leaf("2")],
     });
-    const drawer = new OriginalDrawer(tree);
+    const drawer = new ClassicDrawer(tree);
     drawer.draw(0, 0, 0);
 
     expect(drawer.width).toBe(2 * Config.BoxWidth + Config.StrokeWidth);
@@ -167,10 +167,10 @@ describe("OriginalDrawer pixel math", () => {
   });
 
   test("a bare leaf (no pair/array at all) sizes from the measured text, not the box grid", () => {
-    // e.g. `draw_data(1, 42)` — a value1 with no compound structure takes OriginalDrawer's
+    // e.g. `draw_data(1, 42)` — a value1 with no compound structure takes ClassicDrawer's
     // separate DataTreeNode-root branch (Konva.Text measurement), not drawNode's box-grid math.
     const tree = Tree.fromSerializedNode(leaf("42"));
-    const drawer = new OriginalDrawer(tree);
+    const drawer = new ClassicDrawer(tree);
     // x/y only offset the returned <Stage>'s own width/height props (`this.width + x`), not the
     // drawer's public `.width`/`.height` fields — same as the compound-tree branch below, where
     // `.width`/`.height` are `getNodeWidth(root) - minX` with no x/y term either. Passing non-zero
@@ -182,14 +182,14 @@ describe("OriginalDrawer pixel math", () => {
     expect(drawer.height).toBe(25);
   });
 
-  test("Tree.draw('original') (the real entry point DataVisualizerView calls) returns an OriginalDrawer", () => {
+  test("Tree.draw('classic') (the real entry point DataVisualizerView calls) returns a ClassicDrawer", () => {
     const node: SerializedDataVisualizerNode = {
       type: "array",
       refId: 1,
       children: [leaf("1"), leaf("2")],
     };
-    const drawer = Tree.fromSerializedNode(node).draw("original");
-    expect(drawer).toBeInstanceOf(OriginalDrawer);
+    const drawer = Tree.fromSerializedNode(node).draw("classic");
+    expect(drawer).toBeInstanceOf(ClassicDrawer);
     let element: React.ReactElement | undefined;
     expect(() => {
       element = drawer.draw(10, 10, 0);
@@ -203,7 +203,7 @@ describe("OriginalDrawer pixel math", () => {
       { type: "ref", refId: 1 },
     ];
     const tree = Tree.fromSerializedNode(selfRef);
-    const drawer = new OriginalDrawer(tree);
+    const drawer = new ClassicDrawer(tree);
 
     // The real regression this guards: getNodeWidth/getNodeHeight recursing straight through an
     // AlreadyParsedTreeNode into its actualNode's own children would never terminate on a cycle.
@@ -213,7 +213,7 @@ describe("OriginalDrawer pixel math", () => {
     // accounting for the arrow; the self-loop is necessarily a *backward* arrow (its target, the
     // root, is drawn at the same y it points from), which pushes minX out by
     // ArrowMarginHorizontal+StrokeWidth/2 and minY out by ArrowMarginTop+StrokeWidth/2 (distinct
-    // constants, matching OriginalDrawer's own minX/minY updates) in the negative direction.
+    // constants, matching ClassicDrawer's own minX/minY updates) in the negative direction.
     const nodeWidth = Config.BoxWidth + Config.StrokeWidth;
     const nodeHeight = Config.ArrowMarginBottom + Config.BoxHeight;
     const minXShift = Config.ArrowMarginHorizontal + Config.StrokeWidth / 2;
@@ -229,7 +229,7 @@ describe("OriginalDrawer pixel math", () => {
       refId: 2,
       children: [shared, { type: "ref", refId: 1 }],
     });
-    const drawer = new OriginalDrawer(tree);
+    const drawer = new ClassicDrawer(tree);
     drawer.draw(0, 0, 0);
 
     // Sharing without a cycle must NOT trip the backward-arrow path: the referenced node is drawn
@@ -242,7 +242,7 @@ describe("OriginalDrawer pixel math", () => {
 
   test("a function value sizes by its circle radius, not the box grid", () => {
     const tree = Tree.fromSerializedNode({ type: "array", refId: 1, children: [func(2)] });
-    const drawer = new OriginalDrawer(tree);
+    const drawer = new ClassicDrawer(tree);
     drawer.draw(0, 0, 0);
 
     expect(drawer.width).toBe(Config.CircleRadiusLarge * 4 + 2 * Config.StrokeWidth);
@@ -263,7 +263,7 @@ describe("OriginalDrawer pixel math", () => {
       isBinaryTree: false,
       isGeneralTree: false,
     });
-    const drawer = new OriginalDrawer(tree);
+    const drawer = new ClassicDrawer(tree);
     expect(() => drawer.draw(0, 0, 0)).not.toThrow();
     expect(drawer.width).toBe(0);
     // Not 0: draw() adds Config.StrokeWidth on top of getNodeHeight's result unconditionally, for
@@ -284,16 +284,16 @@ describe("OriginalDrawer pixel math", () => {
       isBinaryTree: false,
       isGeneralTree: false,
     });
-    const drawer = new OriginalDrawer(tree);
+    const drawer = new ClassicDrawer(tree);
     expect(() => drawer.draw(0, 0, 0)).not.toThrow();
     expect(drawer.width).toBe(0);
   });
 
   test("width grows with sibling count and height grows with nesting depth", () => {
-    const two = new OriginalDrawer(
+    const two = new ClassicDrawer(
       Tree.fromSerializedNode({ type: "array", refId: 1, children: [leaf("1"), leaf("2")] }),
     );
-    const three = new OriginalDrawer(
+    const three = new ClassicDrawer(
       Tree.fromSerializedNode({
         type: "array",
         refId: 1,
@@ -304,10 +304,10 @@ describe("OriginalDrawer pixel math", () => {
     three.draw(0, 0, 1);
     expect(three.width).toBeGreaterThan(two.width);
 
-    const flat = new OriginalDrawer(
+    const flat = new ClassicDrawer(
       Tree.fromSerializedNode({ type: "array", refId: 1, children: [leaf("1")] }),
     );
-    const nested = new OriginalDrawer(
+    const nested = new ClassicDrawer(
       Tree.fromSerializedNode({
         type: "array",
         refId: 1,
