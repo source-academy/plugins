@@ -1,7 +1,7 @@
 {
   "name": "@sourceacademy/common-module-loader",
   "version": "0.0.1",
-  "packageManager": "yarn@4.12.0",
+  "packageManager": "yarn@4.18.0",
   "description": "The common types for loading modules in Source Academy",
   "scripts": {
     "build": "rollup -c",
