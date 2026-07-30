@@ -6,7 +6,7 @@ import { Config } from "./Config";
 import { Tree, type ViewMode } from "./tree/Tree";
 
 const VIEW_MODES: { mode: ViewMode; label: string }[] = [
-  { mode: "original", label: "Original" },
+  { mode: "classic", label: "Classic" },
   { mode: "binaryTree", label: "Binary Tree" },
   { mode: "generalTree", label: "General Tree" },
 ];
@@ -14,7 +14,7 @@ const VIEW_MODES: { mode: ViewMode; label: string }[] = [
 // To account for overflow to the left/top due to a backward arrow — matches the old code's
 // `createDrawing`'s `leftMargin`/`topMargin` exactly. This is *not* visual padding (the Card
 // around each drawing already provides that via CSS); it's the minimum inset a stroked box drawn
-// at x=0 needs so its own border isn't clipped by the canvas edge. `OriginalDrawer.draw()` already
+// at x=0 needs so its own border isn't clipped by the canvas edge. `ClassicDrawer.draw()` already
 // factors this same constant into the Stage's width/height — passing any other value here desyncs
 // that sizing from where content actually starts, clipping the far/bottom edge of every box.
 const DRAWING_MARGIN = Config.StrokeWidth / 2;
@@ -32,7 +32,7 @@ type Props = {
  * over the rows already pushed through the channel — same shape (one `SerializedDataVisualizerRow`
  * per call is exactly the old code's one `Step`), no singleton needed.
  *
- * A view-mode toggle (Original/Binary Tree/General Tree) applies globally across every call and
+ * A view-mode toggle (Classic/Binary Tree/General Tree) applies globally across every call and
  * argument — matching the old tool's single static toggle, just as local state instead. Switching
  * modes doesn't hide or filter anything: a structure that isn't actually the selected tree shape
  * still renders, just as the drawer's own "not a binary/general tree" warning box (see
@@ -40,7 +40,7 @@ type Props = {
  */
 export default function DataVisualizerView({ rows }: Props) {
   const [currentStep, setCurrentStep] = useState(0);
-  const [viewMode, setViewMode] = useState<ViewMode>("original");
+  const [viewMode, setViewMode] = useState<ViewMode>("classic");
 
   // Mirrors the old code's `DataVisualizer.init(steps => { ...; setCurrentStep(0); })`: every time a
   // new set of calls arrives (a fresh Run), jump back to the first call.

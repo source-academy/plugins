@@ -6,7 +6,7 @@ import { formatLeaf } from "../format";
 import type { ClassificationResult } from "../classify";
 import { ArrowDrawable, BackwardArrowDrawable } from "../drawable/Drawable";
 import { AlreadyParsedTreeNode } from "./AlreadyParsedTreeNode";
-import { OriginalDrawer } from "./OriginalDrawer";
+import { ClassicDrawer } from "./ClassicDrawer";
 import type { Tree } from "./Tree";
 import {
   ArrayTreeNode,
@@ -19,7 +19,7 @@ import {
 /**
  * Tree drawer for binary tree view
  */
-export class BinaryTreeDrawer extends OriginalDrawer {
+export class BinaryTreeDrawer extends ClassicDrawer {
   constructor(
     tree: Tree,
     private classification: ClassificationResult,

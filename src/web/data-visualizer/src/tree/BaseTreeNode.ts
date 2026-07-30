@@ -5,7 +5,7 @@ export class TreeNode {
   public nodePos: number = 0;
   /** This node's color-palette index, shared by every box belonging to it — populated from
    * {@link TreeLayout.colorByRefId} when the tree is a valid binary or general tree; always 0
-   * (rendered as plain black) in the original box-and-pointer view. */
+   * (rendered as plain black) in the classic box-and-pointer view. */
   public nodeColor: number = 0;
 
   constructor() {
