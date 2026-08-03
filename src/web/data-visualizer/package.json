@@ -38,7 +38,7 @@
     "@sourceacademy/conductor": "^0.8.0",
     "@types/react": "^19.0.0",
     "@types/react-test-renderer": "^19.0.0",
-    "konva": "^9.3.0",
+    "konva": "^10.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-konva": "^19.0.0",
