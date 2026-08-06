@@ -4,7 +4,7 @@ import tseslint from "typescript-eslint";
 
 export default defineConfig([
   {
-    ignores: ["**/dist", "coverage"],
+    ignores: ["**/dist", "**/node_modules", "coverage"],
   },
   tseslint.configs.recommended,
   eslintConfigPrettierFlat,
@@ -13,7 +13,9 @@ export default defineConfig([
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {
-        project: ["src/tsconfig.json", "src/tsconfig.test.json"],
+        projectService: {
+          allowDefaultProject: ['vitest.config.ts']
+        },
         tsconfigRootDir: import.meta.dirname,
       },
     },
@@ -26,6 +28,7 @@ export default defineConfig([
       "@typescript-eslint/no-import-type-side-effects": "error",
       "@typescript-eslint/no-unnecessary-type-assertion": "error",
       "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+      '@typescript-eslint/only-throw-error': 'error',
       "@typescript-eslint/require-await": "error",
       "@typescript-eslint/return-await": ["error", "in-try-catch"],
     },

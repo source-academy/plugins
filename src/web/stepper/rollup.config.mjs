@@ -1,3 +1,6 @@
+﻿// @ts-check
+
+import { defineConfig } from "rollup";
 import commonjs from "@rollup/plugin-commonjs";
 import nodeResolve from "@rollup/plugin-node-resolve";
 import terser from "@rollup/plugin-terser";
@@ -15,10 +18,7 @@ const external = [
   "@blueprintjs/core",
 ];
 
-/**
- * @type {import('rollup').RollupOptions}
- */
-export default {
+export default defineConfig({
   input: "src/index.ts",
   output: {
     file: "dist/index.cjs",
@@ -32,4 +32,4 @@ export default {
     typescript(),
     terser(),
   ],
-};
+});

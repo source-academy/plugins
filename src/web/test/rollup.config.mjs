@@ -1,11 +1,12 @@
+﻿// @ts-check
+
+import { defineConfig } from "rollup";
 import nodeResolve from "@rollup/plugin-node-resolve";
 import terser from "@rollup/plugin-terser";
 import typescript from "@rollup/plugin-typescript";
 import commonjs from "@rollup/plugin-commonjs";
-/**
- * @type {import('rollup').RollupOptions}
- */
-export default {
+
+export default defineConfig({
   input: "src/index.tsx",
   output: [
     {
@@ -19,4 +20,5 @@ export default {
   ],
   plugins: [nodeResolve(), commonjs(), typescript(), terser()],
   external: ["react", "react-dom", "react/jsx-runtime"],
-};
+});
+
