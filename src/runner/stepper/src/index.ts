@@ -4,8 +4,8 @@ import {
   type SerializedStepperStep,
   type StepperMessage,
   type SyntaxProfile,
-} from "@sourceacademy/common-stepper";
-import type { IChannel, IConduit, IPlugin } from "@sourceacademy/conductor/conduit";
+} from '@sourceacademy/common-stepper';
+import type { IChannel, IConduit, IPlugin } from '@sourceacademy/conductor/conduit';
 
 /**
  * The language-agnostic runner half of the stepper.
@@ -35,9 +35,9 @@ export abstract class BaseStepperRunnerPlugin<TAst = unknown> implements IPlugin
     this.__stepperChannel = stepperChannel;
     this.__stepperChannel.subscribe(message => {
       // The host re-opened the stepper tab and wants the latest steps without a re-run.
-      if (message.type === "request") {
+      if (message.type === 'request') {
         this.__stepperChannel.send({
-          type: "steps",
+          type: 'steps',
           steps: this.__lastSteps,
           profile: this.getSyntaxProfile(),
         });
@@ -76,10 +76,10 @@ export abstract class BaseStepperRunnerPlugin<TAst = unknown> implements IPlugin
     try {
       const steps = await this.getSteps(ast);
       this.__lastSteps = steps;
-      this.__stepperChannel.send({ type: "steps", steps, profile: this.getSyntaxProfile() });
+      this.__stepperChannel.send({ type: 'steps', steps, profile: this.getSyntaxProfile() });
     } catch (error) {
       this.__stepperChannel.send({
-        type: "error",
+        type: 'error',
         error: error instanceof Error ? error.message : String(error),
       });
     }

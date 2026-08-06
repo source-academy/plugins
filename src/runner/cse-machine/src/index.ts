@@ -4,8 +4,8 @@ import {
   RUNNER_ID,
   type CseSnapshot,
   type CseSnapshotMessage,
-} from "@sourceacademy/common-cse-machine";
-import type { IPlugin, IChannel, IConduit } from "@sourceacademy/conductor/conduit";
+} from '@sourceacademy/common-cse-machine';
+import type { IPlugin, IChannel, IConduit } from '@sourceacademy/conductor/conduit';
 
 /**
  * Runner-side CSE machine plugin.
@@ -31,7 +31,7 @@ export class CseMachinePlugin implements IPlugin {
     [cseChannel]: IChannel<any>[],
   ) {
     if (!cseChannel) {
-      throw new Error("CSE channel is required but was not provided.");
+      throw new Error('CSE channel is required but was not provided.');
     }
     this.__cseChannel = cseChannel;
   }

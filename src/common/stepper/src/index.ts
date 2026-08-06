@@ -12,19 +12,19 @@
  */
 
 /** The channel the stepper runner and host plugins communicate over. */
-export const STEPPER_CHANNEL_ID = "__stepper";
+export const STEPPER_CHANNEL_ID = '__stepper';
 
 /** The id of the runner (worker-side) stepper plugin. */
-export const RUNNER_ID = "__runner_stepper";
+export const RUNNER_ID = '__runner_stepper';
 
 /** The id of the web/host (browser-side) stepper plugin. */
-export const WEB_ID = "__web_stepper";
+export const WEB_ID = '__web_stepper';
 
 /**
  * The id used to look the stepper up in the plugin directory (i.e. the argument to
  * `IRunnerPlugin.hostLoadPlugin`). The host resolves this to the web plugin's bundle URL.
  */
-export const STEPPER_DIRECTORY_ID = "stepper";
+export const STEPPER_DIRECTORY_ID = 'stepper';
 
 /**
  * A single AST node, serialized to plain JSON.
@@ -61,7 +61,7 @@ export interface SerializedMarker {
    */
   redexNodeType?: string;
   /** Whether the highlight applies before or after the reduction. */
-  redexType?: "beforeMarker" | "afterMarker";
+  redexType?: 'beforeMarker' | 'afterMarker';
   /** A human-readable explanation of the reduction, shown alongside the step. */
   explanation?: string;
 }
@@ -100,7 +100,7 @@ export interface SerializedStepperStep {
  */
 
 /** A CSS class hint for a rendered token, mapped by the host to its stepper colour classes. */
-export type StepperTokenClass = "operator" | "identifier" | "literal" | "conditional";
+export type StepperTokenClass = 'operator' | 'identifier' | 'literal' | 'conditional';
 
 /**
  * One piece of a node's render template. A template is an ordered list of parts; the host emits each
@@ -174,7 +174,7 @@ export interface SyntaxProfile {
 
 /** Runner → host: the computed evaluation steps for the most recent run. */
 export interface StepperStepsMessage {
-  type: "steps";
+  type: 'steps';
   steps: SerializedStepperStep[];
   /**
    * The language's rendering rules. Optional and run-level (the same for every step). When absent,
@@ -185,7 +185,7 @@ export interface StepperStepsMessage {
 
 /** Runner → host: stepping failed (e.g. a parse error). */
 export interface StepperErrorMessage {
-  type: "error";
+  type: 'error';
   error: string;
 }
 
@@ -194,7 +194,7 @@ export interface StepperErrorMessage {
  * display when the stepper tab is (re)opened without re-running the program.
  */
 export interface StepperRequestMessage {
-  type: "request";
+  type: 'request';
 }
 
 /** Every message that may cross the {@link STEPPER_CHANNEL_ID} channel. */

@@ -29,7 +29,8 @@
     "@rollup/plugin-typescript": "catalog:",
     "rollup": "catalog:",
     "tslib": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
   "repository": {
     "type": "git",

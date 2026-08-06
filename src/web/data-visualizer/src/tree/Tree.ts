@@ -1,19 +1,19 @@
-import type { RefId, SerializedDataVisualizerNode } from "@sourceacademy/common-data-visualizer";
+import type { RefId, SerializedDataVisualizerNode } from '@sourceacademy/common-data-visualizer';
 
-import { classify, type ClassificationResult } from "../classify";
-import { AlreadyParsedTreeNode } from "./AlreadyParsedTreeNode";
-import { BinaryTreeDrawer } from "./BinaryTreeDrawer";
-import { ClassicDrawer } from "./ClassicDrawer";
-import { GeneralTreeDrawer } from "./GeneralTreeDrawer";
+import { classify, type ClassificationResult } from '../classify';
+import { AlreadyParsedTreeNode } from './AlreadyParsedTreeNode';
+import { BinaryTreeDrawer } from './BinaryTreeDrawer';
+import { ClassicDrawer } from './ClassicDrawer';
+import { GeneralTreeDrawer } from './GeneralTreeDrawer';
 import {
   ArrayTreeNode,
   DataTreeNode,
   DrawableTreeNode,
   FunctionTreeNode,
   TreeNode,
-} from "./TreeNode";
+} from './TreeNode';
 
-export type ViewMode = "classic" | "binaryTree" | "generalTree";
+export type ViewMode = 'classic' | 'binaryTree' | 'generalTree';
 
 /**
  *  A tree object built from one serialized data-visualizer node (one drawn argument of one
@@ -64,18 +64,18 @@ export class Tree {
 
     function constructNode(node: SerializedDataVisualizerNode): TreeNode {
       switch (node.type) {
-        case "ref": {
+        case 'ref': {
           const already = refToTreeNode.get(node.refId);
           // Should always be present — the runner never emits a "ref" before the value it refers
           // to. Falling back to empty rather than throwing keeps a malformed message from crashing
           // the whole tab.
           return already ? new AlreadyParsedTreeNode(already) : DataTreeNode.empty();
         }
-        case "empty":
+        case 'empty':
           return DataTreeNode.empty();
-        case "leaf":
+        case 'leaf':
           return DataTreeNode.leaf(node.displayValue, node.label);
-        case "array": {
+        case 'array': {
           const treeNode = new ArrayTreeNode();
           refToTreeNode.set(node.refId, treeNode);
           treeNodes[nodeCount] = treeNode;
@@ -87,7 +87,7 @@ export class Tree {
           treeNode.children = node.children.map(constructNode);
           return treeNode;
         }
-        case "function": {
+        case 'function': {
           const treeNode = new FunctionTreeNode();
           refToTreeNode.set(node.refId, treeNode);
           treeNodes[nodeCount] = treeNode;
@@ -109,9 +109,9 @@ export class Tree {
    */
   draw(viewMode: ViewMode): ClassicDrawer | BinaryTreeDrawer | GeneralTreeDrawer {
     switch (viewMode) {
-      case "binaryTree":
+      case 'binaryTree':
         return new BinaryTreeDrawer(this, this.classification);
-      case "generalTree":
+      case 'generalTree':
         return new GeneralTreeDrawer(this, this.classification);
       default:
         return new ClassicDrawer(this);

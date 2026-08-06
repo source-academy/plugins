@@ -11,6 +11,7 @@
   "scripts": {
     "build": "tsx lib/build.ts",
     "dev": "tsx lib/build.ts --watch",
+    "runall": "yarn workspaces foreach -A --exclude \"@sourceacademy/plugins-workspace\" run",
     "test": "vitest run",
     "test-coverage": "vitest run --coverage",
     "test:dev": "vitest",
@@ -24,6 +25,7 @@
     "@sourceacademy/plugin-directory": "source-academy/plugin-directory#main",
     "@types/node": "^25.9.1",
     "@vitest/coverage-istanbul": "^4.1.9",
+    "@vitest/eslint-plugin": "^1.6.26",
     "@yarnpkg/types": "^4.0.1",
     "commander": "^15.0.0",
     "eslint": "^10.0.3",

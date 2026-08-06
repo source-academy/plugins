@@ -4,8 +4,8 @@ import {
   WEB_ID,
   type CseSnapshot,
   type CseSnapshotMessage,
-} from "@sourceacademy/common-cse-machine";
-import type { IPlugin, IChannel, IConduit } from "@sourceacademy/conductor/conduit";
+} from '@sourceacademy/common-cse-machine';
+import type { IPlugin, IChannel, IConduit } from '@sourceacademy/conductor/conduit';
 
 // Re-export the protocol types so host apps can depend on a single package for the
 // web side of the CSE machine.
@@ -16,7 +16,7 @@ export type {
   CseSerializedBinding,
   CseSerializedEnvFrame,
   CseSnapshotMessage,
-} from "@sourceacademy/common-cse-machine";
+} from '@sourceacademy/common-cse-machine';
 
 /**
  * Web/host-side CSE machine plugin.
@@ -46,7 +46,7 @@ export abstract class CseMachineHostPlugin implements IPlugin {
     [cseChannel]: IChannel<any>[],
   ) {
     if (!cseChannel) {
-      throw new Error("CSE channel is required but was not provided.");
+      throw new Error('CSE channel is required but was not provided.');
     }
     (cseChannel as IChannel<CseSnapshotMessage>).subscribe(message => {
       if (

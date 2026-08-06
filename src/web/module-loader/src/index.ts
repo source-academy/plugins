@@ -3,13 +3,13 @@ import {
   ModuleLoaderMessageType,
   WEB_ID,
   type ModuleLoaderMessage,
-} from "@sourceacademy/common-module-loader";
+} from '@sourceacademy/common-module-loader';
 import {
   type IPlugin,
   type IChannel,
   type IConduit,
   checkIsPluginClass,
-} from "@sourceacademy/conductor/conduit";
+} from '@sourceacademy/conductor/conduit';
 
 type ModuleDirectoryBundle = {
   tabs: string[];
@@ -37,7 +37,7 @@ export class ModuleLoaderWebPlugin implements IPlugin {
         return this.__moduleRequestChannel.send({
           type: ModuleLoaderMessageType.MODULE_ERROR,
           moduleName: message.moduleName,
-          error: "Module directory not loaded yet",
+          error: 'Module directory not loaded yet',
         });
       }
       if (!Object.hasOwn(this.moduleDirectory, message.moduleName)) {
@@ -56,12 +56,12 @@ export class ModuleLoaderWebPlugin implements IPlugin {
       }
       const moduleBaseUrl = this.moduleDirectoryURL.slice(
         0,
-        this.moduleDirectoryURL.lastIndexOf("/") + 1,
+        this.moduleDirectoryURL.lastIndexOf('/') + 1,
       );
       return this.__moduleRequestChannel.send({
         type: ModuleLoaderMessageType.MODULE_RESPONSE,
         moduleName: message.moduleName,
-        moduleURL: moduleBaseUrl + "bundles/" + message.moduleName + ".js",
+        moduleURL: moduleBaseUrl + 'bundles/' + message.moduleName + '.js',
         tabs: this.moduleDirectory[message.moduleName].tabs,
       });
     });
@@ -79,7 +79,7 @@ export class ModuleLoaderWebPlugin implements IPlugin {
         this.moduleDirectory = data;
       })
       .catch(error => {
-        console.error("Failed to load module directory:", error);
+        console.error('Failed to load module directory:', error);
       });
   }
 
@@ -91,9 +91,9 @@ export class ModuleLoaderWebPlugin implements IPlugin {
       if (this.moduleDirectory[moduleName].tabs.includes(tabName)) {
         const moduleBaseUrl = this.moduleDirectoryURL.slice(
           0,
-          this.moduleDirectoryURL.lastIndexOf("/") + 1,
+          this.moduleDirectoryURL.lastIndexOf('/') + 1,
         );
-        return moduleBaseUrl + "tabs/" + tabName + ".js";
+        return moduleBaseUrl + 'tabs/' + tabName + '.js';
       }
     }
     return null;

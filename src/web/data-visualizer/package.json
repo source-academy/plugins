@@ -50,6 +50,7 @@
     "react-test-renderer": "^19.0.0",
     "rollup": "catalog:",
     "tslib": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

@@ -123,14 +123,14 @@ const STEPPER_CSS = `
 }
 `;
 
-const STYLE_ELEMENT_ID = "__sa_stepper_styles";
+const STYLE_ELEMENT_ID = '__sa_stepper_styles';
 
 /** Injects (or refreshes) the stepper stylesheet in the document. No-op outside the browser. */
 export function injectStepperStyles(): void {
-  if (typeof document === "undefined") return;
+  if (typeof document === 'undefined') return;
   let style = document.getElementById(STYLE_ELEMENT_ID) as HTMLStyleElement | null;
   if (style === null) {
-    style = document.createElement("style");
+    style = document.createElement('style');
     style.id = STYLE_ELEMENT_ID;
     document.head.appendChild(style);
   }
