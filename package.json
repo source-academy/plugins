@@ -11,7 +11,8 @@
   "scripts": {
     "build": "tsx lib/build.ts",
     "dev": "tsx lib/build.ts --watch",
-    "runall": "yarn workspaces foreach -p -A --exclude \"@sourceacademy/plugins-workspace\" run",
+    "run:all": "yarn workspaces foreach -pt -A --exclude \"@sourceacademy/plugins-workspace\" run",
+    "run:since": "yarn workspaces foreach -pt --since --exclude \"@sourceacademy/plugins-workspace\" run",
     "test": "vitest run",
     "test-coverage": "vitest run --coverage",
     "test:dev": "vitest",
