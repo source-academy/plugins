@@ -5,7 +5,7 @@ import { Config } from "../Config";
 import { formatLeaf } from "../format";
 import { ArrowDrawable, BackwardArrowDrawable } from "../drawable/Drawable";
 import { AlreadyParsedTreeNode } from "./AlreadyParsedTreeNode";
-import { Tree } from "./Tree";
+import type { Tree } from "./Tree";
 import {
   ArrayTreeNode,
   DataTreeNode,
@@ -15,9 +15,9 @@ import {
 } from "./TreeNode";
 
 /**
- * Base tree drawer for original view
+ * Base tree drawer for classic view
  */
-export class OriginalDrawer {
+export class ClassicDrawer {
   protected tree: Tree;
   public leftCOUNTER: number = 0;
   public rightCOUNTER: number = 0;
@@ -70,7 +70,7 @@ export class OriginalDrawer {
       );
     }
 
-    // OriginalView
+    // ClassicView
     this.drawNode(this.tree.rootNode, x, y, x, y, 0, 0, 0, 0);
     this.width = this.getNodeWidth(this.tree.rootNode) - this.minX;
     this.height = this.getNodeHeight(this.tree.rootNode) - this.minY + Config.StrokeWidth;
@@ -148,7 +148,7 @@ export class OriginalDrawer {
       const drawable = node.createDrawable(x, y, parentX, parentY, -1);
       this.drawables.push(drawable);
     } else if (node instanceof ArrayTreeNode) {
-      // OriginalView
+      // ClassicView
       const drawable = node.createDrawable(x, y, parentX, parentY, -1);
       this.drawables.push(drawable);
       let leftX = x;

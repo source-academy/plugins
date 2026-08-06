@@ -2,7 +2,7 @@
 # Manual changes might be lost - proceed with caution!
 
 __metadata:
-  version: 8
+  version: 10
   cacheKey: 10c0
 
 "@babel/code-frame@npm:^7.0.0, @babel/code-frame@npm:^7.27.1, @babel/code-frame@npm:^7.29.7":
@@ -487,8 +487,8 @@ __metadata:
   linkType: hard
 
 "@changesets/cli@npm:^2.31.0":
-  version: 2.31.0
-  resolution: "@changesets/cli@npm:2.31.0"
+  version: 2.31.1
+  resolution: "@changesets/cli@npm:2.31.1"
   dependencies:
     "@changesets/apply-release-plan": "npm:^7.1.1"
     "@changesets/assemble-release-plan": "npm:^6.0.10"
@@ -518,7 +518,7 @@ __metadata:
     term-size: "npm:^2.1.0"
   bin:
     changeset: bin.js
-  checksum: 10c0/3b15f4f5fc7ccaa0b82ca4f9803977ed141b6bed66f83cf8004c2f4ab8e3a00c3a813569b76e4c757d0a8ca5e778bcb6df6e4df91be6c98e0dfaa2cff87c9434
+  checksum: 10c0/375789e85def0bb303ada45d5085c92765010e6b88b8252eb459346ac8a94eba098c9cb8ad416241757796a8828c417fc9e0a23011bd3a74ce33eef013d8311a
   languageName: node
   linkType: hard
 
@@ -1961,6 +1961,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sourceacademy/common-autocomplete@npm:^0.0.1, @sourceacademy/common-autocomplete@workspace:src/common/autocomplete":
+  version: 0.0.0-use.local
+  resolution: "@sourceacademy/common-autocomplete@workspace:src/common/autocomplete"
+  dependencies:
+    "@rollup/plugin-node-resolve": "npm:^16.0.3"
+    "@rollup/plugin-terser": "npm:^1.0.0"
+    "@rollup/plugin-typescript": "npm:^12.3.0"
+    rollup: "npm:^4.60.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^6.0.3"
+    vitest: "npm:^4.1.9"
+  languageName: unknown
+  linkType: soft
+
 "@sourceacademy/common-cse-machine@workspace:*, @sourceacademy/common-cse-machine@workspace:src/common/cse-machine":
   version: 0.0.0-use.local
   resolution: "@sourceacademy/common-cse-machine@workspace:src/common/cse-machine"
@@ -2054,7 +2068,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@sourceacademy/conductor@npm:>=0.3.0, @sourceacademy/conductor@npm:^0.3.0":
+"@sourceacademy/conductor@npm:^0.3.0":
   version: 0.3.0
   resolution: "@sourceacademy/conductor@npm:0.3.0"
   checksum: 10c0/e6d50cc0b9188fa5ec54c3bb2e6b9a0f9391ba37449e74a326c89c4e14deb00c4882700062427737e6f6fca556fd95d91fa9d7f6e125fe1d43938a65cc3c0c4d
@@ -2062,9 +2076,9 @@ __metadata:
   linkType: hard
 
 "@sourceacademy/conductor@npm:^0.8.0":
-  version: 0.8.1
-  resolution: "@sourceacademy/conductor@npm:0.8.1"
-  checksum: 10c0/2b63c9ae6a0aaae39d3fee7da1a25345770f5a6c1cdf2c2ab3bf085b02388c7d7968f6e6bc05cb9da79f2e3f11813dfc1640a31ee90a4195199671b1123e86f1
+  version: 0.8.3
+  resolution: "@sourceacademy/conductor@npm:0.8.3"
+  checksum: 10c0/25a35004fd92abc3f9342c1928a6be884388d3a8465cdc26491ccf56566121dd7a68a0c305defe668dfe7b96eebe61e93059631f80a92e0d9a4dc2775090f3e5
   languageName: node
   linkType: hard
 
@@ -2075,6 +2089,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sourceacademy/runner-autocomplete@workspace:src/runner/autocomplete":
+  version: 0.0.0-use.local
+  resolution: "@sourceacademy/runner-autocomplete@workspace:src/runner/autocomplete"
+  dependencies:
+    "@rollup/plugin-node-resolve": "npm:^16.0.3"
+    "@rollup/plugin-terser": "npm:^1.0.0"
+    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@sourceacademy/common-autocomplete": "npm:^0.0.1"
+    "@sourceacademy/conductor": "npm:^0.8.0"
+    rollup: "npm:^4.60.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^6.0.3"
+    vitest: "npm:^4.1.9"
+  peerDependencies:
+    "@sourceacademy/conductor": ^0.8.0
+  languageName: unknown
+  linkType: soft
+
 "@sourceacademy/runner-cse-machine@workspace:src/runner/cse-machine":
   version: 0.0.0-use.local
   resolution: "@sourceacademy/runner-cse-machine@workspace:src/runner/cse-machine"
@@ -2083,7 +2115,7 @@ __metadata:
     "@rollup/plugin-terser": "npm:^1.0.0"
     "@rollup/plugin-typescript": "npm:^12.3.0"
     "@sourceacademy/common-cse-machine": "workspace:*"
-    "@sourceacademy/conductor": "npm:>=0.3.0"
+    "@sourceacademy/conductor": "npm:^0.8.0"
     "@vitest/coverage-istanbul": "npm:^4.1.9"
     rollup: "npm:^4.60.2"
     tslib: "npm:^2.8.1"
@@ -2091,7 +2123,7 @@ __metadata:
     vitest: "npm:^4.1.9"
   peerDependencies:
     "@sourceacademy/common-cse-machine": ">=0.3.0"
-    "@sourceacademy/conductor": ">=0.3.0"
+    "@sourceacademy/conductor": ^0.8.0
   languageName: unknown
   linkType: soft
 
@@ -2103,7 +2135,7 @@ __metadata:
     "@rollup/plugin-terser": "npm:^1.0.0"
     "@rollup/plugin-typescript": "npm:^12.3.0"
     "@sourceacademy/common-data-visualizer": "workspace:*"
-    "@sourceacademy/conductor": "npm:>=0.3.0"
+    "@sourceacademy/conductor": "npm:^0.8.0"
     "@types/jest": "npm:^30.0.0"
     jest: "npm:^30.4.2"
     rollup: "npm:^4.60.2"
@@ -2111,7 +2143,7 @@ __metadata:
     tslib: "npm:^2.8.1"
     typescript: "npm:^6.0.3"
   peerDependencies:
-    "@sourceacademy/conductor": ">=0.3.0"
+    "@sourceacademy/conductor": ^0.8.0
   languageName: unknown
   linkType: soft
 
@@ -2131,7 +2163,7 @@ __metadata:
     typescript: "npm:^6.0.3"
     vitest: "npm:^4.1.9"
   peerDependencies:
-    "@sourceacademy/conductor": ">=0.3.0"
+    "@sourceacademy/conductor": ^0.8.0
   languageName: unknown
   linkType: soft
 
@@ -2143,7 +2175,7 @@ __metadata:
     "@rollup/plugin-terser": "npm:^1.0.0"
     "@rollup/plugin-typescript": "npm:^12.3.0"
     "@sourceacademy/common-test": "workspace:*"
-    "@sourceacademy/conductor": "npm:>=0.3.0"
+    "@sourceacademy/conductor": "npm:^0.8.0"
     "@vitest/coverage-istanbul": "npm:^4.1.9"
     py-slang: "github:proto-aiken-13/py-slang#branch-ev3-engine"
     rollup: "npm:^4.60.2"
@@ -2151,7 +2183,7 @@ __metadata:
     typescript: "npm:^6.0.3"
     vitest: "npm:^4.1.9"
   peerDependencies:
-    "@sourceacademy/conductor": ">=0.3.0"
+    "@sourceacademy/conductor": ^0.8.0
   languageName: unknown
   linkType: soft
 
@@ -2163,7 +2195,7 @@ __metadata:
     "@rollup/plugin-terser": "npm:^1.0.0"
     "@rollup/plugin-typescript": "npm:^12.3.0"
     "@sourceacademy/common-stepper": "workspace:*"
-    "@sourceacademy/conductor": "npm:>=0.3.0"
+    "@sourceacademy/conductor": "npm:^0.8.0"
     "@types/jest": "npm:^30.0.0"
     jest: "npm:^30.4.2"
     rollup: "npm:^4.60.2"
@@ -2171,7 +2203,7 @@ __metadata:
     tslib: "npm:^2.8.1"
     typescript: "npm:^6.0.3"
   peerDependencies:
-    "@sourceacademy/conductor": ">=0.3.0"
+    "@sourceacademy/conductor": ^0.8.0
   languageName: unknown
   linkType: soft
 
@@ -2183,7 +2215,7 @@ __metadata:
     "@rollup/plugin-terser": "npm:^1.0.0"
     "@rollup/plugin-typescript": "npm:^12.3.0"
     "@sourceacademy/common-test": "workspace:*"
-    "@sourceacademy/conductor": "npm:>=0.3.0"
+    "@sourceacademy/conductor": "npm:^0.8.0"
     "@sourceacademy/runner-remote-execution": "workspace:*"
     "@vitest/coverage-istanbul": "npm:^4.1.9"
     py-slang: "github:proto-aiken-13/py-slang#branch-ev3-engine"
@@ -2192,7 +2224,7 @@ __metadata:
     typescript: "npm:^6.0.3"
     vitest: "npm:^4.1.9"
   peerDependencies:
-    "@sourceacademy/conductor": ">=0.3.0"
+    "@sourceacademy/conductor": ^0.8.0
   languageName: unknown
   linkType: soft
 
@@ -2203,6 +2235,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sourceacademy/web-autocomplete@workspace:src/web/autocomplete":
+  version: 0.0.0-use.local
+  resolution: "@sourceacademy/web-autocomplete@workspace:src/web/autocomplete"
+  dependencies:
+    "@rollup/plugin-commonjs": "npm:^29.0.3"
+    "@rollup/plugin-node-resolve": "npm:^16.0.3"
+    "@rollup/plugin-terser": "npm:^1.0.0"
+    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@sourceacademy/common-autocomplete": "npm:^0.0.1"
+    "@sourceacademy/conductor": "npm:^0.8.0"
+    rollup: "npm:^4.60.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^6.0.3"
+    vitest: "npm:^4.1.9"
+  peerDependencies:
+    "@sourceacademy/conductor": ^0.8.0
+  languageName: unknown
+  linkType: soft
+
 "@sourceacademy/web-cse-machine@workspace:src/web/cse-machine":
   version: 0.0.0-use.local
   resolution: "@sourceacademy/web-cse-machine@workspace:src/web/cse-machine"
@@ -2211,7 +2262,7 @@ __metadata:
     "@rollup/plugin-terser": "npm:^1.0.0"
     "@rollup/plugin-typescript": "npm:^12.3.0"
     "@sourceacademy/common-cse-machine": "workspace:*"
-    "@sourceacademy/conductor": "npm:>=0.3.0"
+    "@sourceacademy/conductor": "npm:^0.8.0"
     "@vitest/coverage-istanbul": "npm:^4.1.9"
     rollup: "npm:^4.60.2"
     tslib: "npm:^2.8.1"
@@ -2219,7 +2270,7 @@ __metadata:
     vitest: "npm:^4.1.9"
   peerDependencies:
     "@sourceacademy/common-cse-machine": ">=0.3.0"
-    "@sourceacademy/conductor": ">=0.3.0"
+    "@sourceacademy/conductor": ^0.8.0
   languageName: unknown
   linkType: soft
 
@@ -2236,12 +2287,14 @@ __metadata:
     "@rollup/plugin-typescript": "npm:^12.3.0"
     "@sourceacademy/common-data-visualizer": "workspace:*"
     "@sourceacademy/common-tabs": "workspace:^"
-    "@sourceacademy/conductor": "npm:>=0.3.0"
+    "@sourceacademy/conductor": "npm:^0.8.0"
     "@types/react": "npm:^19.0.0"
+    "@types/react-test-renderer": "npm:^19.0.0"
     konva: "npm:^9.3.0"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
     react-konva: "npm:^19.0.0"
+    react-test-renderer: "npm:^19.0.0"
     rollup: "npm:^4.60.2"
     tslib: "npm:^2.8.1"
     typescript: "npm:^6.0.3"
@@ -2264,13 +2317,13 @@ __metadata:
     "@rollup/plugin-typescript": "npm:^12.3.0"
     "@sourceacademy/common-module-loader": "workspace:*"
     "@sourceacademy/common-tabs": "workspace:^"
-    "@sourceacademy/conductor": "npm:>=0.3.0"
+    "@sourceacademy/conductor": "npm:^0.8.0"
     rollup: "npm:^4.60.2"
     tslib: "npm:^2.8.1"
     typescript: "npm:^6.0.3"
     vitest: "npm:^4.1.9"
   peerDependencies:
-    "@sourceacademy/conductor": ">=0.3.0"
+    "@sourceacademy/conductor": ^0.8.0
   languageName: unknown
   linkType: soft
 
@@ -2287,7 +2340,7 @@ __metadata:
     "@rollup/plugin-typescript": "npm:^12.3.0"
     "@sourceacademy/common-stepper": "workspace:*"
     "@sourceacademy/common-tabs": "workspace:^"
-    "@sourceacademy/conductor": "npm:>=0.3.0"
+    "@sourceacademy/conductor": "npm:^0.8.0"
     "@types/react": "npm:^19.0.0"
     classnames: "npm:^2.3.2"
     react: "npm:^19.0.0"
@@ -2312,7 +2365,7 @@ __metadata:
     "@rollup/plugin-typescript": "npm:^12.3.0"
     "@sourceacademy/common-tabs": "workspace:^"
     "@sourceacademy/common-test": "workspace:*"
-    "@sourceacademy/conductor": "npm:>=0.3.0"
+    "@sourceacademy/conductor": "npm:^0.8.0"
     "@types/react": "npm:^19.2.17"
     rollup: "npm:^4.60.2"
     tslib: "npm:^2.8.1"
@@ -2320,7 +2373,7 @@ __metadata:
     vitest: "npm:^4.1.9"
   peerDependencies:
     "@sourceacademy/common-tabs": ^0.0.1
-    "@sourceacademy/conductor": ">=0.3.0"
+    "@sourceacademy/conductor": ^0.8.0
     react: ^19
     react-dom: ^19
   languageName: unknown
@@ -2506,7 +2559,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:^19.0.0, @types/react@npm:^19.2.17":
+"@types/react-test-renderer@npm:^19.0.0":
+  version: 19.1.0
+  resolution: "@types/react-test-renderer@npm:19.1.0"
+  dependencies:
+    "@types/react": "npm:*"
+  checksum: 10c0/799654e430df10aeaf267d71507fb64ec151359ead7e3774111bfd4abce7e0911dba461811195c06c22a6d17496ea92537d3185320ff4112fe29954cad1b9152
+  languageName: node
+  linkType: hard
+
+"@types/react@npm:*, @types/react@npm:^19.0.0, @types/react@npm:^19.2.17":
   version: 19.2.17
   resolution: "@types/react@npm:19.2.17"
   dependencies:
@@ -6133,6 +6195,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-is@npm:^19.2.8":
+  version: 19.2.8
+  resolution: "react-is@npm:19.2.8"
+  checksum: 10c0/ed5322c84efe035c8fc814b1614ff5ca7fb8c2872a7c045197daf99f9b1bd68f32a2c79ffcbcfcff2fc5d93924ff9f9447400898f5b1534e6302bb0736a257f0
+  languageName: node
+  linkType: hard
+
 "react-konva@npm:^19.0.0":
   version: 19.2.5
   resolution: "react-konva@npm:19.2.5"
@@ -6171,6 +6240,18 @@ __metadata:
   peerDependencies:
     react: ^19.2.0
   checksum: 10c0/3f7b27ea8d0ff4c8bf0e402a285e1af9b7d0e6f4c1a70a28f4384938bc1130bc82a90a31df0b79ef5e380e2e55e2598bd90b4dbf802b1203d735ba0355817d3a
+  languageName: node
+  linkType: hard
+
+"react-test-renderer@npm:^19.0.0":
+  version: 19.2.8
+  resolution: "react-test-renderer@npm:19.2.8"
+  dependencies:
+    react-is: "npm:^19.2.8"
+    scheduler: "npm:^0.27.0"
+  peerDependencies:
+    react: ^19.2.8
+  checksum: 10c0/3ecb6b68f9658050bbe7f8e04fed58644c5693b1a5a716d78dd4ad9defac184e658f8a153265903e75b438f4aee5a7f2c6a9565ccce8e6321a93bb0237c04e66
   languageName: node
   linkType: hard
 
@@ -6247,7 +6328,7 @@ __metadata:
 
 "resolve@patch:resolve@npm%3A^1.22.1#optional!builtin<compat/resolve>":
   version: 1.22.12
-  resolution: "resolve@patch:resolve@npm%3A1.22.12#optional!builtin<compat/resolve>::version=1.22.12&hash=c3c19d"
+  resolution: "resolve@patch:resolve@npm%3A1.22.12#optional!builtin<compat/resolve>::version=1.22.12&hash=9bd1a5"
   dependencies:
     es-errors: "npm:^1.3.0"
     is-core-module: "npm:^2.16.1"
@@ -6255,7 +6336,7 @@ __metadata:
     supports-preserve-symlinks-flag: "npm:^1.0.0"
   bin:
     resolve: bin/resolve
-  checksum: 10c0/fc6519984ae1f894d877c0060ba8b1f5ba3bc0e85a02f74e141929c118c23d74d9735619a9cc2965397387e514884245c65d72a40731dcb6cfc84c7bcdc8321e
+  checksum: 10c0/e12af106e16e652bd83060e8afacece4ee3dcbd0f4cf028e3d9ad178e6ced9ecb1c87ee60158b239582313902a717f8adc57a9b76ea54b1994141ba15f420c65
   languageName: node
   linkType: hard
 
@@ -6460,16 +6541,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:^7.3.5, semver@npm:^7.5.3, semver@npm:^7.7.3":
-  version: 7.8.4
-  resolution: "semver@npm:7.8.4"
-  bin:
-    semver: bin/semver.js
-  checksum: 10c0/81b7c296fd7927b80f67fa516b75fa1017caac8167795320de28e76ccbc6f7f01763c30ecd10d6a0d8fd089708ab0548a5aebb94b0870e99c2a2b4600a46389b
-  languageName: node
-  linkType: hard
-
-"semver@npm:^7.5.4, semver@npm:^7.7.2, semver@npm:^7.8.0":
+"semver@npm:^7.3.5, semver@npm:^7.5.3, semver@npm:^7.5.4, semver@npm:^7.7.2, semver@npm:^7.7.3, semver@npm:^7.8.0":
   version: 7.8.5
   resolution: "semver@npm:7.8.5"
   bin:
@@ -6913,8 +6985,8 @@ __metadata:
   linkType: hard
 
 "tsx@npm:^4.22.3":
-  version: 4.23.1
-  resolution: "tsx@npm:4.23.1"
+  version: 4.23.5
+  resolution: "tsx@npm:4.23.5"
   dependencies:
     esbuild: "npm:~0.28.0"
     fsevents: "npm:~2.3.3"
@@ -6923,7 +6995,7 @@ __metadata:
       optional: true
   bin:
     tsx: dist/cli.mjs
-  checksum: 10c0/2f7393c09ffd161701342c87141c6158945967c0fdb6476f157a72e53554cbc983b8e516b441beafde27c9840d8ffd619802acce6b6be5e9e197d693e111a55d
+  checksum: 10c0/caed1b05eac5fbbb6f8a1ca8b22ae157b74caaba14cc781b023f8baaaa990fa8dfa60a4252eabda1a68c4dcaade3411013998fa001580a2de4ac1f0d78c80c92
   languageName: node
   linkType: hard
 

@@ -1,7 +1,7 @@
 {
   "name": "@sourceacademy/web-stepper",
   "version": "0.0.1",
-  "packageManager": "yarn@4.12.0",
+  "packageManager": "yarn@4.18.0",
   "description": "Host (web) plugin for the Source Academy stepper: renders evaluation steps",
   "repository": {
     "type": "git",
@@ -38,7 +38,7 @@
     "@rollup/plugin-typescript": "^12.3.0",
     "@sourceacademy/common-stepper": "workspace:*",
     "@sourceacademy/common-tabs": "workspace:^",
-    "@sourceacademy/conductor": ">=0.3.0",
+    "@sourceacademy/conductor": "^0.8.0",
     "@types/react": "^19.0.0",
     "classnames": "^2.3.2",
     "react": "^19.0.0",

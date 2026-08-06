@@ -1,7 +1,7 @@
 {
   "name": "@sourceacademy/web-data-visualizer",
   "version": "0.0.1",
-  "packageManager": "yarn@4.12.0",
+  "packageManager": "yarn@4.18.0",
   "description": "Host (web) plugin for the Source Academy data visualizer: classifies and renders drawn structures",
   "repository": {
     "type": "git",
@@ -40,12 +40,14 @@
     "@rollup/plugin-typescript": "^12.3.0",
     "@sourceacademy/common-data-visualizer": "workspace:*",
     "@sourceacademy/common-tabs": "workspace:^",
-    "@sourceacademy/conductor": ">=0.3.0",
+    "@sourceacademy/conductor": "^0.8.0",
     "@types/react": "^19.0.0",
+    "@types/react-test-renderer": "^19.0.0",
     "konva": "^9.3.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-konva": "^19.0.0",
+    "react-test-renderer": "^19.0.0",
     "rollup": "^4.60.2",
     "tslib": "^2.8.1",
     "typescript": "^6.0.3"
