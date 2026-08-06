@@ -32,19 +32,19 @@
     "@blueprintjs/core": "^6.0.0",
     "@blueprintjs/icons": "^6.0.0",
     "@mantine/hooks": "^9.0.0",
-    "@rollup/plugin-commonjs": "^28.0.0",
-    "@rollup/plugin-node-resolve": "^16.0.3",
-    "@rollup/plugin-terser": "^1.0.0",
-    "@rollup/plugin-typescript": "^12.3.0",
+    "@rollup/plugin-commonjs": "catalog:",
+    "@rollup/plugin-node-resolve": "catalog:",
+    "@rollup/plugin-terser": "catalog:",
+    "@rollup/plugin-typescript": "catalog:",
     "@sourceacademy/common-stepper": "workspace:*",
     "@sourceacademy/common-tabs": "workspace:^",
-    "@sourceacademy/conductor": "^0.8.0",
+    "@sourceacademy/conductor": "catalog:",
     "@types/react": "^19.0.0",
     "classnames": "^2.3.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "rollup": "^4.60.2",
-    "tslib": "^2.8.1",
-    "typescript": "^6.0.3"
+    "rollup": "catalog:",
+    "tslib": "catalog:",
+    "typescript": "catalog:"
   }
 }

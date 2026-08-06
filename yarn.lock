@@ -1637,26 +1637,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rollup/plugin-commonjs@npm:^28.0.0":
-  version: 28.0.9
-  resolution: "@rollup/plugin-commonjs@npm:28.0.9"
-  dependencies:
-    "@rollup/pluginutils": "npm:^5.0.1"
-    commondir: "npm:^1.0.1"
-    estree-walker: "npm:^2.0.2"
-    fdir: "npm:^6.2.0"
-    is-reference: "npm:1.2.1"
-    magic-string: "npm:^0.30.3"
-    picomatch: "npm:^4.0.2"
-  peerDependencies:
-    rollup: ^2.68.0||^3.0.0||^4.0.0
-  peerDependenciesMeta:
-    rollup:
-      optional: true
-  checksum: 10c0/b7af70614a53c549a1ba1e9647879b644bcf44ec78850f04018b929f4ee414274f867fa438308409a06ef8a3a179ed24c25e4f8ef77eb341dfddd2b0cb88c389
-  languageName: node
-  linkType: hard
-
 "@rollup/plugin-commonjs@npm:^29.0.3":
   version: 29.0.3
   resolution: "@rollup/plugin-commonjs@npm:29.0.3"
@@ -1965,13 +1945,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@sourceacademy/common-autocomplete@workspace:src/common/autocomplete"
   dependencies:
-    "@rollup/plugin-node-resolve": "npm:^16.0.3"
-    "@rollup/plugin-terser": "npm:^1.0.0"
-    "@rollup/plugin-typescript": "npm:^12.3.0"
-    rollup: "npm:^4.60.2"
-    tslib: "npm:^2.8.1"
-    typescript: "npm:^6.0.3"
-    vitest: "npm:^4.1.9"
+    "@rollup/plugin-node-resolve": "catalog:"
+    "@rollup/plugin-terser": "catalog:"
+    "@rollup/plugin-typescript": "catalog:"
+    rollup: "catalog:"
+    tslib: "catalog:"
+    typescript: "catalog:"
+    vitest: "catalog:"
   languageName: unknown
   linkType: soft
 
@@ -1979,14 +1959,14 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@sourceacademy/common-cse-machine@workspace:src/common/cse-machine"
   dependencies:
-    "@rollup/plugin-node-resolve": "npm:^16.0.3"
-    "@rollup/plugin-terser": "npm:^1.0.0"
-    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@rollup/plugin-node-resolve": "catalog:"
+    "@rollup/plugin-terser": "catalog:"
+    "@rollup/plugin-typescript": "catalog:"
     "@vitest/coverage-istanbul": "npm:^4.1.9"
-    rollup: "npm:^4.60.2"
-    tslib: "npm:^2.8.1"
-    typescript: "npm:^6.0.3"
-    vitest: "npm:^4.1.9"
+    rollup: "catalog:"
+    tslib: "catalog:"
+    typescript: "catalog:"
+    vitest: "catalog:"
   languageName: unknown
   linkType: soft
 
@@ -1994,15 +1974,15 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@sourceacademy/common-data-visualizer@workspace:src/common/data-visualizer"
   dependencies:
-    "@rollup/plugin-node-resolve": "npm:^16.0.3"
-    "@rollup/plugin-terser": "npm:^1.0.0"
-    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@rollup/plugin-node-resolve": "catalog:"
+    "@rollup/plugin-terser": "catalog:"
+    "@rollup/plugin-typescript": "catalog:"
     "@types/jest": "npm:^30.0.0"
     jest: "npm:^30.4.2"
-    rollup: "npm:^4.60.2"
+    rollup: "catalog:"
     ts-jest: "npm:^29.4.11"
-    tslib: "npm:^2.8.1"
-    typescript: "npm:^6.0.3"
+    tslib: "catalog:"
+    typescript: "catalog:"
   languageName: unknown
   linkType: soft
 
@@ -2010,13 +1990,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@sourceacademy/common-module-loader@workspace:src/common/module-loader"
   dependencies:
-    "@rollup/plugin-node-resolve": "npm:^16.0.3"
-    "@rollup/plugin-terser": "npm:^1.0.0"
-    "@rollup/plugin-typescript": "npm:^12.3.0"
-    rollup: "npm:^4.60.2"
-    tslib: "npm:^2.8.1"
-    typescript: "npm:^6.0.3"
-    vitest: "npm:^4.1.9"
+    "@rollup/plugin-node-resolve": "catalog:"
+    "@rollup/plugin-terser": "catalog:"
+    "@rollup/plugin-typescript": "catalog:"
+    rollup: "catalog:"
+    tslib: "catalog:"
+    typescript: "catalog:"
+    vitest: "catalog:"
   languageName: unknown
   linkType: soft
 
@@ -2024,15 +2004,15 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@sourceacademy/common-stepper@workspace:src/common/stepper"
   dependencies:
-    "@rollup/plugin-node-resolve": "npm:^16.0.3"
-    "@rollup/plugin-terser": "npm:^1.0.0"
-    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@rollup/plugin-node-resolve": "catalog:"
+    "@rollup/plugin-terser": "catalog:"
+    "@rollup/plugin-typescript": "catalog:"
     "@types/jest": "npm:^30.0.0"
     jest: "npm:^30.4.2"
-    rollup: "npm:^4.60.2"
+    rollup: "catalog:"
     ts-jest: "npm:^29.4.11"
-    tslib: "npm:^2.8.1"
-    typescript: "npm:^6.0.3"
+    tslib: "catalog:"
+    typescript: "catalog:"
   languageName: unknown
   linkType: soft
 
@@ -2041,13 +2021,13 @@ __metadata:
   resolution: "@sourceacademy/common-tabs@workspace:src/common/tabs"
   dependencies:
     "@blueprintjs/icons": "npm:^6.0.0"
-    "@rollup/plugin-node-resolve": "npm:^16.0.3"
-    "@rollup/plugin-terser": "npm:^1.0.0"
-    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@rollup/plugin-node-resolve": "catalog:"
+    "@rollup/plugin-terser": "catalog:"
+    "@rollup/plugin-typescript": "catalog:"
     "@types/react": "npm:^19.2.17"
-    rollup: "npm:^4.60.2"
-    tslib: "npm:^2.8.1"
-    typescript: "npm:^6.0.3"
+    rollup: "catalog:"
+    tslib: "catalog:"
+    typescript: "catalog:"
   peerDependencies:
     "@blueprintjs/icons": ^6.0.0
     react: ^18 || ^19
@@ -2058,13 +2038,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@sourceacademy/common-test@workspace:src/common/test"
   dependencies:
-    "@rollup/plugin-node-resolve": "npm:^16.0.3"
-    "@rollup/plugin-terser": "npm:^1.0.0"
-    "@rollup/plugin-typescript": "npm:^12.3.0"
-    rollup: "npm:^4.60.2"
-    tslib: "npm:^2.8.1"
-    typescript: "npm:^6.0.3"
-    vitest: "npm:^4.1.9"
+    "@rollup/plugin-node-resolve": "catalog:"
+    "@rollup/plugin-terser": "catalog:"
+    "@rollup/plugin-typescript": "catalog:"
+    rollup: "catalog:"
+    tslib: "catalog:"
+    typescript: "catalog:"
+    vitest: "catalog:"
   languageName: unknown
   linkType: soft
 
@@ -2089,21 +2069,42 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sourceacademy/plugins-workspace@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "@sourceacademy/plugins-workspace@workspace:."
+  dependencies:
+    "@changesets/cli": "npm:^2.31.0"
+    "@sourceacademy/conductor": "catalog:"
+    "@sourceacademy/plugin-directory": "source-academy/plugin-directory#main"
+    "@types/node": "npm:^25.9.1"
+    "@vitest/coverage-istanbul": "npm:^4.1.9"
+    "@yarnpkg/types": "npm:^4.0.1"
+    commander: "npm:^15.0.0"
+    eslint: "npm:^10.0.3"
+    eslint-config-prettier: "npm:^10.1.8"
+    prettier: "npm:^3.8.1"
+    tsx: "npm:^4.22.3"
+    typescript: "catalog:"
+    typescript-eslint: "npm:^8.57.1"
+    vitest: "catalog:"
+  languageName: unknown
+  linkType: soft
+
 "@sourceacademy/runner-autocomplete@workspace:src/runner/autocomplete":
   version: 0.0.0-use.local
   resolution: "@sourceacademy/runner-autocomplete@workspace:src/runner/autocomplete"
   dependencies:
-    "@rollup/plugin-node-resolve": "npm:^16.0.3"
-    "@rollup/plugin-terser": "npm:^1.0.0"
-    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@rollup/plugin-node-resolve": "catalog:"
+    "@rollup/plugin-terser": "catalog:"
+    "@rollup/plugin-typescript": "catalog:"
     "@sourceacademy/common-autocomplete": "npm:^0.0.1"
-    "@sourceacademy/conductor": "npm:^0.8.0"
-    rollup: "npm:^4.60.2"
-    tslib: "npm:^2.8.1"
-    typescript: "npm:^6.0.3"
-    vitest: "npm:^4.1.9"
+    "@sourceacademy/conductor": "catalog:"
+    rollup: "catalog:"
+    tslib: "catalog:"
+    typescript: "catalog:"
+    vitest: "catalog:"
   peerDependencies:
-    "@sourceacademy/conductor": ^0.8.0
+    "@sourceacademy/conductor": "*"
   languageName: unknown
   linkType: soft
 
@@ -2111,19 +2112,19 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@sourceacademy/runner-cse-machine@workspace:src/runner/cse-machine"
   dependencies:
-    "@rollup/plugin-node-resolve": "npm:^16.0.3"
-    "@rollup/plugin-terser": "npm:^1.0.0"
-    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@rollup/plugin-node-resolve": "catalog:"
+    "@rollup/plugin-terser": "catalog:"
+    "@rollup/plugin-typescript": "catalog:"
     "@sourceacademy/common-cse-machine": "workspace:*"
-    "@sourceacademy/conductor": "npm:^0.8.0"
+    "@sourceacademy/conductor": "catalog:"
     "@vitest/coverage-istanbul": "npm:^4.1.9"
-    rollup: "npm:^4.60.2"
-    tslib: "npm:^2.8.1"
-    typescript: "npm:^6.0.3"
-    vitest: "npm:^4.1.9"
+    rollup: "catalog:"
+    tslib: "catalog:"
+    typescript: "catalog:"
+    vitest: "catalog:"
   peerDependencies:
     "@sourceacademy/common-cse-machine": ">=0.3.0"
-    "@sourceacademy/conductor": ^0.8.0
+    "@sourceacademy/conductor": "*"
   languageName: unknown
   linkType: soft
 
@@ -2131,19 +2132,19 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@sourceacademy/runner-data-visualizer@workspace:src/runner/data-visualizer"
   dependencies:
-    "@rollup/plugin-node-resolve": "npm:^16.0.3"
-    "@rollup/plugin-terser": "npm:^1.0.0"
-    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@rollup/plugin-node-resolve": "catalog:"
+    "@rollup/plugin-terser": "catalog:"
+    "@rollup/plugin-typescript": "catalog:"
     "@sourceacademy/common-data-visualizer": "workspace:*"
-    "@sourceacademy/conductor": "npm:^0.8.0"
+    "@sourceacademy/conductor": "catalog:"
     "@types/jest": "npm:^30.0.0"
     jest: "npm:^30.4.2"
-    rollup: "npm:^4.60.2"
+    rollup: "catalog:"
     ts-jest: "npm:^29.4.11"
-    tslib: "npm:^2.8.1"
-    typescript: "npm:^6.0.3"
+    tslib: "catalog:"
+    typescript: "catalog:"
   peerDependencies:
-    "@sourceacademy/conductor": ^0.8.0
+    "@sourceacademy/conductor": "*"
   languageName: unknown
   linkType: soft
 
@@ -2151,19 +2152,19 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@sourceacademy/runner-module-loader@workspace:src/runner/module-loader"
   dependencies:
-    "@rollup/plugin-node-resolve": "npm:^16.0.3"
-    "@rollup/plugin-terser": "npm:^1.0.0"
-    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@rollup/plugin-node-resolve": "catalog:"
+    "@rollup/plugin-terser": "catalog:"
+    "@rollup/plugin-typescript": "catalog:"
     "@sourceacademy/common-module-loader": "workspace:*"
-    "@sourceacademy/conductor": "npm:^0.8.0"
+    "@sourceacademy/conductor": "catalog:"
     "@sourceacademy/runner-remote-execution": "workspace:*"
     "@vitest/coverage-istanbul": "npm:^4.1.9"
-    rollup: "npm:^4.60.2"
-    tslib: "npm:^2.8.1"
-    typescript: "npm:^6.0.3"
-    vitest: "npm:^4.1.9"
+    rollup: "catalog:"
+    tslib: "catalog:"
+    typescript: "catalog:"
+    vitest: "catalog:"
   peerDependencies:
-    "@sourceacademy/conductor": ^0.8.0
+    "@sourceacademy/conductor": "*"
   languageName: unknown
   linkType: soft
 
@@ -2171,19 +2172,19 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@sourceacademy/runner-remote-execution@workspace:src/runner/remoteExecution"
   dependencies:
-    "@rollup/plugin-node-resolve": "npm:^16.0.3"
-    "@rollup/plugin-terser": "npm:^1.0.0"
-    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@rollup/plugin-node-resolve": "catalog:"
+    "@rollup/plugin-terser": "catalog:"
+    "@rollup/plugin-typescript": "catalog:"
     "@sourceacademy/common-test": "workspace:*"
-    "@sourceacademy/conductor": "npm:^0.8.0"
+    "@sourceacademy/conductor": "catalog:"
     "@vitest/coverage-istanbul": "npm:^4.1.9"
     py-slang: "github:proto-aiken-13/py-slang#branch-ev3-engine"
-    rollup: "npm:^4.60.2"
-    tslib: "npm:^2.8.1"
-    typescript: "npm:^6.0.3"
-    vitest: "npm:^4.1.9"
+    rollup: "catalog:"
+    tslib: "catalog:"
+    typescript: "catalog:"
+    vitest: "catalog:"
   peerDependencies:
-    "@sourceacademy/conductor": ^0.8.0
+    "@sourceacademy/conductor": "*"
   languageName: unknown
   linkType: soft
 
@@ -2191,19 +2192,19 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@sourceacademy/runner-stepper@workspace:src/runner/stepper"
   dependencies:
-    "@rollup/plugin-node-resolve": "npm:^16.0.3"
-    "@rollup/plugin-terser": "npm:^1.0.0"
-    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@rollup/plugin-node-resolve": "catalog:"
+    "@rollup/plugin-terser": "catalog:"
+    "@rollup/plugin-typescript": "catalog:"
     "@sourceacademy/common-stepper": "workspace:*"
-    "@sourceacademy/conductor": "npm:^0.8.0"
+    "@sourceacademy/conductor": "catalog:"
     "@types/jest": "npm:^30.0.0"
     jest: "npm:^30.4.2"
-    rollup: "npm:^4.60.2"
+    rollup: "catalog:"
     ts-jest: "npm:^29.4.11"
-    tslib: "npm:^2.8.1"
-    typescript: "npm:^6.0.3"
+    tslib: "catalog:"
+    typescript: "catalog:"
   peerDependencies:
-    "@sourceacademy/conductor": ^0.8.0
+    "@sourceacademy/conductor": "*"
   languageName: unknown
   linkType: soft
 
@@ -2211,20 +2212,20 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@sourceacademy/runner-test@workspace:src/runner/test"
   dependencies:
-    "@rollup/plugin-node-resolve": "npm:^16.0.3"
-    "@rollup/plugin-terser": "npm:^1.0.0"
-    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@rollup/plugin-node-resolve": "catalog:"
+    "@rollup/plugin-terser": "catalog:"
+    "@rollup/plugin-typescript": "catalog:"
     "@sourceacademy/common-test": "workspace:*"
-    "@sourceacademy/conductor": "npm:^0.8.0"
+    "@sourceacademy/conductor": "catalog:"
     "@sourceacademy/runner-remote-execution": "workspace:*"
     "@vitest/coverage-istanbul": "npm:^4.1.9"
     py-slang: "github:proto-aiken-13/py-slang#branch-ev3-engine"
-    rollup: "npm:^4.60.2"
-    tslib: "npm:^2.8.1"
-    typescript: "npm:^6.0.3"
-    vitest: "npm:^4.1.9"
+    rollup: "catalog:"
+    tslib: "catalog:"
+    typescript: "catalog:"
+    vitest: "catalog:"
   peerDependencies:
-    "@sourceacademy/conductor": ^0.8.0
+    "@sourceacademy/conductor": "*"
   languageName: unknown
   linkType: soft
 
@@ -2239,18 +2240,18 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@sourceacademy/web-autocomplete@workspace:src/web/autocomplete"
   dependencies:
-    "@rollup/plugin-commonjs": "npm:^29.0.3"
-    "@rollup/plugin-node-resolve": "npm:^16.0.3"
-    "@rollup/plugin-terser": "npm:^1.0.0"
-    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@rollup/plugin-commonjs": "catalog:"
+    "@rollup/plugin-node-resolve": "catalog:"
+    "@rollup/plugin-terser": "catalog:"
+    "@rollup/plugin-typescript": "catalog:"
     "@sourceacademy/common-autocomplete": "npm:^0.0.1"
-    "@sourceacademy/conductor": "npm:^0.8.0"
-    rollup: "npm:^4.60.2"
-    tslib: "npm:^2.8.1"
-    typescript: "npm:^6.0.3"
-    vitest: "npm:^4.1.9"
+    "@sourceacademy/conductor": "catalog:"
+    rollup: "catalog:"
+    tslib: "catalog:"
+    typescript: "catalog:"
+    vitest: "catalog:"
   peerDependencies:
-    "@sourceacademy/conductor": ^0.8.0
+    "@sourceacademy/conductor": "*"
   languageName: unknown
   linkType: soft
 
@@ -2258,19 +2259,19 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@sourceacademy/web-cse-machine@workspace:src/web/cse-machine"
   dependencies:
-    "@rollup/plugin-node-resolve": "npm:^16.0.3"
-    "@rollup/plugin-terser": "npm:^1.0.0"
-    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@rollup/plugin-node-resolve": "catalog:"
+    "@rollup/plugin-terser": "catalog:"
+    "@rollup/plugin-typescript": "catalog:"
     "@sourceacademy/common-cse-machine": "workspace:*"
-    "@sourceacademy/conductor": "npm:^0.8.0"
+    "@sourceacademy/conductor": "catalog:"
     "@vitest/coverage-istanbul": "npm:^4.1.9"
-    rollup: "npm:^4.60.2"
-    tslib: "npm:^2.8.1"
-    typescript: "npm:^6.0.3"
-    vitest: "npm:^4.1.9"
+    rollup: "catalog:"
+    tslib: "catalog:"
+    typescript: "catalog:"
+    vitest: "catalog:"
   peerDependencies:
     "@sourceacademy/common-cse-machine": ">=0.3.0"
-    "@sourceacademy/conductor": ^0.8.0
+    "@sourceacademy/conductor": "*"
   languageName: unknown
   linkType: soft
 
@@ -2280,14 +2281,14 @@ __metadata:
   dependencies:
     "@blueprintjs/core": "npm:^6.0.0"
     "@blueprintjs/icons": "npm:^6.0.0"
-    "@rollup/plugin-commonjs": "npm:^28.0.0"
-    "@rollup/plugin-node-resolve": "npm:^16.0.3"
+    "@rollup/plugin-commonjs": "catalog:"
+    "@rollup/plugin-node-resolve": "catalog:"
     "@rollup/plugin-replace": "npm:^6.0.3"
-    "@rollup/plugin-terser": "npm:^1.0.0"
-    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@rollup/plugin-terser": "catalog:"
+    "@rollup/plugin-typescript": "catalog:"
     "@sourceacademy/common-data-visualizer": "workspace:*"
     "@sourceacademy/common-tabs": "workspace:^"
-    "@sourceacademy/conductor": "npm:^0.8.0"
+    "@sourceacademy/conductor": "catalog:"
     "@types/react": "npm:^19.0.0"
     "@types/react-test-renderer": "npm:^19.0.0"
     konva: "npm:^9.3.0"
@@ -2295,9 +2296,9 @@ __metadata:
     react-dom: "npm:^19.0.0"
     react-konva: "npm:^19.0.0"
     react-test-renderer: "npm:^19.0.0"
-    rollup: "npm:^4.60.2"
-    tslib: "npm:^2.8.1"
-    typescript: "npm:^6.0.3"
+    rollup: "catalog:"
+    tslib: "catalog:"
+    typescript: "catalog:"
   peerDependencies:
     "@blueprintjs/core": ">=5"
     konva: ">=9"
@@ -2311,19 +2312,19 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@sourceacademy/web-module-loader@workspace:src/web/module-loader"
   dependencies:
-    "@rollup/plugin-commonjs": "npm:^29.0.3"
-    "@rollup/plugin-node-resolve": "npm:^16.0.3"
-    "@rollup/plugin-terser": "npm:^1.0.0"
-    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@rollup/plugin-commonjs": "catalog:"
+    "@rollup/plugin-node-resolve": "catalog:"
+    "@rollup/plugin-terser": "catalog:"
+    "@rollup/plugin-typescript": "catalog:"
     "@sourceacademy/common-module-loader": "workspace:*"
     "@sourceacademy/common-tabs": "workspace:^"
-    "@sourceacademy/conductor": "npm:^0.8.0"
-    rollup: "npm:^4.60.2"
-    tslib: "npm:^2.8.1"
-    typescript: "npm:^6.0.3"
-    vitest: "npm:^4.1.9"
+    "@sourceacademy/conductor": "catalog:"
+    rollup: "catalog:"
+    tslib: "catalog:"
+    typescript: "catalog:"
+    vitest: "catalog:"
   peerDependencies:
-    "@sourceacademy/conductor": ^0.8.0
+    "@sourceacademy/conductor": "*"
   languageName: unknown
   linkType: soft
 
@@ -2334,20 +2335,20 @@ __metadata:
     "@blueprintjs/core": "npm:^6.0.0"
     "@blueprintjs/icons": "npm:^6.0.0"
     "@mantine/hooks": "npm:^9.0.0"
-    "@rollup/plugin-commonjs": "npm:^28.0.0"
-    "@rollup/plugin-node-resolve": "npm:^16.0.3"
-    "@rollup/plugin-terser": "npm:^1.0.0"
-    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@rollup/plugin-commonjs": "catalog:"
+    "@rollup/plugin-node-resolve": "catalog:"
+    "@rollup/plugin-terser": "catalog:"
+    "@rollup/plugin-typescript": "catalog:"
     "@sourceacademy/common-stepper": "workspace:*"
     "@sourceacademy/common-tabs": "workspace:^"
-    "@sourceacademy/conductor": "npm:^0.8.0"
+    "@sourceacademy/conductor": "catalog:"
     "@types/react": "npm:^19.0.0"
     classnames: "npm:^2.3.2"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
-    rollup: "npm:^4.60.2"
-    tslib: "npm:^2.8.1"
-    typescript: "npm:^6.0.3"
+    rollup: "catalog:"
+    tslib: "catalog:"
+    typescript: "catalog:"
   peerDependencies:
     "@blueprintjs/core": ">=5"
     react: ">=18"
@@ -2359,21 +2360,21 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@sourceacademy/web-test@workspace:src/web/test"
   dependencies:
-    "@rollup/plugin-commonjs": "npm:^29.0.3"
-    "@rollup/plugin-node-resolve": "npm:^16.0.3"
-    "@rollup/plugin-terser": "npm:^1.0.0"
-    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@rollup/plugin-commonjs": "catalog:"
+    "@rollup/plugin-node-resolve": "catalog:"
+    "@rollup/plugin-terser": "catalog:"
+    "@rollup/plugin-typescript": "catalog:"
     "@sourceacademy/common-tabs": "workspace:^"
     "@sourceacademy/common-test": "workspace:*"
-    "@sourceacademy/conductor": "npm:^0.8.0"
+    "@sourceacademy/conductor": "catalog:"
     "@types/react": "npm:^19.2.17"
-    rollup: "npm:^4.60.2"
-    tslib: "npm:^2.8.1"
-    typescript: "npm:^6.0.3"
-    vitest: "npm:^4.1.9"
+    rollup: "catalog:"
+    tslib: "catalog:"
+    typescript: "catalog:"
+    vitest: "catalog:"
   peerDependencies:
     "@sourceacademy/common-tabs": ^0.0.1
-    "@sourceacademy/conductor": ^0.8.0
+    "@sourceacademy/conductor": "*"
     react: ^19
     react-dom: ^19
   languageName: unknown
@@ -6008,27 +6009,6 @@ __metadata:
   checksum: 10c0/c56bda7769e04907a88423feb320babaed0711af8c436ce3e56763ab1021ba107c7b0cafb11cde7529f669cfc22bffcaebffb573645cbd63842ea9fb17cd7728
   languageName: node
   linkType: hard
-
-"plugins@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "plugins@workspace:."
-  dependencies:
-    "@changesets/cli": "npm:^2.31.0"
-    "@sourceacademy/conductor": "npm:^0.8.0"
-    "@sourceacademy/plugin-directory": "source-academy/plugin-directory#main"
-    "@types/node": "npm:^25.9.1"
-    "@vitest/coverage-istanbul": "npm:^4.1.9"
-    "@yarnpkg/types": "npm:^4.0.1"
-    commander: "npm:^15.0.0"
-    eslint: "npm:^10.0.3"
-    eslint-config-prettier: "npm:^10.1.8"
-    prettier: "npm:^3.8.1"
-    tsx: "npm:^4.22.3"
-    typescript: "npm:^6.0.3"
-    typescript-eslint: "npm:^8.57.1"
-    vitest: "npm:^4.1.9"
-  languageName: unknown
-  linkType: soft
 
 "postcss@npm:^8.5.15":
   version: 8.5.23

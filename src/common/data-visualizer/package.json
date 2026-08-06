@@ -24,14 +24,19 @@
     }
   },
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^16.0.3",
-    "@rollup/plugin-terser": "^1.0.0",
-    "@rollup/plugin-typescript": "^12.3.0",
+    "@rollup/plugin-node-resolve": "catalog:",
+    "@rollup/plugin-terser": "catalog:",
+    "@rollup/plugin-typescript": "catalog:",
     "@types/jest": "^30.0.0",
     "jest": "^30.4.2",
-    "rollup": "^4.60.2",
+    "rollup": "catalog:",
     "ts-jest": "^29.4.11",
-    "tslib": "^2.8.1",
-    "typescript": "^6.0.3"
+    "tslib": "catalog:",
+    "typescript": "catalog:"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/source-academy/plugins",
+    "directory": "src/common/data-visualizer"
   }
 }
