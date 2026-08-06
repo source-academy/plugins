@@ -11,8 +11,8 @@
   "scripts": {
     "build": "rollup -c",
     "prepack": "yarn build",
-    "test": "jest",
-    "test-coverage": "jest --coverage"
+    "test": "vitest",
+    "test-coverage": "vitest --coverage"
   },
   "license": "ISC",
   "files": [
@@ -32,11 +32,9 @@
     "@rollup/plugin-node-resolve": "catalog:",
     "@rollup/plugin-terser": "catalog:",
     "@rollup/plugin-typescript": "catalog:",
-    "@types/jest": "^30.0.0",
-    "jest": "^30.4.2",
     "rollup": "catalog:",
-    "ts-jest": "^29.4.11",
     "tslib": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

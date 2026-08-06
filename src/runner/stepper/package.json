@@ -37,11 +37,9 @@
     "@rollup/plugin-typescript": "catalog:",
     "@sourceacademy/common-stepper": "workspace:*",
     "@sourceacademy/conductor": "catalog:",
-    "@types/jest": "^30.0.0",
-    "jest": "^30.4.2",
     "rollup": "catalog:",
-    "ts-jest": "^29.4.11",
     "tslib": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

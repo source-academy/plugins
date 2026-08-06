@@ -32,7 +32,6 @@
     "@rollup/plugin-typescript": "catalog:",
     "rollup": "catalog:",
     "tslib": "catalog:",
-    "typescript": "catalog:",
-    "vitest": "catalog:"
+    "typescript": "catalog:"
   }
 }
