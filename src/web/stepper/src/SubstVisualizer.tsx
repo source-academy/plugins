@@ -381,6 +381,23 @@ function ProfileFunctionDefinitionPopover({
 }
 
 /**
+ * The popover body for a {@link HoverTextRule}: a single already-formatted line the language
+ * computed ahead of time (e.g. `"built-in function print"`), unlike
+ * {@link ProfileFunctionDefinitionPopover}'s expanded function body — there is no body to render here,
+ * just the text, inside the same chrome the function-definition popover uses.
+ */
+function ProfileHoverTextPopover({ text }: { text: string }) {
+  return (
+    <div className={classNames("stepper-popover", Classes.DARK)}>
+      <div className="stepper-display">
+        <Icon icon="info-sign" />
+        <span>{` ${text}`}</span>
+      </div>
+    </div>
+  );
+}
+
+/**
  * renderNode renders a serialized Stepper AST node to a React ReactNode.
  */
 function renderNode(
@@ -940,6 +957,27 @@ function renderNode(
       // A profile is authoritative: never fall back to JS syntax for an unmapped node type.
       const template = profile.templates[currentNode.type];
       result = template ? renderTemplate(currentNode, template) : `<${currentNode.type}>`;
+
+      // A fixed-text hover popover (e.g. a builtin's `<built-in function print>`) — independent of the
+      // function-value mu-term collapse above: the inline rendering stays exactly what the template
+      // just produced, only a Popover is added on top. See SyntaxProfile.hoverText.
+      const hoverRule = profile.hoverText?.find(rule => rule.type === currentNode.type);
+      const hoverText = hoverRule ? readNodeProp(currentNode, hoverRule.textProp) : undefined;
+      if (typeof hoverText === "string" && hoverText !== "") {
+        const content = result;
+        result = (
+          <Popover
+            interactionKind="hover"
+            placement="bottom"
+            usePortal={popoverDepth === 0}
+            lazy
+            popoverClassName="stepper-popover"
+            content={<ProfileHoverTextPopover text={hoverText} />}
+          >
+            {content}
+          </Popover>
+        );
+      }
     }
   } else {
     const renderer = (
