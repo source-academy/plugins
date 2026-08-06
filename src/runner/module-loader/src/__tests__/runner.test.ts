@@ -212,6 +212,7 @@ describe('requestModule', () => {
       await plugin.requestModule('module');
       expect.fail('Error should have been thrown');
     } catch (err) {
+      // eslint-disable-next-line vitest/no-conditional-expect
       expect(err).toBeInstanceOf(Error);
     }
   });
@@ -262,7 +263,7 @@ describe('requestModule', () => {
         tabs: ['Tab1'],
       };
     });
-    const { plugin, pluginObj, registerPlugin } = makePlugin(channel);
+    const { plugin, pluginObj } = makePlugin(channel);
     await plugin.requestModule('chart');
     await expect(plugin.requestModule('chart')).resolves.toBe(pluginObj);
   });
