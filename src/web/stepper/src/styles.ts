@@ -52,6 +52,16 @@ const STEPPER_CSS = `
   font: 16px/normal 'Inconsolata', 'Consolas', monospace;
 }
 
+/* An opaque value's rendered thumbnail (see the image SyntaxTemplatePart) — shown inline at text
+ * height, DrRacket-style, rather than expanding the line. */
+.sa-substituter .stepper-opaque-thumbnail,
+.stepper-popover .stepper-opaque-thumbnail {
+  height: 1.4em;
+  width: auto;
+  vertical-align: middle;
+  border-radius: 3px;
+}
+
 .sa-substituter .stepper-mu-term,
 .stepper-popover .stepper-mu-term {
   font-weight: bold;

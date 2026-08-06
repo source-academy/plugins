@@ -834,6 +834,25 @@ function renderNode(
           <span key={key}>{part.parts.map((p, i) => renderPart(p, i))}</span>
         ) : null;
       }
+      if ("unless" in part) {
+        return node[part.unless] ? null : (
+          <span key={key}>{part.parts.map((p, i) => renderPart(p, i))}</span>
+        );
+      }
+      if ("image" in part) {
+        const src = readNodeProp(node, part.image);
+        if (typeof src !== "string" || src === "") return null;
+        const alt = part.altProp === undefined ? undefined : readNodeProp(node, part.altProp);
+        return (
+          <img
+            key={key}
+            className={classNames("stepper-opaque-thumbnail", cls(part.cls))}
+            src={src}
+            alt={alt == null ? "" : String(alt)}
+            title={alt == null ? undefined : String(alt)}
+          />
+        );
+      }
       return null;
     };
     return <span>{template.map((part, i) => renderPart(part, i))}</span>;
