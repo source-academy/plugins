@@ -18,6 +18,6 @@ export default defineConfig({
       format: 'esm',
     },
   ],
-  plugins: [nodeResolve(), commonjs(), typescript(), terser()],
+  plugins: [nodeResolve(), commonjs(), typescript({ exclude: ['**/__tests__/**'] }), terser()],
   external: ['react', 'react-dom', 'react/jsx-runtime'],
 });

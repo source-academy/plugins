@@ -18,5 +18,5 @@ export default defineConfig({
       format: 'esm',
     },
   ],
-  plugins: [nodeResolve(), typescript(), terser()],
+  plugins: [nodeResolve(), typescript({ exclude: ['**/__tests__/**'] }), terser()],
 });

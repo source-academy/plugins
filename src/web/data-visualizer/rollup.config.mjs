@@ -38,7 +38,7 @@ export default defineConfig({
     replace({ preventAssignment: true, 'process.env.NODE_ENV': JSON.stringify('production') }),
     nodeResolve({ browser: true, preferBuiltins: false }),
     commonjs(),
-    typescript(),
+    typescript({ exclude: ['**/__tests__/**'] }),
     terser(),
   ],
 });

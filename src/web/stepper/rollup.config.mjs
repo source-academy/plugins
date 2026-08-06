@@ -29,7 +29,7 @@ export default defineConfig({
   plugins: [
     nodeResolve({ browser: true, preferBuiltins: false }),
     commonjs(),
-    typescript(),
+    typescript({ exclude: ['**/__tests__/**'] }),
     terser(),
   ],
 });
