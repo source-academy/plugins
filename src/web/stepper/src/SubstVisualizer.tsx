@@ -957,27 +957,28 @@ function renderNode(
       // A profile is authoritative: never fall back to JS syntax for an unmapped node type.
       const template = profile.templates[currentNode.type];
       result = template ? renderTemplate(currentNode, template) : `<${currentNode.type}>`;
+    }
 
-      // A fixed-text hover popover (e.g. a builtin's `<built-in function print>`) — independent of the
-      // function-value mu-term collapse above: the inline rendering stays exactly what the template
-      // just produced, only a Popover is added on top. See SyntaxProfile.hoverText.
-      const hoverRule = profile.hoverText?.find(rule => rule.type === currentNode.type);
-      const hoverText = hoverRule ? readNodeProp(currentNode, hoverRule.textProp) : undefined;
-      if (typeof hoverText === "string" && hoverText !== "") {
-        const content = result;
-        result = (
-          <Popover
-            interactionKind="hover"
-            placement="bottom"
-            usePortal={popoverDepth === 0}
-            lazy
-            popoverClassName="stepper-popover"
-            content={<ProfileHoverTextPopover text={hoverText} />}
-          >
-            {content}
-          </Popover>
-        );
-      }
+    // A fixed-text hover popover (e.g. a builtin's `<built-in function print>`) is independent of the
+    // function-value mu-term collapse above and applies regardless of which branch produced `result` —
+    // a node type can be listed in both `functionValues` and `hoverText` and get both behaviours, not
+    // just whichever branch happened to run first. See SyntaxProfile.hoverText.
+    const hoverRule = profile.hoverText?.find(rule => rule.type === currentNode.type);
+    const hoverText = hoverRule ? readNodeProp(currentNode, hoverRule.textProp) : undefined;
+    if (typeof hoverText === "string" && hoverText !== "") {
+      const content = result;
+      result = (
+        <Popover
+          interactionKind="hover"
+          placement="bottom"
+          usePortal={popoverDepth === 0}
+          lazy
+          popoverClassName="stepper-popover"
+          content={<ProfileHoverTextPopover text={hoverText} />}
+        >
+          {content}
+        </Popover>
+      );
     }
   } else {
     const renderer = (
