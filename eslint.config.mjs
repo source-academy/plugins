@@ -50,7 +50,7 @@ export default defineConfig([
     },
   },
   {
-    files: ['src/**/*.js'],
+    files: ['**/*.{js,cjs}'],
     rules: {
       '@typescript-eslint/no-require-imports': 'off',
     },

@@ -304,10 +304,10 @@ interface FunctionDefinitionPopoverContentProps {
   node: StepperNode;
   styleWrapper: StyleWrapper | undefined;
   popoverDepth: number;
-  renderNode: (node: StepperNode, context: RenderContext) => React.ReactNode;
+  renderNode: (node: StepperNode | undefined | null, context: RenderContext) => React.ReactNode;
   renderFunctionArguments: (
     nodes: StepperNode[],
-    renderNodeFn: (node: StepperNode, context: RenderContext) => React.ReactNode,
+    renderNodeFn: (node: StepperNode | undefined | null, context: RenderContext) => React.ReactNode,
     styleWrapper: StyleWrapper | undefined,
     popoverDepth: number,
   ) => React.ReactNode;
