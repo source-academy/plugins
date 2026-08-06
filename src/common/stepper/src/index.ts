@@ -118,15 +118,16 @@ export type StepperTokenClass = "operator" | "identifier" | "literal" | "conditi
  *  - `{ block }` — render the `node[block]` array as an indented suite (one statement per line).
  *  - `{ lines }` — render the `node[lines]` array one-per-line without extra indentation (the root).
  *  - `{ when, parts }` — render `parts` only when `node[when]` is present (e.g. an optional `else`).
- *  - `{ unless, parts }` — render `parts` only when `node[when]` is absent/falsy; the inverse of
+ *  - `{ unless, parts }` — render `parts` only when `node[unless]` is absent/falsy; the inverse of
  *    `when`, for an "otherwise" branch (e.g. a value that renders one way when a field is present and
  *    another way when it isn't — see `image` below).
- *  - `{ image, altProp?, cls? }` — render `node[image]` (expected to be a data URL, e.g.
- *    `"data:image/png;base64,..."`) as an inline `<img>`; renders nothing when the property is
- *    absent/falsy, exactly like `child`/`list` do for a missing value. `altProp` optionally names
- *    another (possibly dotted) node property to use as the image's `alt`/`title` text. Lets a
- *    language display an opaque runtime value as a small picture inline in a step — e.g. a rendered
- *    thumbnail a module attaches to a graphics object — DrRacket-style, rather than only ever as text.
+ *  - `{ image, altProp?, cls? }` — render `node[image]` as an inline `<img>`; renders nothing when
+ *    the property is absent/falsy, or when it isn't a `data:` URL (e.g. `"data:image/png;base64,..."`)
+ *    — only self-contained data URLs are rendered, never a live network URL, so a module can't turn a
+ *    stepper render into a request to an arbitrary host. `altProp` optionally names another (possibly
+ *    dotted) node property to use as the image's `alt`/`title` text. Lets a language display an opaque
+ *    runtime value as a small picture inline in a step — e.g. a rendered thumbnail a module attaches
+ *    to a graphics object — DrRacket-style, rather than only ever as text.
  */
 export type SyntaxTemplatePart =
   | string

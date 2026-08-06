@@ -841,7 +841,7 @@ function renderNode(
       }
       if ("image" in part) {
         const src = readNodeProp(node, part.image);
-        if (typeof src !== "string" || src === "") return null;
+        if (typeof src !== "string" || !src.startsWith("data:")) return null;
         const alt = part.altProp === undefined ? undefined : readNodeProp(node, part.altProp);
         return (
           <img
