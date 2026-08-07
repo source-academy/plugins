@@ -1,6 +1,6 @@
 {
   "name": "@sourceacademy/common-stepper",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "packageManager": "yarn@4.18.0",
   "description": "Shared, language-agnostic protocol for the Source Academy stepper plugin pair",
   "scripts": {
