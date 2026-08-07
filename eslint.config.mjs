@@ -7,12 +7,12 @@ import vitest from '@vitest/eslint-plugin';
 
 export default defineConfig([
   {
-    ignores: ['**/dist', '**/node_modules', 'coverage'],
+    ignores: ['**/dist', '**/node_modules', '**/coverage'],
   },
   tseslint.configs.recommended,
   eslintConfigPrettierFlat,
   {
-    files: ['src/**/*.{ts,tsx}'],
+    files: ['**/*.{ts,tsx}'],
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {
@@ -26,9 +26,9 @@ export default defineConfig([
       '@typescript-eslint': tseslint.plugin,
     },
     rules: {
-      '@typescript-eslint/no-namespace': 'off',
       '@typescript-eslint/ban-ts-comment': 'warn',
       '@typescript-eslint/no-import-type-side-effects': 'error',
+      '@typescript-eslint/no-namespace': 'off',
       '@typescript-eslint/no-unnecessary-type-assertion': 'error',
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/only-throw-error': 'error',
@@ -46,7 +46,7 @@ export default defineConfig([
       '@typescript-eslint/no-explicit-any': 'off',
 
       'vitest/prefer-import-in-mock': 'error',
-      'vitest/prefer-vi-mocked': 'error',
+      'vitest/prefer-vi-mocked': 'warn',
     },
   },
   {

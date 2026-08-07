@@ -9,16 +9,16 @@
   ],
   "type": "module",
   "scripts": {
-    "build": "tsx lib/build.ts",
-    "dev": "tsx lib/build.ts --watch",
+    "build": "node lib/build.ts",
+    "dev": "node lib/build.ts --watch",
     "run:all": "yarn workspaces foreach -pt -A --exclude \"@sourceacademy/plugins-workspace\" run",
     "run:since": "yarn workspaces foreach -pt --since --exclude \"@sourceacademy/plugins-workspace\" run",
     "test": "vitest run",
     "test-coverage": "vitest run --coverage",
     "test:dev": "vitest",
     "lint": "eslint --concurrency=auto src",
-    "format": "prettier --write \"**/*.{ts,tsx,json,js,mjs}\"",
-    "format:ci": "prettier --list-different \"**/*.{ts,tsx,json,js,mjs}\""
+    "format": "prettier --write \"**/*.{ts,tsx,json,js,cjs,mjs}\"",
+    "format:ci": "prettier --list-different \"**/*.{ts,tsx,json,js,cjs,mjs}\""
   },
   "devDependencies": {
     "@changesets/cli": "^2.31.0",

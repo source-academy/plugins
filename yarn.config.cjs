@@ -13,10 +13,10 @@ module.exports = defineConfig({
 
       // Check that the repository field for each workspace is correct
       workspace.set('repository', {
-        type: "git",
-        url: "git+https://github.com/source-academy/plugins",
-        directory: normedPath
+        type: 'git',
+        url: 'git+https://github.com/source-academy/plugins',
+        directory: normedPath,
       });
     }
-  }
+  },
 });

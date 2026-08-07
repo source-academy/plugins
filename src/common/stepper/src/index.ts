@@ -118,6 +118,16 @@ export type StepperTokenClass = 'operator' | 'identifier' | 'literal' | 'conditi
  *  - `{ block }` — render the `node[block]` array as an indented suite (one statement per line).
  *  - `{ lines }` — render the `node[lines]` array one-per-line without extra indentation (the root).
  *  - `{ when, parts }` — render `parts` only when `node[when]` is present (e.g. an optional `else`).
+ *  - `{ unless, parts }` — render `parts` only when `node[unless]` is absent/falsy; the inverse of
+ *    `when`, for an "otherwise" branch (e.g. a value that renders one way when a field is present and
+ *    another way when it isn't — see `image` below).
+ *  - `{ image, altProp?, cls? }` — render `node[image]` as an inline `<img>`; renders nothing when
+ *    the property is absent/falsy, or when it isn't a `data:` URL (e.g. `"data:image/png;base64,..."`)
+ *    — only self-contained data URLs are rendered, never a live network URL, so a module can't turn a
+ *    stepper render into a request to an arbitrary host. `altProp` optionally names another (possibly
+ *    dotted) node property to use as the image's `alt`/`title` text. Lets a language display an opaque
+ *    runtime value as a small picture inline in a step — e.g. a rendered thumbnail a module attaches
+ *    to a graphics object — DrRacket-style, rather than only ever as text.
  */
 export type SyntaxTemplatePart =
   | string
@@ -127,7 +137,9 @@ export type SyntaxTemplatePart =
   | { list: string; sep: string; prefix?: string; cls?: StepperTokenClass }
   | { block: string }
   | { lines: string }
-  | { when: string; parts: SyntaxTemplatePart[] };
+  | { when: string; parts: SyntaxTemplatePart[] }
+  | { unless: string; parts: SyntaxTemplatePart[] }
+  | { image: string; altProp?: string; cls?: StepperTokenClass };
 
 /**
  * Declares a node type as a "function value" in the substitution model and where to read its name.
@@ -151,6 +163,28 @@ export interface FunctionValueRule {
 }
 
 /**
+ * Declares a node type that shows a fixed hover popover alongside its normal inline rendering.
+ *
+ * Unlike {@link FunctionValueRule} — whose popover is the node's own template, i.e. a function's body,
+ * rendered on demand — this popover is a single line of *plain text* the language computed ahead of
+ * time and stashed on the node (e.g. `"built-in function print"` for a builtin referenced as a value,
+ * or `"module function stack"` for a name imported from a module): there is no body to expand, so
+ * nothing is collapsed or replaced — the node still renders exactly as `templates[type]` produces it,
+ * with a popover merely added on top. The host implements this generically from these rules, so any
+ * language gets the behaviour for any node type by listing it here — no per-language host code.
+ */
+export interface HoverTextRule {
+  /** The node `type` this applies to, e.g. `"Builtin"`. */
+  type: string;
+  /**
+   * Dotted path to the node property holding the popover's already-formatted plain-text content (e.g.
+   * `"hoverText"`, or `"decl.hoverText"` for a node whose text lives on a child). When the path
+   * resolves to an empty value, no popover is added for that particular node.
+   */
+  textProp: string;
+}
+
+/**
  * A language's complete rendering rules: a per-node-type template table plus the precedence maps the
  * host uses to insert parentheses generically. Authored once per language and shipped by its runner.
  */
@@ -166,6 +200,11 @@ export interface SyntaxProfile {
    * collapsed mu-term + hover popover instead of expanding its body inline. See {@link FunctionValueRule}.
    */
   functionValues?: FunctionValueRule[];
+  /**
+   * Node types that show a fixed-text hover popover alongside their normal inline rendering. See
+   * {@link HoverTextRule}.
+   */
+  hoverText?: HoverTextRule[];
 }
 
 /* -------------------------------------------------------------------------- */
