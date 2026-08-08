@@ -1,16 +1,42 @@
 // @ts-check
 
-import eslintConfigPrettierFlat from 'eslint-config-prettier/flat';
-import { defineConfig } from 'eslint/config';
-import tseslint from 'typescript-eslint';
 import vitest from '@vitest/eslint-plugin';
+import { defineConfig } from 'eslint/config';
+import eslintConfigPrettierFlat from 'eslint-config-prettier/flat';
+import * as importPlugin from 'eslint-plugin-import-x';
+import tseslint from 'typescript-eslint';
 
 export default defineConfig([
   {
     ignores: ['**/dist', '**/node_modules', '**/coverage'],
   },
-  tseslint.configs.recommended,
   eslintConfigPrettierFlat,
+  {
+    plugins: {
+      import: importPlugin
+    },
+    rules: {
+      'import/first': 'warn',
+      'import/newline-after-import': 'warn',
+      'import/no-duplicates': ['warn', { 'prefer-inline': false }],
+      'import/no-useless-path-segments': 'error',
+      'import/order': [
+        'warn',
+        {
+          groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
+          named: {
+            import: true,
+            types: 'types-last'
+          },
+          alphabetize: {
+            order: 'asc',
+            orderImportKind: 'asc'
+          },
+        }
+      ],
+    }
+  },
+  tseslint.configs.recommended,
   {
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
@@ -45,8 +71,10 @@ export default defineConfig([
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
 
+      'vitest/prefer-describe-function-title': 'warn',
       'vitest/prefer-import-in-mock': 'error',
       'vitest/prefer-vi-mocked': 'warn',
+      'vitest/valid-title': ['warn', { ignoreTypeOfDescribeName: true }],
     },
   },
   {
