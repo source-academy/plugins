@@ -1,4 +1,7 @@
-import { vi, test, expect } from 'vitest';
+import type { PySlangMessage } from '@sourceacademy/common-test';
+import { remoteRunnerPlugin } from '@sourceacademy/runner-remote-execution';
+import { expect, test, vi } from 'vitest';
+
 
 vi.mock(
   import('py-slang/src/engines/ev3/EV3Engine'),
@@ -11,9 +14,6 @@ vi.mock(
       },
     }) as any,
 );
-
-import { remoteRunnerPlugin } from '@sourceacademy/runner-remote-execution';
-import type { PySlangMessage } from '@sourceacademy/common-test';
 
 test('plugin subscribes to channel and sends result on run message', async () => {
   const sentMessages: PySlangMessage[] = [];

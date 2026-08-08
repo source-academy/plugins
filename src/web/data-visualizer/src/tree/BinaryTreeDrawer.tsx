@@ -2,9 +2,9 @@ import Konva from 'konva';
 import { Layer, Stage, Text } from 'react-konva';
 
 import { Config } from '../Config';
-import { formatLeaf } from '../format';
 import type { ClassificationResult } from '../classify';
 import { ArrowDrawable, BackwardArrowDrawable } from '../drawable/Drawable';
+import { formatLeaf } from '../format';
 import { AlreadyParsedTreeNode } from './AlreadyParsedTreeNode';
 import { ClassicDrawer } from './ClassicDrawer';
 import type { Tree } from './Tree';

@@ -1,5 +1,5 @@
 import { CHANNEL_ID, RUNNER_ID, type PySlangMessage } from '@sourceacademy/common-test';
-import type { IPlugin, IChannel, IConduit } from '@sourceacademy/conductor/conduit';
+import type { IChannel, IConduit, IPlugin } from '@sourceacademy/conductor/conduit';
 import { EV3Engine } from 'py-slang/src/engines/ev3/EV3Engine';
 
 export class remoteRunnerPlugin implements IPlugin {

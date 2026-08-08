@@ -388,7 +388,7 @@ function ProfileFunctionDefinitionPopover({
  */
 function ProfileHoverTextPopover({ text }: { text: string }) {
   return (
-    <div className={classNames("stepper-popover", Classes.DARK)}>
+    <div className={classNames('stepper-popover', Classes.DARK)}>
       <div className="stepper-display">
         <Icon icon="info-sign" />
         <span>{` ${text}`}</span>
@@ -851,21 +851,21 @@ function renderNode(
           <span key={key}>{part.parts.map((p, i) => renderPart(p, i))}</span>
         ) : null;
       }
-      if ("unless" in part) {
+      if ('unless' in part) {
         return node[part.unless] ? null : (
           <span key={key}>{part.parts.map((p, i) => renderPart(p, i))}</span>
         );
       }
-      if ("image" in part) {
+      if ('image' in part) {
         const src = readNodeProp(node, part.image);
-        if (typeof src !== "string" || !src.startsWith("data:")) return null;
+        if (typeof src !== 'string' || !src.startsWith('data:')) return null;
         const alt = part.altProp === undefined ? undefined : readNodeProp(node, part.altProp);
         return (
           <img
             key={key}
-            className={classNames("stepper-opaque-thumbnail", cls(part.cls))}
+            className={classNames('stepper-opaque-thumbnail', cls(part.cls))}
             src={src}
-            alt={alt == null ? "" : String(alt)}
+            alt={alt == null ? '' : String(alt)}
             title={alt == null ? undefined : String(alt)}
           />
         );
@@ -965,7 +965,7 @@ function renderNode(
     // just whichever branch happened to run first. See SyntaxProfile.hoverText.
     const hoverRule = profile.hoverText?.find(rule => rule.type === currentNode.type);
     const hoverText = hoverRule ? readNodeProp(currentNode, hoverRule.textProp) : undefined;
-    if (typeof hoverText === "string" && hoverText !== "") {
+    if (typeof hoverText === 'string' && hoverText !== '') {
       const content = result;
       result = (
         <Popover

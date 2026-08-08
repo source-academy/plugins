@@ -1,4 +1,3 @@
-import { BaseAutoCompleteRunnerPlugin } from '..';
 import {
   AUTOCOMPLETE_CHANNEL_ID,
   RUNNER_PLUGIN_ID,
@@ -17,6 +16,7 @@ import {
   type IRpcMessage,
 } from '@sourceacademy/conductor/conduit';
 import { afterEach, expect, test, vi } from 'vitest';
+import { BaseAutoCompleteRunnerPlugin } from '..';
 
 afterEach(() => {
   vi.useRealTimers();

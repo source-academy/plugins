@@ -1,9 +1,9 @@
 ﻿// @ts-check
 
-import { defineConfig } from 'rollup';
 import nodeResolve from '@rollup/plugin-node-resolve';
 import terser from '@rollup/plugin-terser';
 import typescript from '@rollup/plugin-typescript';
+import { defineConfig } from 'rollup';
 
 export default defineConfig({
   input: 'src/index.ts',

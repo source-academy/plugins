@@ -1,5 +1,3 @@
-import { describe, test, expect, vi } from 'vitest';
-import { CseMachinePlugin } from '..';
 import {
   CSE_CHANNEL,
   CSE_MESSAGE_TYPE_SNAPSHOTS,
@@ -7,6 +5,8 @@ import {
   type CseSnapshot,
 } from '@sourceacademy/common-cse-machine';
 import type { IChannel, IConduit } from '@sourceacademy/conductor/conduit';
+import { describe, expect, test, vi } from 'vitest';
+import { CseMachinePlugin } from '..';
 
 const makeChannel = () => {
   const send = vi.fn();

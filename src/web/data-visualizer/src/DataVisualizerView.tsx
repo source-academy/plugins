@@ -1,7 +1,7 @@
 import { Button, ButtonGroup, Card, Classes } from '@blueprintjs/core';
+import type { SerializedDataVisualizerRow } from '@sourceacademy/common-data-visualizer';
 import { useEffect, useState } from 'react';
 
-import type { SerializedDataVisualizerRow } from '@sourceacademy/common-data-visualizer';
 import { Config } from './Config';
 import { Tree, type ViewMode } from './tree/Tree';
 

@@ -1,5 +1,15 @@
 import type { SerializedDataVisualizerNode } from '@sourceacademy/common-data-visualizer';
+import { Text } from 'react-konva';
 import { describe, expect, test, vi } from 'vitest';
+
+
+import type { ClassificationResult } from '../classify';
+import { ArrowDrawable, BackwardArrowDrawable } from '../drawable/Drawable';
+import { AlreadyParsedTreeNode } from '../tree/AlreadyParsedTreeNode';
+import { BinaryTreeDrawer } from '../tree/BinaryTreeDrawer';
+import { GeneralTreeDrawer } from '../tree/GeneralTreeDrawer';
+import { Tree } from '../tree/Tree';
+import { ArrayTreeNode, FunctionTreeNode } from '../tree/TreeNode';
 
 // Same rationale as tree.test.ts: avoid Konva's Node-environment build requiring the optional
 // `canvas` package for what are, here, pure layout-arithmetic and warning-fallback checks.
@@ -37,16 +47,6 @@ vi.mock(import('react-konva'), () => {
     Arrow: stub('Arrow'),
   } as any;
 });
-
-import { Text } from 'react-konva';
-
-import type { ClassificationResult } from '../classify';
-import { ArrowDrawable, BackwardArrowDrawable } from '../drawable/Drawable';
-import { AlreadyParsedTreeNode } from '../tree/AlreadyParsedTreeNode';
-import { BinaryTreeDrawer } from '../tree/BinaryTreeDrawer';
-import { GeneralTreeDrawer } from '../tree/GeneralTreeDrawer';
-import { Tree } from '../tree/Tree';
-import { ArrayTreeNode, FunctionTreeNode } from '../tree/TreeNode';
 
 const empty = (): SerializedDataVisualizerNode => ({ type: 'empty' });
 const leaf = (n: number): SerializedDataVisualizerNode => ({
@@ -112,7 +112,7 @@ type DrawerInternals = {
 const internals = (drawer: BinaryTreeDrawer | GeneralTreeDrawer): DrawerInternals =>
   drawer as DrawerInternals;
 
-describe('BinaryTreeDrawer', () => {
+describe(BinaryTreeDrawer, () => {
   test('a non-binary-tree structure draws the fixed-size warning box instead of a tree', () => {
     const tree = Tree.fromSerializedNode(pair(leaf(1), leaf(2)));
     const drawer = tree.draw('binaryTree') as BinaryTreeDrawer;
@@ -214,7 +214,7 @@ describe('BinaryTreeDrawer', () => {
   });
 });
 
-describe('GeneralTreeDrawer', () => {
+describe(GeneralTreeDrawer, () => {
   test('a non-general-tree structure draws the fixed-size warning box instead of a tree', () => {
     // An *improper* list (here, a bare 2-tuple whose second slot is a leaf rather than another pair
     // or the empty terminator) is the only shape General Tree View actually rejects — a binary-tree-

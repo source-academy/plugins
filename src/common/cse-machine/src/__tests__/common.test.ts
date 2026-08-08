@@ -1,16 +1,16 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
   CSE_CHANNEL,
   CSE_DIRECTORY_ID,
   CSE_MESSAGE_TYPE_SNAPSHOTS,
   RUNNER_ID,
   WEB_ID,
+  type CseSerializedBinding,
+  type CseSerializedEnvFrame,
+  type CseSerializedInstruction,
+  type CseSerializedValue,
   type CseSnapshot,
   type CseSnapshotMessage,
-  type CseSerializedValue,
-  type CseSerializedInstruction,
-  type CseSerializedEnvFrame,
-  type CseSerializedBinding,
 } from '../index';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -96,7 +96,7 @@ describe('structured-clone safety', () => {
 
 // ── CseSnapshotMessage ────────────────────────────────────────────────────────
 
-describe('CseSnapshotMessage', () => {
+describe(CseSnapshotMessage, () => {
   it('totalSteps matches snapshots.length for a batch', () => {
     const snapshots: CseSnapshot[] = [
       { stepIndex: 0, control: [], stash: [], environments: [] },
@@ -198,7 +198,7 @@ describe('CseSnapshot optional fields', () => {
 
 // ── CseSerializedValue ────────────────────────────────────────────────────────
 
-describe('CseSerializedValue', () => {
+describe(CseSerializedValue, () => {
   it('accepts minimal value with displayValue and label only', () => {
     const v: CseSerializedValue = { displayValue: 'true', label: 'bool' };
     expect(v.tag).toBeUndefined();
@@ -219,7 +219,7 @@ describe('CseSerializedValue', () => {
 
 // ── CseSerializedInstruction ──────────────────────────────────────────────────
 
-describe('CseSerializedInstruction', () => {
+describe(CseSerializedInstruction, () => {
   it('accepts minimal instruction with displayText only', () => {
     const instr: CseSerializedInstruction = { displayText: 'pop' };
     expect(instr.tag).toBeUndefined();
@@ -242,7 +242,7 @@ describe('CseSerializedInstruction', () => {
 
 // ── CseSerializedEnvFrame ─────────────────────────────────────────────────────
 
-describe('CseSerializedEnvFrame', () => {
+describe(CseSerializedEnvFrame, () => {
   it('root frame has null parentId', () => {
     const frame: CseSerializedEnvFrame = {
       id: 'g',
@@ -318,7 +318,7 @@ describe('CseSerializedEnvFrame', () => {
 
 // ── CseSerializedBinding ──────────────────────────────────────────────────────
 
-describe('CseSerializedBinding', () => {
+describe(CseSerializedBinding, () => {
   it('isConst is optional and defaults to undefined', () => {
     const b: CseSerializedBinding = {
       name: 'x',

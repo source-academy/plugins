@@ -1,11 +1,11 @@
+import type { ITabService, Tab } from '@sourceacademy/common-tabs';
 import { CHANNEL_ID, WEB_ID, type TestMessage } from '@sourceacademy/common-test';
 import {
-  type IPlugin,
+  checkIsPluginClass,
   type IChannel,
   type IConduit,
-  checkIsPluginClass,
+  type IPlugin,
 } from '@sourceacademy/conductor/conduit';
-import type { ITabService, Tab } from '@sourceacademy/common-tabs';
 
 function Element({
   workspaceLocation,

@@ -1,5 +1,16 @@
 import type { SerializedDataVisualizerNode } from '@sourceacademy/common-data-visualizer';
+import { Group, Line, Rect, Text } from 'react-konva';
 import { describe, expect, test, vi } from 'vitest';
+
+
+import { Config } from '../Config';
+import ArrayDrawable from '../drawable/ArrayDrawable';
+import { NullDrawable } from '../drawable/Drawable';
+import { formatLeaf } from '../format';
+import { AlreadyParsedTreeNode } from '../tree/AlreadyParsedTreeNode';
+import { ClassicDrawer } from '../tree/ClassicDrawer';
+import { Tree } from '../tree/Tree';
+import { ArrayTreeNode, DataTreeNode, FunctionTreeNode, TreeNode } from '../tree/TreeNode';
 
 // These tests exercise layout arithmetic and presentational branching, never actually rendering
 // to a canvas — but importing the real `konva`/`react-konva` still runs their module-init code,
@@ -43,17 +54,6 @@ vi.mock(import('react-konva'), () => {
     Arrow: stub('Arrow'),
   } as any;
 });
-
-import { Group, Line, Rect, Text } from 'react-konva';
-
-import { Config } from '../Config';
-import { NullDrawable } from '../drawable/Drawable';
-import ArrayDrawable from '../drawable/ArrayDrawable';
-import { formatLeaf } from '../format';
-import { AlreadyParsedTreeNode } from '../tree/AlreadyParsedTreeNode';
-import { ClassicDrawer } from '../tree/ClassicDrawer';
-import { Tree } from '../tree/Tree';
-import { ArrayTreeNode, DataTreeNode, FunctionTreeNode, TreeNode } from '../tree/TreeNode';
 
 const leaf = (displayValue: string): SerializedDataVisualizerNode => ({
   type: 'leaf',
@@ -325,7 +325,7 @@ describe('ClassicDrawer pixel math', () => {
   });
 });
 
-describe('formatLeaf', () => {
+describe(formatLeaf, () => {
   test('wraps and passes through short strings unchanged apart from quoting', () => {
     expect(formatLeaf('hi', 'string')).toBe('"hi"');
   });
@@ -355,7 +355,7 @@ type ArrayDrawableOutput = React.ReactElement<{
   ];
 }>;
 
-describe('ArrayDrawable', () => {
+describe(ArrayDrawable, () => {
   const render = (nodes: DataTreeNode[]): ArrayDrawableOutput =>
     new ArrayDrawable({ nodes, x: 0, y: 0, color: 'black' }).render() as ArrayDrawableOutput;
 

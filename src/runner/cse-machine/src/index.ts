@@ -5,7 +5,7 @@ import {
   type CseSnapshot,
   type CseSnapshotMessage,
 } from '@sourceacademy/common-cse-machine';
-import type { IPlugin, IChannel, IConduit } from '@sourceacademy/conductor/conduit';
+import type { IChannel, IConduit, IPlugin } from '@sourceacademy/conductor/conduit';
 
 /**
  * Runner-side CSE machine plugin.

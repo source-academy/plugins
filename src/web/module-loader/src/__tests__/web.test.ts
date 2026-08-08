@@ -1,5 +1,3 @@
-import { afterEach, describe, expect, test, vi, type Mock } from 'vitest';
-import { ModuleLoaderWebPlugin } from '..';
 import {
   CHANNEL_ID,
   ModuleLoaderMessageType,
@@ -7,6 +5,8 @@ import {
   type ModuleLoaderMessage,
 } from '@sourceacademy/common-module-loader';
 import type { IChannel, IConduit } from '@sourceacademy/conductor/conduit';
+import { afterEach, describe, expect, test, vi, type Mock } from 'vitest';
+import { ModuleLoaderWebPlugin } from '..';
 
 type ModuleDirectory = Record<string, { tabs: string[] }>;
 type ChannelSubscriber = (msg: ModuleLoaderMessage) => void;

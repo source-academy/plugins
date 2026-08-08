@@ -5,10 +5,10 @@ import {
   type ModuleLoaderMessage,
 } from '@sourceacademy/common-module-loader';
 import {
-  type IPlugin,
+  checkIsPluginClass,
   type IChannel,
   type IConduit,
-  checkIsPluginClass,
+  type IPlugin,
 } from '@sourceacademy/conductor/conduit';
 
 type ModuleDirectoryBundle = {

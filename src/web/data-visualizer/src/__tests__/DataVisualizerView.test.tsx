@@ -1,7 +1,12 @@
+import { Button } from '@blueprintjs/core';
 import type { SerializedDataVisualizerRow } from '@sourceacademy/common-data-visualizer';
 import { act } from 'react';
 import TestRenderer from 'react-test-renderer';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+
+
+import DataVisualizerView from '../DataVisualizerView';
+import { Tree } from '../tree/Tree';
 
 // Same rationale as the other __tests__ files: avoid Konva's Node-environment build requiring the
 // optional `canvas` package. DataVisualizerView pulls this in transitively via Tree/the drawers.
@@ -39,11 +44,6 @@ vi.mock(import('react-konva'), () => {
     Arrow: stub('Arrow'),
   } as any;
 });
-
-import { Button } from '@blueprintjs/core';
-
-import DataVisualizerView from '../DataVisualizerView';
-import { Tree } from '../tree/Tree';
 
 // React 19 warns ("The current testing environment is not configured to support act(...)")
 // unless this is set - the standard flag for a hand-rolled (non testing-library) React test setup.
@@ -112,7 +112,7 @@ const renderView = (rows: SerializedDataVisualizerRow[]): TestRenderer.ReactTest
   return renderer;
 };
 
-describe('DataVisualizerView', () => {
+describe(DataVisualizerView, () => {
   test('shows the placeholder help text and no controls when there are no rows yet', () => {
     const renderer = renderView([]);
     expect(renderer.root.findByProps({ id: 'data-visualizer-default-text' })).toBeTruthy();

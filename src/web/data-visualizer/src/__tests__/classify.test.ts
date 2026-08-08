@@ -1,6 +1,6 @@
+import type { SerializedDataVisualizerNode } from '@sourceacademy/common-data-visualizer';
 import { expect, test } from 'vitest';
 
-import type { SerializedDataVisualizerNode } from '@sourceacademy/common-data-visualizer';
 import { classify } from '../classify';
 
 let nextRefId = 1;

@@ -1,10 +1,10 @@
 ﻿// @ts-check
 
-import { defineConfig } from 'rollup';
 import commonjs from '@rollup/plugin-commonjs';
 import nodeResolve from '@rollup/plugin-node-resolve';
 import terser from '@rollup/plugin-terser';
 import typescript from '@rollup/plugin-typescript';
+import { defineConfig } from 'rollup';
 
 // React and Blueprint are provided by the host at load time through the require-provider (see the
 // frontend's `requireProvider`), so they are kept external and resolved via `require(...)` calls in

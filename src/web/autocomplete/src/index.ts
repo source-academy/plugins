@@ -1,12 +1,4 @@
 import {
-  makeRpc,
-  type IChannel,
-  type IConduit,
-  type IPlugin,
-  type IRpcMessage,
-  type Remote,
-} from '@sourceacademy/conductor/conduit';
-import {
   AUTOCOMPLETE_CHANNEL_ID,
   SYNTAX_CHANNEL_ID,
   WEB_PLUGIN_ID,
@@ -19,6 +11,14 @@ import {
   type TransferredModeFunction,
   type TransferredSyntaxHighlightData,
 } from '@sourceacademy/common-autocomplete';
+import {
+  makeRpc,
+  type IChannel,
+  type IConduit,
+  type IPlugin,
+  type IRpcMessage,
+  type Remote,
+} from '@sourceacademy/conductor/conduit';
 
 let nextAutoCompleteRequestId = 0;
 

@@ -1,10 +1,10 @@
-import { expect, test } from 'vitest';
-
 import {
   DATA_VISUALIZER_CHANNEL_ID,
   RUNNER_ID,
   type SerializedDataVisualizerNode,
 } from '@sourceacademy/common-data-visualizer';
+import { expect, test } from 'vitest';
+
 import { BaseDataVisualizerRunnerPlugin, createRefIdAllocator, type RefIdAllocator } from '..';
 
 class FakeChannel {

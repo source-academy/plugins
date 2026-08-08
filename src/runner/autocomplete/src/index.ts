@@ -1,12 +1,4 @@
 import {
-  makeRpc,
-  type IChannel,
-  type IConduit,
-  type IPlugin,
-  type IRpcMessage,
-} from '@sourceacademy/conductor/conduit';
-
-import {
   AUTOCOMPLETE_CHANNEL_ID,
   RUNNER_PLUGIN_ID,
   SYNTAX_CHANNEL_ID,
@@ -19,6 +11,14 @@ import {
   type TransferredModeFunction,
   type TransferredSyntaxHighlightData,
 } from '@sourceacademy/common-autocomplete';
+import {
+  makeRpc,
+  type IChannel,
+  type IConduit,
+  type IPlugin,
+  type IRpcMessage,
+} from '@sourceacademy/conductor/conduit';
+
 
 const transferModeFunction = (name: keyof ModeRpc, fn: ModeFunction): TransferredModeFunction =>
   typeof fn === 'function' ? { rpc: name } : fn;
