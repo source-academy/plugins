@@ -1,12 +1,12 @@
 export interface SyntaxHighlightRequest {
-  type: "request";
+  type: 'request';
 }
 export interface SyntaxHighlightResponse {
-  type: "response";
+  type: 'response';
   data: TransferredSyntaxHighlightData;
 }
 export interface SyntaxHighlightAck {
-  type: "ack";
+  type: 'ack';
 }
 
 export type SyntaxHighlightMessage =
@@ -86,7 +86,7 @@ export interface SyntaxHighlightData {
  */
 export type TransferredSyntaxHighlightData = Omit<
   SyntaxHighlightData,
-  "indents" | "outdents" | "autoOutdent"
+  'indents' | 'outdents' | 'autoOutdent'
 > & {
   indents: TransferredModeFunction;
   outdents: TransferredModeFunction;

@@ -1,16 +1,15 @@
-import { describe, test, expect, vi } from "vitest";
-import { CseMachinePlugin } from "..";
 import {
   CSE_CHANNEL,
   CSE_MESSAGE_TYPE_SNAPSHOTS,
   RUNNER_ID,
   type CseSnapshot,
-} from "@sourceacademy/common-cse-machine";
-import type { IChannel, IConduit } from "@sourceacademy/conductor/conduit";
+} from '@sourceacademy/common-cse-machine';
+import type { IChannel, IConduit } from '@sourceacademy/conductor/conduit';
+import { describe, expect, test, vi } from 'vitest';
+import { CseMachinePlugin } from '..';
 
 const makeChannel = () => {
   const send = vi.fn();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return { send } as unknown as IChannel<any> & { send: typeof send };
 };
 const makePlugin = (ch = makeChannel()) => new CseMachinePlugin({} as IConduit, [ch]);
@@ -19,50 +18,50 @@ const minimalSnapshot = (): CseSnapshot => ({
   stepIndex: 0,
   control: [],
   stash: [],
-  environments: [{ id: "g", name: "global", parentId: null, bindings: [], isActive: true }],
+  environments: [{ id: 'g', name: 'global', parentId: null, bindings: [], isActive: true }],
 });
 
 // ── Identity / wiring ─────────────────────────────────────────────────────────
 
-describe("plugin identity", () => {
-  test("id is RUNNER_ID", () => {
+describe('plugin identity', () => {
+  test('id is RUNNER_ID', () => {
     expect(makePlugin().id).toBe(RUNNER_ID);
   });
 
-  test("channelAttach declares the CSE channel", () => {
+  test('channelAttach declares the CSE channel', () => {
     expect(CseMachinePlugin.channelAttach).toEqual([CSE_CHANNEL]);
   });
 
-  test("channelAttach contains exactly one channel", () => {
+  test('channelAttach contains exactly one channel', () => {
     expect(CseMachinePlugin.channelAttach).toHaveLength(1);
   });
 });
 
 // ── Constructor ───────────────────────────────────────────────────────────────
 
-describe("constructor", () => {
-  test("throws when no channel is provided", () => {
+describe('constructor', () => {
+  test('throws when no channel is provided', () => {
     expect(() => new CseMachinePlugin({} as IConduit, [])).toThrow(
-      "CSE channel is required but was not provided.",
+      'CSE channel is required but was not provided.',
     );
   });
 
-  test("does not throw when a channel is provided", () => {
+  test('does not throw when a channel is provided', () => {
     expect(() => makePlugin()).not.toThrow();
   });
 });
 
 // ── sendSnapshots ─────────────────────────────────────────────────────────────
 
-describe("sendSnapshots", () => {
-  test("sends a message with the correct type discriminator", () => {
+describe('sendSnapshots', () => {
+  test('sends a message with the correct type discriminator', () => {
     const channel = makeChannel();
     const plugin = makePlugin(channel);
     plugin.sendSnapshots([minimalSnapshot()]);
     expect(channel.send.mock.calls[0][0].type).toBe(CSE_MESSAGE_TYPE_SNAPSHOTS);
   });
 
-  test("sends snapshots unchanged", () => {
+  test('sends snapshots unchanged', () => {
     const channel = makeChannel();
     const plugin = makePlugin(channel);
     const snapshots = [minimalSnapshot()];
@@ -70,7 +69,7 @@ describe("sendSnapshots", () => {
     expect(channel.send.mock.calls[0][0].snapshots).toEqual(snapshots);
   });
 
-  test("sets totalSteps to the length of the snapshots array", () => {
+  test('sets totalSteps to the length of the snapshots array', () => {
     const channel = makeChannel();
     const plugin = makePlugin(channel);
     const snapshots = [minimalSnapshot(), { ...minimalSnapshot(), stepIndex: 1 }];
@@ -78,14 +77,14 @@ describe("sendSnapshots", () => {
     expect(channel.send.mock.calls[0][0].totalSteps).toBe(2);
   });
 
-  test("calls channel.send exactly once per sendSnapshots call", () => {
+  test('calls channel.send exactly once per sendSnapshots call', () => {
     const channel = makeChannel();
     const plugin = makePlugin(channel);
     plugin.sendSnapshots([minimalSnapshot()]);
     expect(channel.send).toHaveBeenCalledTimes(1);
   });
 
-  test("can be called multiple times, sending once each time", () => {
+  test('can be called multiple times, sending once each time', () => {
     const channel = makeChannel();
     const plugin = makePlugin(channel);
     plugin.sendSnapshots([minimalSnapshot()]);
@@ -93,7 +92,7 @@ describe("sendSnapshots", () => {
     expect(channel.send).toHaveBeenCalledTimes(2);
   });
 
-  test("handles an empty snapshots array", () => {
+  test('handles an empty snapshots array', () => {
     const channel = makeChannel();
     const plugin = makePlugin(channel);
     plugin.sendSnapshots([]);
@@ -105,14 +104,14 @@ describe("sendSnapshots", () => {
     });
   });
 
-  test("defaults breakpointSteps to an empty array when omitted", () => {
+  test('defaults breakpointSteps to an empty array when omitted', () => {
     const channel = makeChannel();
     const plugin = makePlugin(channel);
     plugin.sendSnapshots([minimalSnapshot()]);
     expect(channel.send.mock.calls[0][0].breakpointSteps).toEqual([]);
   });
 
-  test("forwards the breakpointSteps argument unchanged", () => {
+  test('forwards the breakpointSteps argument unchanged', () => {
     const channel = makeChannel();
     const plugin = makePlugin(channel);
     const snapshots = [minimalSnapshot(), { ...minimalSnapshot(), stepIndex: 1 }];
@@ -120,7 +119,7 @@ describe("sendSnapshots", () => {
     expect(channel.send.mock.calls[0][0].breakpointSteps).toEqual([1]);
   });
 
-  test("handles a large batch of snapshots", () => {
+  test('handles a large batch of snapshots', () => {
     const channel = makeChannel();
     const plugin = makePlugin(channel);
     const snapshots = Array.from({ length: 50 }, (_, i) => ({
@@ -131,14 +130,14 @@ describe("sendSnapshots", () => {
     expect(channel.send.mock.calls[0][0].totalSteps).toBe(50);
   });
 
-  test("preserves snapshot fields including currentLine and metadata", () => {
+  test('preserves snapshot fields including currentLine and metadata', () => {
     const channel = makeChannel();
     const plugin = makePlugin(channel);
     const snap: CseSnapshot = {
       stepIndex: 3,
-      control: [{ displayText: "call f", metadata: { instrType: "Application" } }],
-      stash: [{ displayValue: "42", label: "number" }],
-      environments: [{ id: "g", name: "global", parentId: null, bindings: [], isActive: true }],
+      control: [{ displayText: 'call f', metadata: { instrType: 'Application' } }],
+      stash: [{ displayValue: '42', label: 'number' }],
+      environments: [{ id: 'g', name: 'global', parentId: null, bindings: [], isActive: true }],
       currentLine: 7,
     };
     plugin.sendSnapshots([snap]);

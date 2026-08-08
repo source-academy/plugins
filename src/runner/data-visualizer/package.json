@@ -3,11 +3,16 @@
   "version": "0.0.1",
   "packageManager": "yarn@4.18.0",
   "description": "Language-agnostic runner plugin for the Source Academy data visualizer",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/source-academy/plugins",
+    "directory": "src/runner/data-visualizer"
+  },
   "scripts": {
     "build": "rollup -c",
     "prepack": "yarn build",
-    "test": "jest",
-    "test-coverage": "jest --coverage"
+    "test": "vitest",
+    "test-coverage": "vitest --coverage"
   },
   "license": "ISC",
   "files": [
@@ -24,19 +29,17 @@
     }
   },
   "peerDependencies": {
-    "@sourceacademy/conductor": "^0.8.0"
+    "@sourceacademy/conductor": "*"
   },
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^16.0.3",
-    "@rollup/plugin-terser": "^1.0.0",
-    "@rollup/plugin-typescript": "^12.3.0",
+    "@rollup/plugin-node-resolve": "catalog:",
+    "@rollup/plugin-terser": "catalog:",
+    "@rollup/plugin-typescript": "catalog:",
     "@sourceacademy/common-data-visualizer": "workspace:*",
-    "@sourceacademy/conductor": "^0.8.0",
-    "@types/jest": "^30.0.0",
-    "jest": "^30.4.2",
-    "rollup": "^4.60.2",
-    "ts-jest": "^29.4.11",
-    "tslib": "^2.8.1",
-    "typescript": "^6.0.3"
+    "@sourceacademy/conductor": "catalog:",
+    "rollup": "catalog:",
+    "tslib": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

@@ -1,16 +1,43 @@
-import { Command } from "commander";
-import packageJSON from "../package.json" with { type: "json" };
-import fs, { readFile, writeFile } from "fs/promises";
-import { spawn } from "child_process";
-import pathlib from "path";
-import type { IPluginDefinition } from "@sourceacademy/plugin-directory/dist/types/IPluginDefinition.js";
-import process from "process";
-const program = new Command();
-interface Manifest {
-  type: "installable" | "external";
+import { exec, spawn } from 'child_process';
+import fs from 'fs/promises';
+import { createRequire } from 'module';
+import pathlib from 'path';
+import type { IPluginDefinition } from '@sourceacademy/plugin-directory/dist/types/IPluginDefinition.js';
+import { Command } from 'commander';
+import packageJSON from '../package.json' with { type: 'json' };
+
+interface WorkspaceEntry {
+  location: string;
+  name: string;
 }
 
-const globalManifest: Record<string, Record<string, Manifest>> = {};
+interface Manifest {
+  type: 'installable' | 'external';
+}
+
+/**
+ * Use `yarn workspaces list --json` to gather all the workspaces in the repository
+ */
+async function getWorkspaces() {
+  const entries = await new Promise<string[]>((resolve, reject) => {
+    exec('yarn workspaces list --json', (err, stdout, stderr) => {
+      if (err) {
+        reject(err);
+      }
+
+      if (stderr) console.error(stderr);
+
+      resolve(stdout.trim().split('\n'));
+    });
+  });
+
+  return entries.map(each => JSON.parse(each)) as WorkspaceEntry[];
+}
+
+const repoRoot = pathlib.resolve(import.meta.dirname, '..');
+// Create a `require` function to use node's resolution algorithm to find
+// the entry point of plugins
+const require = createRequire(import.meta.url);
 const pluginDirectory: Record<string, IPluginDefinition> = {};
 
 /**
@@ -21,63 +48,92 @@ const pluginDirectory: Record<string, IPluginDefinition> = {};
  * await generateManifest();
  * This will generate the manifest files for each plugin and update the changeset config to ignore non-installable plugins.
  */
-async function generateManifest() {
+export async function generateManifest() {
+  const globalManifest: Record<string, Record<string, Manifest>> = {};
+
   // Create dist directory if it doesn't exist
-  await fs.mkdir("dist", { recursive: true });
+  const distDirectory = pathlib.join(repoRoot, 'dist');
+  await fs.mkdir(distDirectory, { recursive: true });
 
   // The ignore list is used to keep track of non-installable plugins, which should be ignored in changesets to prevent unnecessary version bumps and releases.
   const ignoreList: string[] = [];
 
+  const workspaces = await getWorkspaces();
+
   await Promise.all(
-    packageJSON.workspaces.map(async workspace => {
-      const manifest: Record<string, Manifest> = {};
-      // pluginType is either "web", "runner" or "common"
-      const pluginType = workspace.split("/").slice(-3)[0];
-      for await (const file of fs.glob(`${workspace}manifest.json`)) {
-        const manifestFile = JSON.parse(await fs.readFile(file, "utf-8"));
-        const packageJSONPath = file.replace("manifest.json", "package.json");
-        const packageJSONFile = JSON.parse(await fs.readFile(packageJSONPath, "utf-8"));
-        // folderName is the name of the plugin folder (generally the same as the plugin name)
-        const folderName = file.split(pathlib.sep).slice(-2)[0];
-        manifest[folderName] = manifestFile as Manifest;
-        if (manifestFile.type !== "installable") {
-          ignoreList.push(`@sourceacademy/${pluginType}-${folderName}`);
-          pluginDirectory[folderName] = pluginDirectory[folderName] || {
-            id: folderName,
-            name: folderName,
-            description: packageJSONFile.description,
-            resolutions: {},
-          };
-          // Use the plugin's own declared entry point rather than assuming ".js": external
-          // plugins can emit ".mjs" (e.g. the stepper's wrap.mjs produces real ESM for native
-          // `import()`), and a mismatch here silently 404s for anyone resolving the plugin.
-          // package.json is untyped JSON, so guard against main/module being non-string (e.g. an
-          // object, from a more complex export config) before handing them to pathlib.basename.
-          const mainEntry =
-            typeof packageJSONFile.main === "string" ? packageJSONFile.main : undefined;
-          const moduleEntry =
-            typeof packageJSONFile.module === "string" ? packageJSONFile.module : undefined;
-          const entryFile = pathlib.basename(mainEntry ?? moduleEntry ?? "index.js");
-          pluginDirectory[folderName].resolutions[pluginType] =
-            "./" + pluginType + "/" + folderName + "/" + entryFile;
-        }
+    workspaces.map(async ({ name: workspaceName, location }) => {
+      // Don't process the root workspace
+      if (workspaceName === packageJSON.name) return;
+
+      const pkgMatch = /@sourceacademy\/(\w+?)-(.+)/.exec(workspaceName);
+
+      if (!pkgMatch) throw new Error(`Invalid package name ${workspaceName}`);
+      const [, pluginType, pluginName] = pkgMatch;
+
+      if (!(pluginType in globalManifest)) {
+        globalManifest[pluginType] = {};
       }
-      globalManifest[pluginType] = manifest;
-      await fs.writeFile(`dist/${pluginType}.json`, JSON.stringify(manifest, null, 2));
+
+      const workspacePath = pathlib.resolve(repoRoot, location);
+      const manifestFilePath = pathlib.join(workspacePath, 'manifest.json');
+      const pkgJsonPath = pathlib.join(workspacePath, 'package.json');
+
+      const [{ default: manifestFile }, { default: packageJSONFile }] = await Promise.all([
+        import(`file://${manifestFilePath}`, { with: { type: 'json' } }),
+        import(`file://${pkgJsonPath}`, { with: { type: 'json' } }),
+      ]);
+
+      const manifest = globalManifest[pluginType];
+      manifest[pluginName] = manifestFile as Manifest;
+
+      if (manifestFile.type !== 'installable') {
+        ignoreList.push(workspaceName);
+
+        pluginDirectory[pluginName] = pluginDirectory[pluginName] || {
+          id: pluginName,
+          name: pluginName,
+          description: packageJSONFile.description,
+          resolutions: {},
+        };
+
+        // Use the plugin's own declared entry point rather than assuming ".js": external
+        // plugins can emit ".mjs" (e.g. the stepper's wrap.mjs produces real ESM for native
+        // `import()`), and a mismatch here silently 404s for anyone resolving the plugin.
+        const entryFile = pathlib.basename(require.resolve(workspacePath));
+
+        pluginDirectory[pluginName].resolutions[pluginType] = pathlib.posix.join(
+          '.',
+          pluginType,
+          pluginName,
+          entryFile,
+        );
+      }
+    }),
+  );
+
+  // Write the manifest for each plugin type to the dist folder.
+  await Promise.all(
+    Object.entries(globalManifest).map(([pluginType, manifest]) => {
+      const outpath = pathlib.join(repoRoot, 'dist', `${pluginType}.json`);
+      return fs.writeFile(outpath, JSON.stringify(manifest, null, 2));
     }),
   );
 
   // Write the plugin directory to the dist folder. This is used by the plugin loaders to load non-installable plugins.
   await fs.writeFile(
-    `dist/directory.json`,
+    pathlib.join(repoRoot, 'dist', 'directory.json'),
     JSON.stringify(Object.values(pluginDirectory), null, 2),
   );
 
   // Update changeset config to ignore non-installable plugins
-  const changesetConfig = await fs.readFile(".changeset/config.json", "utf-8");
-  const changesetConfigJSON = JSON.parse(changesetConfig);
+  const changesetFilePath = pathlib.join(repoRoot, '.changeset', 'config.json');
+  const { default: changesetConfigJSON } = await import(`file://${changesetFilePath}`, {
+    with: { type: 'json' },
+  });
   changesetConfigJSON.ignore = ignoreList;
-  await fs.writeFile(".changeset/config.json", JSON.stringify(changesetConfigJSON, null, 2));
+  await fs.writeFile(changesetFilePath, JSON.stringify(changesetConfigJSON, null, 2));
+
+  return globalManifest;
 }
 
 /**
@@ -87,13 +143,13 @@ async function generateManifest() {
  * @example
  * await spawnPromise("yarn", ["build"]);
  */
-async function spawnPromise(...args: Parameters<typeof spawn>) {
+function spawnPromise(...args: Parameters<typeof spawn>) {
   return new Promise<void>((resolve, reject) => {
     const child = spawn(...args);
-    child.on("error", err => {
+    child.on('error', err => {
       reject(err);
     });
-    child.on("close", code => {
+    child.on('close', code => {
       if (code === 0) {
         resolve();
       } else {
@@ -109,17 +165,17 @@ async function spawnPromise(...args: Parameters<typeof spawn>) {
  * @example
  * await copyDistFiles();
  */
-async function copyDistFiles() {
+async function copyDistFiles(globalManifest: Record<string, Record<string, Manifest>>) {
   await Promise.all(
     // Iterate over each plugin type (web, runner, common)
     Object.entries(globalManifest).map(async ([pluginType, manifest]) => {
       await Promise.all(
         // Iterate over each plugin in the plugin type and copy the dist files if the plugin is of type "external"
         Object.entries(manifest).map(async ([pluginName, pluginManifest]) => {
-          if (pluginManifest.type === "external") {
+          if (pluginManifest.type === 'external') {
             await fs.cp(
-              `src/${pluginType}/${pluginName}/dist`,
-              `dist/${pluginType}/${pluginName}`,
+              pathlib.join(repoRoot, 'src', pluginType, pluginName, 'dist'),
+              pathlib.join(repoRoot, 'dist', pluginType, pluginName),
               { recursive: true },
             );
           }
@@ -138,18 +194,18 @@ async function copyDistFiles() {
  * This will run the build script of each plugin with the --watch flag, which is useful for development.
  */
 async function build(extraArgs: string[] = []) {
-  await Promise.all([
+  const [globalManifest] = await Promise.all([
     generateManifest(),
     spawnPromise(
-      process.platform === "win32" ? "yarn.cmd" : "yarn",
-      ["workspaces", "foreach", "-Apt", "--topological-dev", "run", "build", ...extraArgs],
+      process.platform === 'win32' ? 'yarn.cmd' : 'yarn',
+      ['workspaces', 'foreach', '-Apt', '--topological-dev', 'run', 'build', ...extraArgs],
       {
-        stdio: "inherit",
+        stdio: 'inherit',
         shell: true,
       },
     ),
   ]);
-  await copyDistFiles();
+  await copyDistFiles(globalManifest);
   await transform();
 }
 
@@ -157,14 +213,14 @@ async function build(extraArgs: string[] = []) {
  * Transforms a particular external plugin to its final form
  */
 async function transformSingle(path: string) {
-  if (path.endsWith("mjs")) {
+  if (path.endsWith('mjs')) {
     return;
   }
-  let file = (await readFile(path)).toString("utf-8");
+  let file = await fs.readFile(path, 'utf-8');
 
   // Create a mock "module" object, then return the exports
   file = `export default require => {let module = {exports: {}}; let exports = module.exports; ${file}; return module.exports;}`;
-  await writeFile(path, file);
+  await fs.writeFile(path, file);
 }
 
 /**
@@ -179,7 +235,12 @@ async function transform() {
   await Promise.all(promises);
 }
 
-// TO-DO: Add more options
-const options = program.parse();
-const extraArgs = options.args;
-await build(extraArgs);
+// Only run automatically if not testing
+if (process.env.NODE_ENV !== 'test') {
+  const program = new Command();
+
+  // TODO: Add more options
+  const options = program.parse();
+  const extraArgs = options.args;
+  await build(extraArgs);
+}

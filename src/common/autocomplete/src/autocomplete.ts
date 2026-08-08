@@ -1,34 +1,34 @@
 // Adapted from https://learn.microsoft.com/en-us/dotnet/api/microsoft.visualstudio.languageserver.protocol.completionitemkind?view=visualstudiosdk-2022
 export enum CompletionItemKind {
-  Text = "text",
-  Method = "method",
-  Function = "func",
-  Constructor = "constructor",
-  Field = "field",
-  Variable = "var",
-  Class = "class",
-  Interface = "interface",
-  Module = "module",
-  Property = "property",
-  Unit = "unit",
-  Value = "value",
-  Enum = "enum",
-  Keyword = "keyword",
-  Snippet = "snippet",
-  Color = "color",
-  File = "file",
-  Reference = "reference",
-  Folder = "folder",
-  EnumMember = "enumMember",
-  Constant = "constant",
-  Struct = "struct",
-  Event = "event",
-  Operator = "operator",
-  TypeParameter = "typeParameter",
+  Text = 'text',
+  Method = 'method',
+  Function = 'func',
+  Constructor = 'constructor',
+  Field = 'field',
+  Variable = 'var',
+  Class = 'class',
+  Interface = 'interface',
+  Module = 'module',
+  Property = 'property',
+  Unit = 'unit',
+  Value = 'value',
+  Enum = 'enum',
+  Keyword = 'keyword',
+  Snippet = 'snippet',
+  Color = 'color',
+  File = 'file',
+  Reference = 'reference',
+  Folder = 'folder',
+  EnumMember = 'enumMember',
+  Constant = 'constant',
+  Struct = 'struct',
+  Event = 'event',
+  Operator = 'operator',
+  TypeParameter = 'typeParameter',
 }
 
 export interface AutoCompleteRequest {
-  type: "request";
+  type: 'request';
   /** Correlates this request with its response. */
   requestId: number;
   /** The current code in the editor */
@@ -40,7 +40,7 @@ export interface AutoCompleteRequest {
 }
 
 export interface AutoCompleteResponse {
-  type: "response";
+  type: 'response';
   /** The ID of the request that produced this response. */
   requestId: number;
   /** A list of autocomplete entries relevant to the current cursor position in the code */

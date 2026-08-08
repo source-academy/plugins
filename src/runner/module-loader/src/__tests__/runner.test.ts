@@ -1,15 +1,15 @@
-import { afterEach, describe, expect, test, vi, type Mock, type MockedFunction } from "vitest";
-import { ModuleLoaderRunnerPlugin } from "..";
 import {
   CHANNEL_ID,
   ModuleLoaderMessageType,
   RUNNER_ID,
   type ModuleLoaderMessage,
-} from "@sourceacademy/common-module-loader";
-import type { IChannel, IConduit } from "@sourceacademy/conductor/conduit";
-import type { IModulePlugin } from "@sourceacademy/conductor/module";
-import type { IInterfacableEvaluator, IRunnerPlugin } from "@sourceacademy/conductor/runner";
-import type { PluginClass } from "@sourceacademy/conductor/conduit";
+} from '@sourceacademy/common-module-loader';
+import type { IChannel, IConduit, PluginClass  } from '@sourceacademy/conductor/conduit';
+import type { IModulePlugin } from '@sourceacademy/conductor/module';
+import type { IInterfacableEvaluator, IRunnerPlugin } from '@sourceacademy/conductor/runner';
+import { afterEach, describe, expect, test, vi, type Mock, type MockedFunction } from 'vitest';
+import { ModuleLoaderRunnerPlugin } from '..';
+
 type ChannelSubscriber = (msg: ModuleLoaderMessage) => void | Promise<void>;
 
 type TestChannel = IChannel<ModuleLoaderMessage> & {
@@ -26,7 +26,10 @@ const mockBundleURL2 = `data:text/javascript;charset=utf-8,${encodeURIComponent(
     class MockModulePlugin2 {}
     export default () => ({ default: MockModulePlugin2 });
     `)}`;
-vi.mock("module", () => ({}));
+
+// Used for the mock module that the plugin needs to try import
+// eslint-disable-next-line vitest/prefer-import-in-mock
+vi.mock('module', () => ({}));
 
 const makeChannel = (
   getResponse?: (
@@ -105,24 +108,24 @@ afterEach(() => {
   ModuleLoaderRunnerPlugin.instance = null;
 });
 
-describe("plugin identity", () => {
-  test("id is RUNNER_ID", () => {
+describe('plugin identity', () => {
+  test('id is RUNNER_ID', () => {
     expect(makePlugin().plugin.id).toBe(RUNNER_ID);
   });
 
-  test("channelAttach declares the module loader channel", () => {
+  test('channelAttach declares the module loader channel', () => {
     expect(ModuleLoaderRunnerPlugin.channelAttach).toEqual([CHANNEL_ID]);
   });
 
-  test("constructor sets the singleton instance", () => {
+  test('constructor sets the singleton instance', () => {
     const { plugin } = makePlugin();
     expect(ModuleLoaderRunnerPlugin.instance).toBe(plugin);
   });
 });
 
-describe("requestModule", () => {
-  test("requests a module, imports the returned bundle, registers it, and initialises it", async () => {
-    const tabs = ["ChartTab", "SettingsTab"];
+describe('requestModule', () => {
+  test('requests a module, imports the returned bundle, registers it, and initialises it', async () => {
+    const tabs = ['ChartTab', 'SettingsTab'];
     const channel = makeChannel(msg => {
       if (msg.type !== ModuleLoaderMessageType.REQUEST_MODULE) {
         return undefined;
@@ -136,24 +139,24 @@ describe("requestModule", () => {
     });
     const { plugin, evaluator, registerPlugin, initialise, pluginObj } = makePlugin(channel);
 
-    await expect(plugin.requestModule("chart")).resolves.toBe(pluginObj);
+    await expect(plugin.requestModule('chart')).resolves.toBe(pluginObj);
 
     expect(channel.subscribe).toHaveBeenCalledOnce();
     expect(channel.send).toHaveBeenCalledWith({
       type: ModuleLoaderMessageType.REQUEST_MODULE,
-      moduleName: "chart",
+      moduleName: 'chart',
     });
     expect(channel.unsubscribe).toHaveBeenCalledOnce();
     expect(registerPlugin).toHaveBeenCalledOnce();
     const [pluginClass, receivedEvaluator, options] = registerPlugin.mock.calls[0];
     expect(pluginClass).toEqual(expect.any(Function));
-    expect(pluginClass.name).toBe("MockModulePlugin");
+    expect(pluginClass.name).toBe('MockModulePlugin');
     expect(receivedEvaluator).toBe(evaluator);
     expect(options).toMatchObject({ tabs });
     expect(initialise).toHaveBeenCalledOnce();
   });
 
-  test("loadTab delegates to the conductor for declared tabs only", async () => {
+  test('loadTab delegates to the conductor for declared tabs only', async () => {
     const channel = makeChannel(msg => {
       if (msg.type !== ModuleLoaderMessageType.REQUEST_MODULE) {
         return undefined;
@@ -162,12 +165,12 @@ describe("requestModule", () => {
         type: ModuleLoaderMessageType.MODULE_RESPONSE,
         moduleName: msg.moduleName,
         moduleURL: mockBundleURL,
-        tabs: ["ChartTab"],
+        tabs: ['ChartTab'],
       };
     });
     const { plugin, registerPlugin, hostLoadPlugin } = makePlugin(channel);
 
-    await plugin.requestModule("chart");
+    await plugin.requestModule('chart');
     const options = registerPlugin.mock.calls[0][2];
 
     let resolveHostLoadPlugin!: () => void;
@@ -177,20 +180,20 @@ describe("requestModule", () => {
       }),
     );
 
-    const loadTabPromise = options.loadTab("ChartTab");
-    expect(hostLoadPlugin).toHaveBeenCalledWith("ChartTab");
+    const loadTabPromise = options.loadTab('ChartTab');
+    expect(hostLoadPlugin).toHaveBeenCalledWith('ChartTab');
     await expect(
-      Promise.race([loadTabPromise.then(() => "resolved"), Promise.resolve("pending")]),
-    ).resolves.toBe("pending");
+      Promise.race([loadTabPromise.then(() => 'resolved'), Promise.resolve('pending')]),
+    ).resolves.toBe('pending');
 
     resolveHostLoadPlugin();
     await expect(loadTabPromise).resolves.toBeUndefined();
-    await expect(() => options.loadTab("MissingTab")).rejects.toThrow(
-      "Tab MissingTab not found in module chart",
+    await expect(() => options.loadTab('MissingTab')).rejects.toThrow(
+      'Tab MissingTab not found in module chart',
     );
   });
 
-  test("rejects when the plugin is invalid", () => {
+  test('rejects when the plugin is invalid', async () => {
     // mock the import function
     const channel = makeChannel(msg => {
       if (msg.type !== ModuleLoaderMessageType.REQUEST_MODULE) {
@@ -199,17 +202,22 @@ describe("requestModule", () => {
       return {
         type: ModuleLoaderMessageType.MODULE_RESPONSE,
         moduleName: msg.moduleName,
-        moduleURL: "module",
-        tabs: ["Tab1"],
+        moduleURL: 'module',
+        tabs: ['Tab1'],
       };
     });
     const { plugin } = makePlugin(channel);
-    plugin.requestModule("module").catch(err => {
+
+    try {
+      await plugin.requestModule('module');
+      expect.fail('Error should have been thrown');
+    } catch (err) {
+      // eslint-disable-next-line vitest/no-conditional-expect
       expect(err).toBeInstanceOf(Error);
-    });
+    }
   });
 
-  test("out of order responses are ignored", async () => {
+  test('out of order responses are ignored', async () => {
     const channel = makeChannel(msg => {
       if (msg.type !== ModuleLoaderMessageType.REQUEST_MODULE) {
         return undefined;
@@ -217,33 +225,33 @@ describe("requestModule", () => {
       return [
         {
           type: ModuleLoaderMessageType.MODULE_RESPONSE,
-          moduleName: "module2",
+          moduleName: 'module2',
           moduleURL: mockBundleURL2,
-          tabs: ["Tab2"],
+          tabs: ['Tab2'],
         },
         {
           type: ModuleLoaderMessageType.MODULE_RESPONSE,
-          moduleName: "module",
+          moduleName: 'module',
           moduleURL: mockBundleURL,
-          tabs: ["Tab1"],
+          tabs: ['Tab1'],
         },
       ];
     });
     const { plugin, pluginObj, registerPlugin } = makePlugin(channel);
-    await expect(plugin.requestModule("module")).resolves.toBe(pluginObj);
+    await expect(plugin.requestModule('module')).resolves.toBe(pluginObj);
 
     expect(channel.subscribe).toHaveBeenCalledOnce();
     expect(channel.send).toHaveBeenCalledWith({
       type: ModuleLoaderMessageType.REQUEST_MODULE,
-      moduleName: "module",
+      moduleName: 'module',
     });
     expect(channel.unsubscribe).toHaveBeenCalledOnce();
     expect(registerPlugin).toHaveBeenCalledOnce();
     const [pluginClass] = registerPlugin.mock.calls[0];
-    expect(pluginClass.name).toBe("MockModulePlugin");
+    expect(pluginClass.name).toBe('MockModulePlugin');
   });
 
-  test("module requests are cached", async () => {
+  test('module requests are cached', async () => {
     const channel = makeChannel(msg => {
       if (msg.type !== ModuleLoaderMessageType.REQUEST_MODULE) {
         return undefined;
@@ -252,15 +260,15 @@ describe("requestModule", () => {
         type: ModuleLoaderMessageType.MODULE_RESPONSE,
         moduleName: msg.moduleName,
         moduleURL: mockBundleURL,
-        tabs: ["Tab1"],
+        tabs: ['Tab1'],
       };
     });
-    const { plugin, pluginObj, registerPlugin } = makePlugin(channel);
-    await plugin.requestModule("chart");
-    await expect(plugin.requestModule("chart")).resolves.toBe(pluginObj);
+    const { plugin, pluginObj } = makePlugin(channel);
+    await plugin.requestModule('chart');
+    await expect(plugin.requestModule('chart')).resolves.toBe(pluginObj);
   });
 
-  test("rejects when the mocked web side returns a module error", async () => {
+  test('rejects when the mocked web side returns a module error', async () => {
     const channel = makeChannel(msg => {
       if (msg.type !== ModuleLoaderMessageType.REQUEST_MODULE) {
         return undefined;
@@ -268,12 +276,12 @@ describe("requestModule", () => {
       return {
         type: ModuleLoaderMessageType.MODULE_ERROR,
         moduleName: msg.moduleName,
-        error: "Module not found: missing",
+        error: 'Module not found: missing',
       };
     });
     const { plugin, registerPlugin } = makePlugin(channel);
 
-    await expect(plugin.requestModule("missing")).rejects.toThrow("Module not found: missing");
+    await expect(plugin.requestModule('missing')).rejects.toThrow('Module not found: missing');
     expect(channel.unsubscribe).toHaveBeenCalledOnce();
     expect(registerPlugin).not.toHaveBeenCalled();
   });

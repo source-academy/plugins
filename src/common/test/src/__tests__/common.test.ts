@@ -1,6 +1,6 @@
-import { CHANNEL_ID } from "..";
-import { test, expect } from "vitest";
+import { expect, test } from 'vitest';
+import { CHANNEL_ID } from '..';
 
-test("should have a valid channel id", () => {
-  expect(CHANNEL_ID).toBe("test");
+test('should have a valid channel id', () => {
+  expect(CHANNEL_ID).toBe('test');
 });

@@ -1,12 +1,12 @@
-import { describe, test, expect, vi } from "vitest";
-import { CseMachineHostPlugin } from "..";
 import {
   CSE_CHANNEL,
   CSE_MESSAGE_TYPE_SNAPSHOTS,
   WEB_ID,
   type CseSnapshot,
-} from "@sourceacademy/common-cse-machine";
-import type { IChannel, IConduit } from "@sourceacademy/conductor/conduit";
+} from '@sourceacademy/common-cse-machine';
+import type { IChannel, IConduit } from '@sourceacademy/conductor/conduit';
+import { describe, expect, test, vi } from 'vitest';
+import { CseMachineHostPlugin } from '..';
 
 const makeChannel = () => {
   let subscriber: ((msg: unknown) => void) | undefined;
@@ -31,7 +31,7 @@ const snapshot = (): CseSnapshot => ({
   stepIndex: 0,
   control: [],
   stash: [],
-  environments: [{ id: "g", name: "global", parentId: null, bindings: [], isActive: true }],
+  environments: [{ id: 'g', name: 'global', parentId: null, bindings: [], isActive: true }],
 });
 
 const validMessage = (snapshots: CseSnapshot[] = [snapshot()], breakpointSteps: number[] = []) => ({
@@ -43,51 +43,50 @@ const validMessage = (snapshots: CseSnapshot[] = [snapshot()], breakpointSteps: 
 
 // ── Identity / wiring ─────────────────────────────────────────────────────────
 
-describe("plugin identity", () => {
-  test("id is WEB_ID", () => {
+describe('plugin identity', () => {
+  test('id is WEB_ID', () => {
     const channel = makeChannel();
     const { plugin } = makePlugin(channel);
     expect(plugin.id).toBe(WEB_ID);
   });
 
-  test("channelAttach declares the CSE channel", () => {
+  test('channelAttach declares the CSE channel', () => {
     expect(CseMachineHostPlugin.channelAttach).toEqual([CSE_CHANNEL]);
   });
 
-  test("channelAttach contains exactly one channel", () => {
+  test('channelAttach contains exactly one channel', () => {
     expect(CseMachineHostPlugin.channelAttach).toHaveLength(1);
   });
 });
 
 // ── Constructor ───────────────────────────────────────────────────────────────
 
-describe("constructor", () => {
-  test("throws when no channel is provided", () => {
+describe('constructor', () => {
+  test('throws when no channel is provided', () => {
     class TestPlugin extends CseMachineHostPlugin {
       receiveSnapshots = vi.fn();
     }
     expect(() => new TestPlugin({} as IConduit, [])).toThrow(
-      "CSE channel is required but was not provided.",
+      'CSE channel is required but was not provided.',
     );
   });
 
-  test("does not throw when a channel is provided", () => {
+  test('does not throw when a channel is provided', () => {
     expect(() => makePlugin(makeChannel())).not.toThrow();
   });
 });
 
 // ── Valid messages ────────────────────────────────────────────────────────────
 
-describe("valid messages", () => {
-  test("receiveSnapshots is called with the snapshot array", () => {
+describe('valid messages', () => {
+  test('receiveSnapshots is called with the snapshot array', () => {
     const channel = makeChannel();
     const { receive } = makePlugin(channel);
     channel.emit(validMessage());
-    expect(receive).toHaveBeenCalledOnce();
-    expect(receive).toHaveBeenCalledWith([snapshot()], []);
+    expect(receive).toHaveBeenCalledExactlyOnceWith([snapshot()], []);
   });
 
-  test("receiveSnapshots receives multiple snapshots in order", () => {
+  test('receiveSnapshots receives multiple snapshots in order', () => {
     const channel = makeChannel();
     const { receive } = makePlugin(channel);
     const snaps = [snapshot(), { ...snapshot(), stepIndex: 1 }, { ...snapshot(), stepIndex: 2 }];
@@ -95,7 +94,7 @@ describe("valid messages", () => {
     expect(receive).toHaveBeenCalledWith(snaps, []);
   });
 
-  test("receiveSnapshots is called once per valid message", () => {
+  test('receiveSnapshots is called once per valid message', () => {
     const channel = makeChannel();
     const { receive } = makePlugin(channel);
     channel.emit(validMessage());
@@ -103,35 +102,35 @@ describe("valid messages", () => {
     expect(receive).toHaveBeenCalledTimes(2);
   });
 
-  test("handles an empty snapshots array", () => {
+  test('handles an empty snapshots array', () => {
     const channel = makeChannel();
     const { receive } = makePlugin(channel);
     channel.emit(validMessage([]));
     expect(receive).toHaveBeenCalledWith([], []);
   });
 
-  test("preserves snapshot fields passed through the channel", () => {
+  test('preserves snapshot fields passed through the channel', () => {
     const channel = makeChannel();
     const { receive } = makePlugin(channel);
     const snap: CseSnapshot = {
       stepIndex: 4,
-      control: [{ displayText: "branch", metadata: { instrType: "Branch" } }],
-      stash: [{ displayValue: "false", label: "bool" }],
-      environments: [{ id: "g", name: "global", parentId: null, bindings: [], isActive: true }],
+      control: [{ displayText: 'branch', metadata: { instrType: 'Branch' } }],
+      stash: [{ displayValue: 'false', label: 'bool' }],
+      environments: [{ id: 'g', name: 'global', parentId: null, bindings: [], isActive: true }],
       currentLine: 9,
     };
     channel.emit(validMessage([snap]));
     expect(receive).toHaveBeenCalledWith([snap], []);
   });
 
-  test("receiveSnapshots is called with the breakpointSteps array", () => {
+  test('receiveSnapshots is called with the breakpointSteps array', () => {
     const channel = makeChannel();
     const { receive } = makePlugin(channel);
     channel.emit(validMessage([snapshot(), { ...snapshot(), stepIndex: 1 }], [1]));
     expect(receive).toHaveBeenCalledWith([snapshot(), { ...snapshot(), stepIndex: 1 }], [1]);
   });
 
-  test("defaults breakpointSteps to an empty array when the field is missing from the message", () => {
+  test('defaults breakpointSteps to an empty array when the field is missing from the message', () => {
     const channel = makeChannel();
     const { receive } = makePlugin(channel);
     channel.emit({ type: CSE_MESSAGE_TYPE_SNAPSHOTS, snapshots: [snapshot()], totalSteps: 1 });
@@ -141,61 +140,61 @@ describe("valid messages", () => {
 
 // ── Invalid / malformed messages ──────────────────────────────────────────────
 
-describe("invalid messages", () => {
-  test("unknown message type is silently ignored", () => {
+describe('invalid messages', () => {
+  test('unknown message type is silently ignored', () => {
     const channel = makeChannel();
     const { receive } = makePlugin(channel);
-    channel.emit({ type: "unknown", snapshots: [snapshot()], totalSteps: 1 });
+    channel.emit({ type: 'unknown', snapshots: [snapshot()], totalSteps: 1 });
     expect(receive).not.toHaveBeenCalled();
   });
 
-  test("null message is silently ignored", () => {
+  test('null message is silently ignored', () => {
     const channel = makeChannel();
     const { receive } = makePlugin(channel);
     channel.emit(null);
     expect(receive).not.toHaveBeenCalled();
   });
 
-  test("undefined message is silently ignored", () => {
+  test('undefined message is silently ignored', () => {
     const channel = makeChannel();
     const { receive } = makePlugin(channel);
     channel.emit(undefined);
     expect(receive).not.toHaveBeenCalled();
   });
 
-  test("snapshots field is not an array — ignored", () => {
+  test('snapshots field is not an array — ignored', () => {
     const channel = makeChannel();
     const { receive } = makePlugin(channel);
-    channel.emit({ type: CSE_MESSAGE_TYPE_SNAPSHOTS, snapshots: "bad", totalSteps: 1 });
+    channel.emit({ type: CSE_MESSAGE_TYPE_SNAPSHOTS, snapshots: 'bad', totalSteps: 1 });
     expect(receive).not.toHaveBeenCalled();
   });
 
-  test("totalSteps mismatch — ignored", () => {
+  test('totalSteps mismatch — ignored', () => {
     const channel = makeChannel();
     const { receive } = makePlugin(channel);
     channel.emit({ type: CSE_MESSAGE_TYPE_SNAPSHOTS, snapshots: [snapshot()], totalSteps: 99 });
     expect(receive).not.toHaveBeenCalled();
   });
 
-  test("missing snapshots field — ignored", () => {
+  test('missing snapshots field — ignored', () => {
     const channel = makeChannel();
     const { receive } = makePlugin(channel);
     channel.emit({ type: CSE_MESSAGE_TYPE_SNAPSHOTS, totalSteps: 0 });
     expect(receive).not.toHaveBeenCalled();
   });
 
-  test("empty object — ignored", () => {
+  test('empty object — ignored', () => {
     const channel = makeChannel();
     const { receive } = makePlugin(channel);
     channel.emit({});
     expect(receive).not.toHaveBeenCalled();
   });
 
-  test("invalid messages do not block subsequent valid ones", () => {
+  test('invalid messages do not block subsequent valid ones', () => {
     const channel = makeChannel();
     const { receive } = makePlugin(channel);
     channel.emit(null);
-    channel.emit({ type: "bad" });
+    channel.emit({ type: 'bad' });
     channel.emit(validMessage());
     expect(receive).toHaveBeenCalledOnce();
   });
@@ -203,8 +202,8 @@ describe("invalid messages", () => {
 
 // ── Re-exports ────────────────────────────────────────────────────────────────
 
-describe("re-exports from common", () => {
-  test("CseSnapshot type is re-exported and usable", () => {
+describe('re-exports from common', () => {
+  test('CseSnapshot type is re-exported and usable', () => {
     // If the import at the top of this file resolves, the re-export works.
     // This test documents the contract rather than testing runtime behaviour.
     const snap: CseSnapshot = snapshot();

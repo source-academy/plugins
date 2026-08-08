@@ -1,12 +1,4 @@
 import {
-  makeRpc,
-  type IChannel,
-  type IConduit,
-  type IPlugin,
-  type IRpcMessage,
-} from "@sourceacademy/conductor/conduit";
-
-import {
   AUTOCOMPLETE_CHANNEL_ID,
   RUNNER_PLUGIN_ID,
   SYNTAX_CHANNEL_ID,
@@ -18,10 +10,18 @@ import {
   type SyntaxHighlightMessage,
   type TransferredModeFunction,
   type TransferredSyntaxHighlightData,
-} from "@sourceacademy/common-autocomplete";
+} from '@sourceacademy/common-autocomplete';
+import {
+  makeRpc,
+  type IChannel,
+  type IConduit,
+  type IPlugin,
+  type IRpcMessage,
+} from '@sourceacademy/conductor/conduit';
+
 
 const transferModeFunction = (name: keyof ModeRpc, fn: ModeFunction): TransferredModeFunction =>
-  typeof fn === "function" ? { rpc: name } : fn;
+  typeof fn === 'function' ? { rpc: name } : fn;
 
 /**
  * This plugin provides autocomplete suggestions and syntax highlighting.
@@ -63,34 +63,34 @@ export abstract class BaseAutoCompleteRunnerPlugin implements IPlugin {
     makeRpc<ModeRpc, Record<never, never>>(
       this.__syntaxHighlightChannel as unknown as IChannel<IRpcMessage>,
       {
-        indents: (...args: unknown[]) => this.__callModeFunction("indents", args),
-        outdents: (...args: unknown[]) => this.__callModeFunction("outdents", args),
-        autoOutdent: (...args: unknown[]) => this.__callModeFunction("autoOutdent", args),
+        indents: (...args: unknown[]) => this.__callModeFunction('indents', args),
+        outdents: (...args: unknown[]) => this.__callModeFunction('outdents', args),
+        autoOutdent: (...args: unknown[]) => this.__callModeFunction('autoOutdent', args),
       },
     );
 
     const handler = setInterval(() => {
       this.__syntaxHighlightChannel.send({
-        type: "response",
+        type: 'response',
         data: this.__transferMode(),
       });
     }, 1000);
     this.__syntaxHighlightChannel.subscribe((message: SyntaxHighlightMessage) => {
-      if (message.type === "ack") {
+      if (message.type === 'ack') {
         clearInterval(handler);
-      } else if (message.type === "request") {
+      } else if (message.type === 'request') {
         this.__syntaxHighlightChannel.send({
-          type: "response",
+          type: 'response',
           data: this.__transferMode(),
         });
       }
     });
     this.__autoCompleteChannel.subscribe((message: AutoCompleteMessage) => {
-      if (message.type === "request") {
+      if (message.type === 'request') {
         const { requestId, code, row, column } = message;
         const entries = this.autocomplete(code, row, column);
         this.__autoCompleteChannel.send({
-          type: "response",
+          type: 'response',
           requestId,
           declarations: entries,
         });
@@ -102,16 +102,16 @@ export abstract class BaseAutoCompleteRunnerPlugin implements IPlugin {
     const mode = this.mode;
     return {
       ...mode,
-      indents: transferModeFunction("indents", mode.indents),
-      outdents: transferModeFunction("outdents", mode.outdents),
-      autoOutdent: transferModeFunction("autoOutdent", mode.autoOutdent),
+      indents: transferModeFunction('indents', mode.indents),
+      outdents: transferModeFunction('outdents', mode.outdents),
+      autoOutdent: transferModeFunction('autoOutdent', mode.autoOutdent),
     };
   }
 
   private __callModeFunction(name: keyof ModeRpc, args: unknown[]): unknown {
     const mode = this.mode;
     const fn = mode[name];
-    if (typeof fn !== "function") {
+    if (typeof fn !== 'function') {
       throw new Error(
         `Mode function "${name}" is configured with a hook and cannot be called over RPC.`,
       );

@@ -3,6 +3,11 @@
   "version": "0.0.2",
   "packageManager": "yarn@4.18.0",
   "description": "The web plugin for the module loader in Source Academy",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/source-academy/plugins",
+    "directory": "src/web/module-loader"
+  },
   "scripts": {
     "build": "rollup -c",
     "prepack": "yarn build"
@@ -25,19 +30,19 @@
     }
   },
   "peerDependencies": {
-    "@sourceacademy/conductor": "^0.8.0"
+    "@sourceacademy/conductor": "*"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^29.0.3",
-    "@rollup/plugin-node-resolve": "^16.0.3",
-    "@rollup/plugin-terser": "^1.0.0",
-    "@rollup/plugin-typescript": "^12.3.0",
+    "@rollup/plugin-commonjs": "catalog:",
+    "@rollup/plugin-node-resolve": "catalog:",
+    "@rollup/plugin-terser": "catalog:",
+    "@rollup/plugin-typescript": "catalog:",
     "@sourceacademy/common-module-loader": "workspace:*",
     "@sourceacademy/common-tabs": "workspace:^",
-    "@sourceacademy/conductor": "^0.8.0",
-    "rollup": "^4.60.2",
-    "tslib": "^2.8.1",
-    "typescript": "^6.0.3",
-    "vitest": "^4.1.9"
+    "@sourceacademy/conductor": "catalog:",
+    "rollup": "catalog:",
+    "tslib": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

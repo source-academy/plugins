@@ -1,6 +1,11 @@
 {
   "name": "@sourceacademy/common-cse-machine",
   "version": "0.3.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/source-academy/plugins",
+    "directory": "src/common/cse-machine"
+  },
   "packageManager": "yarn@4.18.0",
   "description": "Shared protocol/types for the Source Academy CSE machine plugin pair",
   "scripts": {
@@ -25,13 +30,13 @@
     }
   },
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^16.0.3",
-    "@rollup/plugin-terser": "^1.0.0",
-    "@rollup/plugin-typescript": "^12.3.0",
+    "@rollup/plugin-node-resolve": "catalog:",
+    "@rollup/plugin-terser": "catalog:",
+    "@rollup/plugin-typescript": "catalog:",
     "@vitest/coverage-istanbul": "^4.1.9",
-    "rollup": "^4.60.2",
-    "tslib": "^2.8.1",
-    "typescript": "^6.0.3",
-    "vitest": "^4.1.9"
+    "rollup": "catalog:",
+    "tslib": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }
