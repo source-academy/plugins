@@ -397,6 +397,23 @@ function ProfileHoverTextPopover({ text }: { text: string }) {
   );
 }
 
+/** Popover body for an `image` part: the inline opaque-value thumbnail, enlarged to be legible. */
+function EnlargedThumbnailPopover({ src, alt }: { src: string; alt?: string }) {
+  return (
+    <div className={classNames("stepper-popover", Classes.DARK)}>
+      <div className="stepper-display">
+        {alt ? (
+          <>
+            <Icon icon="media" />
+            <span>{` ${alt}`}</span>
+          </>
+        ) : null}
+        <img className="stepper-opaque-thumbnail-large" src={src} alt={alt ?? ""} />
+      </div>
+    </div>
+  );
+}
+
 /**
  * renderNode renders a serialized Stepper AST node to a React ReactNode.
  */
@@ -860,14 +877,31 @@ function renderNode(
         const src = readNodeProp(node, part.image);
         if (typeof src !== 'string' || !src.startsWith('data:')) return null;
         const alt = part.altProp === undefined ? undefined : readNodeProp(node, part.altProp);
+        const altText = alt == null ? "" : String(alt);
         return (
-          <img
+          <Popover
             key={key}
+<<<<<<< HEAD
             className={classNames('stepper-opaque-thumbnail', cls(part.cls))}
             src={src}
             alt={alt == null ? '' : String(alt)}
             title={alt == null ? undefined : String(alt)}
           />
+=======
+            interactionKind="hover"
+            placement="bottom"
+            usePortal={popoverDepth === 0}
+            lazy
+            popoverClassName="stepper-popover"
+            content={<EnlargedThumbnailPopover src={src} alt={altText} />}
+          >
+            <img
+              className={classNames("stepper-opaque-thumbnail", cls(part.cls))}
+              src={src}
+              alt={altText}
+            />
+          </Popover>
+>>>>>>> main
         );
       }
       return null;

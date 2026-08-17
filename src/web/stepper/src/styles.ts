@@ -62,6 +62,19 @@ const STEPPER_CSS = `
   border-radius: 3px;
 }
 
+/* The same thumbnail enlarged, shown in the hover popover so an opaque value (e.g. a rune) is
+ * actually legible while the inline copy stays at text height. A fixed width (not max-width) forces
+ * a low-resolution thumbnail to scale up rather than render at its small intrinsic size. */
+.sa-substituter .stepper-opaque-thumbnail-large,
+.stepper-popover .stepper-opaque-thumbnail-large {
+  display: block;
+  width: min(200px, 50vw);
+  height: auto;
+  margin-top: 6px;
+  border-radius: 3px;
+  image-rendering: auto;
+}
+
 .sa-substituter .stepper-mu-term,
 .stepper-popover .stepper-mu-term {
   font-weight: bold;
