@@ -2,8 +2,8 @@ import { exec, spawn } from 'child_process';
 import fs from 'fs/promises';
 import { createRequire } from 'module';
 import pathlib from 'path';
-import type { IPluginDefinition } from '@sourceacademy/plugin-directory/dist/types/IPluginDefinition.js';
 import { Command } from '@commander-js/extra-typings';
+import type { IPluginDefinition } from '@sourceacademy/plugin-directory/dist/types/IPluginDefinition.js';
 import packageJSON from '../package.json' with { type: 'json' };
 
 interface WorkspaceEntry {
@@ -14,6 +14,12 @@ interface WorkspaceEntry {
 interface Manifest {
   type: 'installable' | 'external';
 }
+
+const repoRoot = pathlib.resolve(import.meta.dirname, '..');
+// Create a `require` function to use node's resolution algorithm to find
+// the entry point of plugins
+const require = createRequire(import.meta.url);
+const pluginDirectory: Record<string, IPluginDefinition> = {};
 
 /**
  * Use `yarn workspaces list --json` to gather all the workspaces in the repository
@@ -33,12 +39,6 @@ async function getWorkspaces() {
 
   return entries.map(each => JSON.parse(each)) as WorkspaceEntry[];
 }
-
-const repoRoot = pathlib.resolve(import.meta.dirname, '..');
-// Create a `require` function to use node's resolution algorithm to find
-// the entry point of plugins
-const require = createRequire(import.meta.url);
-const pluginDirectory: Record<string, IPluginDefinition> = {};
 
 /**
  * Generates the manifest files for each plugin and updates the changeset config to ignore non-installable plugins.
@@ -250,19 +250,19 @@ async function clean() {
   await Promise.all(promises);
 }
 
-const program = new Command()
-  .addCommand(
-    new Command('build')
-      .allowExcessArguments(true)
-      .allowUnknownOption(true)
-      .action(async (_, cmd) => {
-        await build(cmd.args);
-      }),
-    { isDefault: true },
-  )
-  .addCommand(new Command('clean').description('Remove dist folders').action(clean));
-
 // Only run automatically if not testing
 if (process.env.NODE_ENV !== 'test') {
+  const program = new Command()
+    .addCommand(
+      new Command('build')
+        .allowExcessArguments(true)
+        .allowUnknownOption(true)
+        .action(async (_, cmd) => {
+          await build(cmd.args);
+        }),
+      { isDefault: true },
+    )
+    .addCommand(new Command('clean').description('Remove dist folders').action(clean));
+
   await program.parseAsync();
 }

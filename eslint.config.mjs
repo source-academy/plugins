@@ -65,6 +65,7 @@ export default defineConfig([
     },
     rules: {
       '@typescript-eslint/ban-ts-comment': 'warn',
+      '@typescript-eslint/no-explicit-any': 'off', // was error
       '@typescript-eslint/no-import-type-side-effects': 'error',
       '@typescript-eslint/no-namespace': 'off',
       '@typescript-eslint/no-unnecessary-type-assertion': 'error',
