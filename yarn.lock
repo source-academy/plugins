@@ -474,6 +474,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@commander-js/extra-typings@npm:^15.0.0":
+  version: 15.0.0
+  resolution: "@commander-js/extra-typings@npm:15.0.0"
+  peerDependencies:
+    commander: ~15.0.0
+  checksum: 10c0/4282857c0acb2da1b893fe8c39a939bdfae2d7cbb43a22c1fe8ef5bef4cf615ddb34d96239f7603294ef5014728799c8212f4451fa9d2e469cce087eb89f0218
+  languageName: node
+  linkType: hard
+
 "@emnapi/core@npm:1.10.0":
   version: 1.10.0
   resolution: "@emnapi/core@npm:1.10.0"
@@ -1355,6 +1364,7 @@ __metadata:
   resolution: "@sourceacademy/plugins-workspace@workspace:."
   dependencies:
     "@changesets/cli": "npm:^2.31.0"
+    "@commander-js/extra-typings": "npm:^15.0.0"
     "@sourceacademy/conductor": "catalog:"
     "@sourceacademy/plugin-directory": "source-academy/plugin-directory#main"
     "@types/node": "npm:^25.9.1"
@@ -1622,6 +1632,7 @@ __metadata:
     "@sourceacademy/common-tabs": "workspace:^"
     "@sourceacademy/conductor": "catalog:"
     "@types/react": "npm:^19.0.0"
+    "@types/react-dom": "npm:^19.0.0"
     classnames: "npm:^2.3.2"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
@@ -1733,6 +1744,15 @@ __metadata:
   dependencies:
     undici-types: "npm:>=7.24.0 <7.24.7"
   checksum: 10c0/9a04682842bebbcf21a1779dfeab9aa733d7bd7bbc0a0edb641ab3a9a3d43eac543225acf669c334f458f1956443ebc072bc3c72840c543b8b356cab5c82d456
+  languageName: node
+  linkType: hard
+
+"@types/react-dom@npm:^19.0.0":
+  version: 19.2.4
+  resolution: "@types/react-dom@npm:19.2.4"
+  peerDependencies:
+    "@types/react": ^19.2.0
+  checksum: 10c0/b7d854ce17bb51a3a067168268a90f0123d10dc490f63f1ff5409f07ac715febeb8f5b7b473404a9d437106571e0312fc2937a945634d590abfc9aa46a14b01b
   languageName: node
   linkType: hard
 
