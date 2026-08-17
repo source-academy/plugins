@@ -1,3 +1,4 @@
+/* eslint-disable vitest/prefer-describe-function-title */
 import { describe, expect, it } from 'vitest';
 import {
   CSE_CHANNEL,
@@ -96,7 +97,7 @@ describe('structured-clone safety', () => {
 
 // ── CseSnapshotMessage ────────────────────────────────────────────────────────
 
-describe(CseSnapshotMessage, () => {
+describe('CseSnapshotMessage', () => {
   it('totalSteps matches snapshots.length for a batch', () => {
     const snapshots: CseSnapshot[] = [
       { stepIndex: 0, control: [], stash: [], environments: [] },
@@ -198,7 +199,7 @@ describe('CseSnapshot optional fields', () => {
 
 // ── CseSerializedValue ────────────────────────────────────────────────────────
 
-describe(CseSerializedValue, () => {
+describe('CseSerializedValue', () => {
   it('accepts minimal value with displayValue and label only', () => {
     const v: CseSerializedValue = { displayValue: 'true', label: 'bool' };
     expect(v.tag).toBeUndefined();
@@ -219,7 +220,7 @@ describe(CseSerializedValue, () => {
 
 // ── CseSerializedInstruction ──────────────────────────────────────────────────
 
-describe(CseSerializedInstruction, () => {
+describe('CseSerializedInstruction', () => {
   it('accepts minimal instruction with displayText only', () => {
     const instr: CseSerializedInstruction = { displayText: 'pop' };
     expect(instr.tag).toBeUndefined();
@@ -242,7 +243,7 @@ describe(CseSerializedInstruction, () => {
 
 // ── CseSerializedEnvFrame ─────────────────────────────────────────────────────
 
-describe(CseSerializedEnvFrame, () => {
+describe('CseSerializedEnvFrame', () => {
   it('root frame has null parentId', () => {
     const frame: CseSerializedEnvFrame = {
       id: 'g',
@@ -318,7 +319,7 @@ describe(CseSerializedEnvFrame, () => {
 
 // ── CseSerializedBinding ──────────────────────────────────────────────────────
 
-describe(CseSerializedBinding, () => {
+describe('CseSerializedBinding', () => {
   it('isConst is optional and defaults to undefined', () => {
     const b: CseSerializedBinding = {
       name: 'x',
