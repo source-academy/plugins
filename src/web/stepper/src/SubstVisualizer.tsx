@@ -881,13 +881,6 @@ function renderNode(
         return (
           <Popover
             key={key}
-<<<<<<< HEAD
-            className={classNames('stepper-opaque-thumbnail', cls(part.cls))}
-            src={src}
-            alt={alt == null ? '' : String(alt)}
-            title={alt == null ? undefined : String(alt)}
-          />
-=======
             interactionKind="hover"
             placement="bottom"
             usePortal={popoverDepth === 0}
@@ -901,7 +894,6 @@ function renderNode(
               alt={altText}
             />
           </Popover>
->>>>>>> main
         );
       }
       return null;
