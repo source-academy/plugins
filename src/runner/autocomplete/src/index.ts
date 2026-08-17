@@ -53,7 +53,6 @@ export abstract class BaseAutoCompleteRunnerPlugin implements IPlugin {
 
   constructor(
     _conduit: IConduit,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [autoCompleteChannel, syntaxHighlightChannel]: IChannel<any>[],
   ) {
     this.__autoCompleteChannel = autoCompleteChannel;

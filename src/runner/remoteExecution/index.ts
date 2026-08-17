@@ -8,7 +8,6 @@ export class remoteRunnerPlugin implements IPlugin {
   private readonly __channel: IChannel<PySlangMessage>;
   private readonly engine: EV3Engine;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(_conduit: IConduit, [channel]: IChannel<any>[]) {
     this.__channel = channel;
     this.engine = new EV3Engine();

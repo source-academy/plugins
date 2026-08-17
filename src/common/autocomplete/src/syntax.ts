@@ -28,7 +28,6 @@ export interface ModeHook {
  * The arguments and return value must be structured-cloneable.
  */
 // Ace mode extensions have different signatures, so the RPC boundary must accept arbitrary arguments.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ModeRpcFunction = (...args: any[]) => unknown;
 
 /** A mode function can either reuse an Ace implementation or run remotely. */

@@ -27,7 +27,6 @@ export class CseMachinePlugin implements IPlugin {
 
   constructor(
     _conduit: IConduit,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [cseChannel]: IChannel<any>[],
   ) {
     if (!cseChannel) {

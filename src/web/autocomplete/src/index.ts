@@ -67,7 +67,6 @@ export abstract class BaseAutoCompleteWebPlugin implements IPlugin {
    */
   abstract loadMode(data: SyntaxHighlightData): void;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(_conduit: IConduit, [autoCompleteChannel, syntaxChannel]: IChannel<any>[]) {
     this.__autoCompleteChannel = autoCompleteChannel;
     this.__syntaxChannel = syntaxChannel;

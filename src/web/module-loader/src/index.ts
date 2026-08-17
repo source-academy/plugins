@@ -26,7 +26,6 @@ export class ModuleLoaderWebPlugin implements IPlugin {
 
   constructor(
     _conduit: IConduit,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [moduleRequestChannel]: IChannel<any>[],
   ) {
     this.__moduleRequestChannel = moduleRequestChannel;

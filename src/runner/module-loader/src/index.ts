@@ -24,7 +24,6 @@ export class ModuleLoaderRunnerPlugin implements IPlugin {
 
   constructor(
     conduit: IConduit,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [moduleRequestChannel]: IChannel<any>[],
     conductor: IRunnerPlugin,
     evaluator: IInterfacableEvaluator,

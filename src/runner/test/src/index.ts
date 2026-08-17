@@ -12,7 +12,6 @@ export abstract class TestPlugin implements IPlugin {
   private readonly __testChannel: IChannel<TestMessage>;
   constructor(
     _conduit: IConduit,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [testChannel]: IChannel<any>[],
   ) {
     this.__testChannel = testChannel;

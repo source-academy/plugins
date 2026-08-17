@@ -27,7 +27,6 @@ import { injectStepperStyles } from './styles';
  * language-specific fields (e.g. `left`, `operator`, `params`) without per-node typing, exactly as
  * the original (class-based) renderer did after casting.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- language-specific AST fields are read untyped, exactly as the original class-based renderer did after casting
 type StepperNode = SerializedStepperNode & Record<string, any>;
 
 function SubstDefaultText() {
