@@ -13,7 +13,7 @@ export default defineConfig([
   eslintConfigPrettierFlat,
   {
     plugins: {
-      import: importPlugin
+      import: importPlugin,
     },
     rules: {
       'import/first': 'warn',
@@ -26,25 +26,27 @@ export default defineConfig([
           groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
           named: {
             import: true,
-            types: 'types-last'
+            types: 'types-last',
           },
           alphabetize: {
             order: 'asc',
-            orderImportKind: 'asc'
+            orderImportKind: 'asc',
           },
-        }
+        },
       ],
 
       'no-restricted-imports': [
         'error',
         {
-          paths: [{
-            name: 'commander',
-            message: 'Use @commander-js/extra-typings instead!'
-          }]
-        }
-      ]
-    }
+          paths: [
+            {
+              name: 'commander',
+              message: 'Use @commander-js/extra-typings instead!',
+            },
+          ],
+        },
+      ],
+    },
   },
   tseslint.configs.recommended,
   {

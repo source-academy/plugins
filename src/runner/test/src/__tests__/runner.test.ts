@@ -2,7 +2,6 @@ import type { PySlangMessage } from '@sourceacademy/common-test';
 import { remoteRunnerPlugin } from '@sourceacademy/runner-remote-execution';
 import { expect, test, vi } from 'vitest';
 
-
 vi.mock(
   import('py-slang/src/engines/ev3/EV3Engine'),
   () =>

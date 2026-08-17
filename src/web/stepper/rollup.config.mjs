@@ -36,5 +36,5 @@ export default defineConfig({
     // Suppress the warnings about 'use client' from @mantine
     if (warning.code === 'MODULE_LEVEL_DIRECTIVE') return;
     warn(warning);
-  }
+  },
 });

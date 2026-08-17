@@ -142,15 +142,11 @@ export async function generateManifest() {
  */
 function runYarnUsingSpawn(...args: string[]) {
   return new Promise<void>((resolve, reject) => {
-    const proc = spawn(
-      process.platform === 'win32' ? 'yarn.cmd' : 'yarn',
-      args,
-      {
-        stdio: 'inherit',
-        shell: true,
-        cwd: repoRoot,
-      },
-    );
+    const proc = spawn(process.platform === 'win32' ? 'yarn.cmd' : 'yarn', args, {
+      stdio: 'inherit',
+      shell: true,
+      cwd: repoRoot,
+    });
     proc.on('error', reject);
     proc.on('close', code => {
       if (code === 0) {
@@ -158,7 +154,7 @@ function runYarnUsingSpawn(...args: string[]) {
       } else {
         reject(new Error(`Process exited with code ${code}`));
       }
-    })
+    });
   });
 }
 
@@ -187,7 +183,6 @@ async function copyDistFiles(globalManifest: Record<string, Record<string, Manif
     }),
   );
 }
-
 
 /**
  * Transforms a particular external plugin to its final form
@@ -225,7 +220,17 @@ async function transform() {
  */
 async function build(extraArgs: string[] = []) {
   // Need to build first so that require.resolve doesn't break
-  await runYarnUsingSpawn('workspaces', 'foreach', '-Apt', '--topological-dev', '--exclude', '@sourceacademy/plugins-workspace', 'run', 'build', ...extraArgs)
+  await runYarnUsingSpawn(
+    'workspaces',
+    'foreach',
+    '-Apt',
+    '--topological-dev',
+    '--exclude',
+    '@sourceacademy/plugins-workspace',
+    'run',
+    'build',
+    ...extraArgs,
+  );
   const globalManifest = await generateManifest();
   await copyDistFiles(globalManifest);
   await transform();
@@ -253,13 +258,9 @@ const program = new Command()
       .action(async (_, cmd) => {
         await build(cmd.args);
       }),
-      { isDefault: true }
+    { isDefault: true },
   )
-  .addCommand(
-    new Command('clean')
-      .description('Remove dist folders')
-      .action(clean)
-  )
+  .addCommand(new Command('clean').description('Remove dist folders').action(clean));
 
 // Only run automatically if not testing
 if (process.env.NODE_ENV !== 'test') {

@@ -2,7 +2,6 @@ import type { SerializedDataVisualizerNode } from '@sourceacademy/common-data-vi
 import { Group, Line, Rect, Text } from 'react-konva';
 import { describe, expect, test, vi } from 'vitest';
 
-
 import { Config } from '../Config';
 import ArrayDrawable from '../drawable/ArrayDrawable';
 import { NullDrawable } from '../drawable/Drawable';

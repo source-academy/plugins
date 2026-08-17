@@ -19,7 +19,6 @@ import {
   type IRpcMessage,
 } from '@sourceacademy/conductor/conduit';
 
-
 const transferModeFunction = (name: keyof ModeRpc, fn: ModeFunction): TransferredModeFunction =>
   typeof fn === 'function' ? { rpc: name } : fn;
 

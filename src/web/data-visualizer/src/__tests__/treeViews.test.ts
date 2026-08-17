@@ -2,7 +2,6 @@ import type { SerializedDataVisualizerNode } from '@sourceacademy/common-data-vi
 import { Text } from 'react-konva';
 import { describe, expect, test, vi } from 'vitest';
 
-
 import type { ClassificationResult } from '../classify';
 import { ArrowDrawable, BackwardArrowDrawable } from '../drawable/Drawable';
 import { AlreadyParsedTreeNode } from '../tree/AlreadyParsedTreeNode';

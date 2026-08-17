@@ -4,7 +4,7 @@ import {
   RUNNER_ID,
   type ModuleLoaderMessage,
 } from '@sourceacademy/common-module-loader';
-import type { IChannel, IConduit, PluginClass  } from '@sourceacademy/conductor/conduit';
+import type { IChannel, IConduit, PluginClass } from '@sourceacademy/conductor/conduit';
 import type { IModulePlugin } from '@sourceacademy/conductor/module';
 import type { IInterfacableEvaluator, IRunnerPlugin } from '@sourceacademy/conductor/runner';
 import { afterEach, describe, expect, test, vi, type Mock, type MockedFunction } from 'vitest';

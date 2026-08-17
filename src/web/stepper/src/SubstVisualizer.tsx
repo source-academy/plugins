@@ -400,7 +400,7 @@ function ProfileHoverTextPopover({ text }: { text: string }) {
 /** Popover body for an `image` part: the inline opaque-value thumbnail, enlarged to be legible. */
 function EnlargedThumbnailPopover({ src, alt }: { src: string; alt?: string }) {
   return (
-    <div className={classNames("stepper-popover", Classes.DARK)}>
+    <div className={classNames('stepper-popover', Classes.DARK)}>
       <div className="stepper-display">
         {alt ? (
           <>
@@ -408,7 +408,7 @@ function EnlargedThumbnailPopover({ src, alt }: { src: string; alt?: string }) {
             <span>{` ${alt}`}</span>
           </>
         ) : null}
-        <img className="stepper-opaque-thumbnail-large" src={src} alt={alt ?? ""} />
+        <img className="stepper-opaque-thumbnail-large" src={src} alt={alt ?? ''} />
       </div>
     </div>
   );
@@ -877,7 +877,7 @@ function renderNode(
         const src = readNodeProp(node, part.image);
         if (typeof src !== 'string' || !src.startsWith('data:')) return null;
         const alt = part.altProp === undefined ? undefined : readNodeProp(node, part.altProp);
-        const altText = alt == null ? "" : String(alt);
+        const altText = alt == null ? '' : String(alt);
         return (
           <Popover
             key={key}
@@ -889,7 +889,7 @@ function renderNode(
             content={<EnlargedThumbnailPopover src={src} alt={altText} />}
           >
             <img
-              className={classNames("stepper-opaque-thumbnail", cls(part.cls))}
+              className={classNames('stepper-opaque-thumbnail', cls(part.cls))}
               src={src}
               alt={altText}
             />

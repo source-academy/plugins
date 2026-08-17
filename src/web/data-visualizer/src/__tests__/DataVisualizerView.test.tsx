@@ -4,7 +4,6 @@ import { act } from 'react';
 import TestRenderer from 'react-test-renderer';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-
 import DataVisualizerView from '../DataVisualizerView';
 import { Tree } from '../tree/Tree';
 
