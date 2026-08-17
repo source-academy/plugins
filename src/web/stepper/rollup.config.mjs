@@ -32,4 +32,9 @@ export default defineConfig({
     typescript({ exclude: ['**/__tests__/**'] }),
     terser(),
   ],
+  onwarn(warning, warn) {
+    // Suppress the warnings about 'use client' from @mantine
+    if (warning.code === 'MODULE_LEVEL_DIRECTIVE') return;
+    warn(warning);
+  }
 });

@@ -34,6 +34,16 @@ export default defineConfig([
           },
         }
       ],
+
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [{
+            name: 'commander',
+            message: 'Use @commander-js/extra-typings instead!'
+          }]
+        }
+      ]
     }
   },
   tseslint.configs.recommended,
