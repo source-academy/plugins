@@ -51,10 +51,7 @@ export abstract class BaseAutoCompleteRunnerPlugin implements IPlugin {
    */
   abstract autocomplete(code: string, row: number, column: number): AutoCompleteEntry[];
 
-  constructor(
-    _conduit: IConduit,
-    [autoCompleteChannel, syntaxHighlightChannel]: IChannel<any>[],
-  ) {
+  constructor(_conduit: IConduit, [autoCompleteChannel, syntaxHighlightChannel]: IChannel<any>[]) {
     this.__autoCompleteChannel = autoCompleteChannel;
     this.__syntaxHighlightChannel = syntaxHighlightChannel;
 

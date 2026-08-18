@@ -24,10 +24,7 @@ export class ModuleLoaderWebPlugin implements IPlugin {
   private moduleDirectoryURL: string | null = null;
   private moduleDirectory: ModuleDirectory | null = null;
 
-  constructor(
-    _conduit: IConduit,
-    [moduleRequestChannel]: IChannel<any>[],
-  ) {
+  constructor(_conduit: IConduit, [moduleRequestChannel]: IChannel<any>[]) {
     this.__moduleRequestChannel = moduleRequestChannel;
     ModuleLoaderWebPlugin.instance = this;
     this.__moduleRequestChannel.subscribe(message => {

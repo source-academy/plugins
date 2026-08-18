@@ -40,10 +40,7 @@ export abstract class CseMachineHostPlugin implements IPlugin {
    */
   abstract receiveSnapshots(snapshots: CseSnapshot[], breakpointSteps: number[]): void;
 
-  constructor(
-    _conduit: IConduit,
-    [cseChannel]: IChannel<any>[],
-  ) {
+  constructor(_conduit: IConduit, [cseChannel]: IChannel<any>[]) {
     if (!cseChannel) {
       throw new Error('CSE channel is required but was not provided.');
     }

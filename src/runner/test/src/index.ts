@@ -10,10 +10,7 @@ export abstract class TestPlugin implements IPlugin {
   readonly id: string = RUNNER_ID;
   static readonly channelAttach = [CHANNEL_ID];
   private readonly __testChannel: IChannel<TestMessage>;
-  constructor(
-    _conduit: IConduit,
-    [testChannel]: IChannel<any>[],
-  ) {
+  constructor(_conduit: IConduit, [testChannel]: IChannel<any>[]) {
     this.__testChannel = testChannel;
     this.__testChannel.subscribe(message => {
       console.log(message);

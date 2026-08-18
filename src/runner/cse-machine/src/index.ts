@@ -25,10 +25,7 @@ export class CseMachinePlugin implements IPlugin {
 
   private readonly __cseChannel: IChannel<CseSnapshotMessage>;
 
-  constructor(
-    _conduit: IConduit,
-    [cseChannel]: IChannel<any>[],
-  ) {
+  constructor(_conduit: IConduit, [cseChannel]: IChannel<any>[]) {
     if (!cseChannel) {
       throw new Error('CSE channel is required but was not provided.');
     }
