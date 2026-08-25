@@ -16,7 +16,7 @@
     "test": "vitest run",
     "test-coverage": "vitest run --coverage",
     "test:dev": "vitest",
-    "lint": "eslint --concurrency=auto src",
+    "lint": "eslint --concurrency=auto",
     "format": "prettier --write \"**/*.{ts,tsx,json,js,cjs,mjs}\"",
     "format:ci": "prettier --list-different \"**/*.{ts,tsx,json,js,cjs,mjs}\""
   },

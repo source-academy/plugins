@@ -2,8 +2,8 @@ import { exec, spawn } from 'child_process';
 import fs from 'fs/promises';
 import { createRequire } from 'module';
 import pathlib from 'path';
-import { Command } from '@commander-js/extra-typings';
 import type { IPluginDefinition } from '@sourceacademy/plugin-directory/dist/types/IPluginDefinition.js';
+import { Command } from '@commander-js/extra-typings';
 import packageJSON from '../package.json' with { type: 'json' };
 
 interface WorkspaceEntry {
@@ -187,10 +187,7 @@ async function copyDistFiles(globalManifest: Record<string, Record<string, Manif
 /**
  * Transforms a particular external plugin to its final form
  */
-async function transformSingle(path: string) {
-  if (path.endsWith('mjs')) {
-    return;
-  }
+export async function transformSingle(path: string) {
   let file = await fs.readFile(path, 'utf-8');
 
   // Create a mock "module" object, then return the exports
@@ -205,6 +202,8 @@ async function transformSingle(path: string) {
 async function transform() {
   const promises = [];
   for await (const file of fs.glob(`./dist/*/*/index.*js`)) {
+    if (pathlib.extname(file) === '.mjs') continue;
+
     promises.push(transformSingle(file));
   }
   await Promise.all(promises);

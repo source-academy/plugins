@@ -3,7 +3,7 @@ import fs from 'fs/promises';
 import pathlib from 'path';
 import { Command } from '@commander-js/extra-typings';
 import { beforeEach, describe, expect, it, test, vi } from 'vitest';
-import { generateManifest } from '../build.js';
+import { generateManifest, transformSingle } from '../build.js';
 
 const repoRoot = pathlib.resolve(import.meta.dirname, '..', '..');
 
@@ -12,6 +12,7 @@ vi.mock(import('fs/promises'), () => ({
     cp: vi.fn(),
     mkdir: vi.fn(),
     writeFile: vi.fn(),
+    readFile: vi.fn()
   } as any,
 }));
 
@@ -86,7 +87,7 @@ const findCall = vi.defineHelper((path: string) => {
     expect.fail(`fs.writeFile was not called with ${path}`);
   }
 
-  return JSON.parse(result[1] as string);
+  return result[1] as string;
 });
 
 beforeEach(() => {
@@ -115,7 +116,7 @@ describe(generateManifest, () => {
     expect(fs.writeFile).toHaveBeenCalledTimes(5);
 
     // Check for plugin directory
-    const pluginDirectory = findCall(pathlib.join(repoRoot, 'dist', 'directory.json'));
+    const pluginDirectory = JSON.parse(findCall(pathlib.join(repoRoot, 'dist', 'directory.json')));
     expect(pluginDirectory).toHaveLength(1);
     expect(pluginDirectory[0]).toHaveProperty(
       'description',
@@ -123,19 +124,47 @@ describe(generateManifest, () => {
     );
 
     // Check commons directory
-    const commonDirectory = findCall(pathlib.join(repoRoot, 'dist', 'common.json'));
+    const commonDirectory = JSON.parse(findCall(pathlib.join(repoRoot, 'dist', 'common.json')));
     expect(commonDirectory).toEqual({ test: { type: 'installable' } });
 
     // Check web directory
-    const webDirectory = findCall(pathlib.join(repoRoot, 'dist', 'web.json'));
+    const webDirectory = JSON.parse(findCall(pathlib.join(repoRoot, 'dist', 'web.json')));
     expect(webDirectory).toEqual({ test: { type: 'external' } });
 
     // Check runner directory
-    const runnerDirectory = findCall(pathlib.join(repoRoot, 'dist', 'runner.json'));
+    const runnerDirectory = JSON.parse(findCall(pathlib.join(repoRoot, 'dist', 'runner.json')));
     expect(runnerDirectory).toEqual({ test: { type: 'installable' } });
 
     // Check for changeset
-    const { ignore: ignoreList } = findCall(pathlib.join(repoRoot, '.changeset', 'config.json'));
+    const { ignore: ignoreList } = JSON.parse(findCall(pathlib.join(repoRoot, '.changeset', 'config.json')));
     expect(ignoreList).toContain('@sourceacademy/web-test');
+  });
+});
+
+describe(transformSingle, () => {
+  it('works', async () => {
+    vi.mocked(fs.readFile).mockResolvedValueOnce(`
+      module.exports = {
+        foo: () => 'foo',
+        bar: () => {
+          const value = require('value');
+          return value;
+        }
+      }
+    `)
+
+    await expect(transformSingle('path.js')).resolves.toBeUndefined();
+    expect(fs.readFile).toHaveBeenCalledOnce();
+
+    const transformedContents = findCall('path.js');
+    const dataUri = 'data:text/javascript,' + encodeURIComponent(transformedContents);
+    const { default: func } = await import(dataUri);
+
+    expect(func).toBeInstanceOf(Function);
+
+    const { foo, bar } = func((p: string) => p === 'value');
+
+    expect(foo()).toEqual('foo');
+    expect(bar()).toEqual(true);
   });
 });
