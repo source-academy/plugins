@@ -12,7 +12,7 @@ vi.mock(import('fs/promises'), () => ({
     cp: vi.fn(),
     mkdir: vi.fn(),
     writeFile: vi.fn(),
-    readFile: vi.fn()
+    readFile: vi.fn(),
   } as any,
 }));
 
@@ -136,7 +136,9 @@ describe(generateManifest, () => {
     expect(runnerDirectory).toEqual({ test: { type: 'installable' } });
 
     // Check for changeset
-    const { ignore: ignoreList } = JSON.parse(findCall(pathlib.join(repoRoot, '.changeset', 'config.json')));
+    const { ignore: ignoreList } = JSON.parse(
+      findCall(pathlib.join(repoRoot, '.changeset', 'config.json')),
+    );
     expect(ignoreList).toContain('@sourceacademy/web-test');
   });
 });
@@ -151,7 +153,7 @@ describe(transformSingle, () => {
           return value;
         }
       }
-    `)
+    `);
 
     await expect(transformSingle('path.js')).resolves.toBeUndefined();
     expect(fs.readFile).toHaveBeenCalledOnce();

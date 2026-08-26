@@ -2,6 +2,7 @@
 
 const pathlib = require('path');
 const { defineConfig } = require('@yarnpkg/types');
+const { repository } = require('./package.json');
 
 module.exports = defineConfig({
   async constraints({ Yarn }) {
@@ -13,8 +14,7 @@ module.exports = defineConfig({
 
       // Check that the repository field for each workspace is correct
       workspace.set('repository', {
-        type: 'git',
-        url: 'git+https://github.com/source-academy/plugins',
+        ...repository,
         directory: normedPath,
       });
     }
