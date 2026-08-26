@@ -1,9 +1,9 @@
-import { exec, type ExecException } from 'child_process';
+import { exec, spawn, type ExecException } from 'child_process';
 import fs from 'fs/promises';
 import pathlib from 'path';
 import { Command } from '@commander-js/extra-typings';
 import { beforeEach, describe, expect, it, test, vi } from 'vitest';
-import { generateManifest, transformSingle } from '../build.js';
+import { copyDistFiles, generateManifest, runYarnUsingSpawn, transformSingle } from '../build.js';
 
 const repoRoot = pathlib.resolve(import.meta.dirname, '..', '..');
 
@@ -168,5 +168,63 @@ describe(transformSingle, () => {
 
     expect(foo()).toEqual('foo');
     expect(bar()).toEqual(true);
+  });
+});
+
+describe(runYarnUsingSpawn, () => {
+  function mockSpawn(retCode: number) {
+    vi.mocked(spawn).mockImplementationOnce(
+      () =>
+        ({
+          on(handler: string, listener: (...args: any[]) => any) {
+            if (handler === 'close') {
+              listener(retCode);
+            }
+            return this;
+          },
+        }) as any,
+    );
+  }
+
+  it('calls yarn when not on windows', async () => {
+    mockSpawn(0);
+    vi.spyOn(process, 'platform', 'get').mockReturnValueOnce('openbsd');
+
+    await runYarnUsingSpawn();
+    expect(spawn).toHaveBeenCalledExactlyOnceWith('yarn', [], expect.any(Object));
+  });
+
+  it('calls yarn.cmd when on windows', async () => {
+    mockSpawn(0);
+    vi.spyOn(process, 'platform', 'get').mockReturnValueOnce('win32');
+
+    await runYarnUsingSpawn();
+    expect(spawn).toHaveBeenCalledExactlyOnceWith('yarn.cmd', [], expect.any(Object));
+  });
+
+  it('rejects with the error code', async () => {
+    mockSpawn(1);
+
+    await expect(runYarnUsingSpawn()).rejects.toThrow('Process exited with code 1');
+  });
+});
+
+describe(copyDistFiles, () => {
+  mockWorkspaces([
+    ['src/common/test', '@sourceacademy/common-test', 'installable'],
+    ['src/web/test', '@sourceacademy/web-test', 'external'],
+    ['src/runner/test', '@sourceacademy/runner-test', 'installable'],
+  ]);
+
+  it('works', async () => {
+    const manifest = await generateManifest();
+    await copyDistFiles(manifest);
+
+    // Only copies external plugins
+    expect(fs.cp).toHaveBeenCalledExactlyOnceWith(
+      pathlib.join(repoRoot, 'src', 'web', 'test', 'dist'),
+      pathlib.join(repoRoot, 'dist', 'web', 'test'),
+      { recursive: true },
+    );
   });
 });

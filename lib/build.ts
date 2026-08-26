@@ -140,7 +140,7 @@ export async function generateManifest() {
 /**
  * Runs `yarn` with the given arguments.
  */
-function runYarnUsingSpawn(...args: string[]) {
+export function runYarnUsingSpawn(...args: string[]) {
   return new Promise<void>((resolve, reject) => {
     const proc = spawn(process.platform === 'win32' ? 'yarn.cmd' : 'yarn', args, {
       stdio: 'inherit',
@@ -164,7 +164,7 @@ function runYarnUsingSpawn(...args: string[]) {
  * @example
  * await copyDistFiles();
  */
-async function copyDistFiles(globalManifest: Record<string, Record<string, Manifest>>) {
+export async function copyDistFiles(globalManifest: Record<string, Record<string, Manifest>>) {
   await Promise.all(
     // Iterate over each plugin type (web, runner, common)
     Object.entries(globalManifest).map(async ([pluginType, manifest]) => {
@@ -213,8 +213,9 @@ async function transform() {
  * Builds the plugins by generating the manifest and running the build script for each plugin.
  * The build script is run in topological order to ensure that dependencies are built before the plugins that depend on them.
  * @param extraArgs Extra arguments to pass to the build script of each plugin. For example, if you want to run the build script in watch mode, you can pass ["--watch"] as extraArgs.
- * @example
+ * @example ```
  * await build(["--watch"]);
+ * ```
  * This will run the build script of each plugin with the --watch flag, which is useful for development.
  */
 async function build(extraArgs: string[] = []) {
@@ -249,6 +250,7 @@ async function clean() {
   await Promise.all(promises);
 }
 
+/* istanbul ignore start */
 // Only run automatically if not testing
 if (process.env.NODE_ENV !== 'test') {
   const program = new Command()
