@@ -97,10 +97,10 @@ export class ClassicDrawer {
     y: number,
     parentX: number,
     parentY: number,
-    colorIndex: number,
-    parentIndex: number,
-    originIndex: number,
-    originX: number,
+    _colorIndex: number,
+    _parentIndex: number,
+    _originIndex: number,
+    _originX: number,
   ) {
     if (node instanceof AlreadyParsedTreeNode) {
       // if its child is part of a cycle and it's been drawn, link back to that node instead

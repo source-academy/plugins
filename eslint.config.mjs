@@ -8,7 +8,7 @@ import tseslint from 'typescript-eslint';
 
 export default defineConfig([
   {
-    ignores: ['**/dist', '**/node_modules', '**/coverage'],
+    ignores: ['.yarn', '.pnp*', '**/dist', '**/node_modules', '**/coverage'],
   },
   eslintConfigPrettierFlat,
   {
