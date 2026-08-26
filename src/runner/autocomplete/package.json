@@ -42,7 +42,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/source-academy/plugins",
+    "url": "git+https://github.com/source-academy/plugins.git",
     "directory": "src/runner/autocomplete"
   }
 }

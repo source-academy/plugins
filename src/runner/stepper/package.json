@@ -5,7 +5,7 @@
   "description": "Language-agnostic runner plugin for the Source Academy stepper",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/source-academy/plugins",
+    "url": "git+https://github.com/source-academy/plugins.git",
     "directory": "src/runner/stepper"
   },
   "scripts": {

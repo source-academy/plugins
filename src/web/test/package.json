@@ -5,7 +5,7 @@
   "description": "The test web plugin for the plugins repository",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/source-academy/plugins",
+    "url": "git+https://github.com/source-academy/plugins.git",
     "directory": "src/web/test"
   },
   "scripts": {

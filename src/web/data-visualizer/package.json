@@ -5,7 +5,7 @@
   "description": "Host (web) plugin for the Source Academy data visualizer: classifies and renders drawn structures",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/source-academy/plugins",
+    "url": "git+https://github.com/source-academy/plugins.git",
     "directory": "src/web/data-visualizer"
   },
   "scripts": {

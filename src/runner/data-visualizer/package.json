@@ -5,7 +5,7 @@
   "description": "Language-agnostic runner plugin for the Source Academy data visualizer",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/source-academy/plugins",
+    "url": "git+https://github.com/source-academy/plugins.git",
     "directory": "src/runner/data-visualizer"
   },
   "scripts": {

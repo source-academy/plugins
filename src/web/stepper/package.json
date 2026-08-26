@@ -5,7 +5,7 @@
   "description": "Host (web) plugin for the Source Academy stepper: renders evaluation steps",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/source-academy/plugins",
+    "url": "git+https://github.com/source-academy/plugins.git",
     "directory": "src/web/stepper"
   },
   "scripts": {

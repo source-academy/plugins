@@ -5,7 +5,7 @@
   "description": "The runner plugin for the module loader in Source Academy",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/source-academy/plugins",
+    "url": "git+https://github.com/source-academy/plugins.git",
     "directory": "src/runner/module-loader"
   },
   "scripts": {
