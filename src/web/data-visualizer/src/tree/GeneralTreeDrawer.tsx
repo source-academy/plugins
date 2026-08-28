@@ -1,20 +1,20 @@
-import Konva from "konva";
-import { Layer, Stage, Text } from "react-konva";
+import Konva from 'konva';
+import { Layer, Stage, Text } from 'react-konva';
 
-import { Config } from "../Config";
-import { formatLeaf } from "../format";
-import type { ClassificationResult } from "../classify";
-import { ArrowDrawable, BackwardArrowDrawable } from "../drawable/Drawable";
-import { AlreadyParsedTreeNode } from "./AlreadyParsedTreeNode";
-import { ClassicDrawer } from "./ClassicDrawer";
-import type { Tree } from "./Tree";
+import { Config } from '../Config';
+import type { ClassificationResult } from '../classify';
+import { ArrowDrawable, BackwardArrowDrawable } from '../drawable/Drawable';
+import { formatLeaf } from '../format';
+import { AlreadyParsedTreeNode } from './AlreadyParsedTreeNode';
+import { ClassicDrawer } from './ClassicDrawer';
+import type { Tree } from './Tree';
 import {
   ArrayTreeNode,
   DataTreeNode,
   DrawableTreeNode,
   FunctionTreeNode,
   TreeNode,
-} from "./TreeNode";
+} from './TreeNode';
 
 /**
  * Tree drawer for general tree view
@@ -34,7 +34,7 @@ export class GeneralTreeDrawer extends ClassicDrawer {
         <Stage key={key} width={445} height={100}>
           <Layer>
             <Text
-              text={"General Tree View only supports trees (no cycles)"}
+              text={'General Tree View only supports trees (no cycles)'}
               align="center"
               fontStyle="normal"
               fontSize={20}
@@ -47,11 +47,11 @@ export class GeneralTreeDrawer extends ClassicDrawer {
 
     if (this.tree.rootNode instanceof DataTreeNode) {
       const root = this.tree.rootNode;
-      const text = root.isEmpty ? "null" : formatLeaf(root.displayValue!, root.label!);
+      const text = root.isEmpty ? 'null' : formatLeaf(root.displayValue!, root.label!);
       const textConfig = {
         text: text,
-        align: "center",
-        fontStyle: "normal",
+        align: 'center',
+        fontStyle: 'normal',
         fontSize: 20,
         fill: Config.Stroke,
       };
@@ -79,7 +79,7 @@ export class GeneralTreeDrawer extends ClassicDrawer {
         width={(Config.NWidth + Config.BoxWidth) * (longestNodePos + 1) - Config.BoxWidth + x * 2}
         height={this.downCOUNTER * Config.BoxHeight * 4 + Config.BoxHeight + y * 2}
       >
-        <Layer key={x + ", " + y} offsetX={0} offsetY={this.minY}>
+        <Layer key={x + ', ' + y} offsetX={0} offsetY={this.minY}>
           {this.drawables}
         </Layer>
       </Stage>
@@ -126,10 +126,10 @@ export class GeneralTreeDrawer extends ClassicDrawer {
           drawnNode.drawableY! - Config.ArrowMarginTop - Config.StrokeWidth / 2,
         );
         arrow = (
-          <BackwardArrowDrawable key={"Arrow (back)" + parentX + x + parentY + y} {...arrowProps} />
+          <BackwardArrowDrawable key={'Arrow (back)' + parentX + x + parentY + y} {...arrowProps} />
         );
       } else {
-        arrow = <ArrowDrawable key={"Arrow" + parentX + x + parentY + y} {...arrowProps} />;
+        arrow = <ArrowDrawable key={'Arrow' + parentX + x + parentY + y} {...arrowProps} />;
       }
       this.drawables.push(arrow);
     }

@@ -1,12 +1,4 @@
 import {
-  makeRpc,
-  type IChannel,
-  type IConduit,
-  type IPlugin,
-  type IRpcMessage,
-  type Remote,
-} from "@sourceacademy/conductor/conduit";
-import {
   AUTOCOMPLETE_CHANNEL_ID,
   SYNTAX_CHANNEL_ID,
   WEB_PLUGIN_ID,
@@ -18,7 +10,15 @@ import {
   type SyntaxHighlightMessage,
   type TransferredModeFunction,
   type TransferredSyntaxHighlightData,
-} from "@sourceacademy/common-autocomplete";
+} from '@sourceacademy/common-autocomplete';
+import {
+  makeRpc,
+  type IChannel,
+  type IConduit,
+  type IPlugin,
+  type IRpcMessage,
+  type Remote,
+} from '@sourceacademy/conductor/conduit';
 
 let nextAutoCompleteRequestId = 0;
 
@@ -45,14 +45,14 @@ export abstract class BaseAutoCompleteWebPlugin implements IPlugin {
   ) {
     const requestId = nextAutoCompleteRequestId++;
     const handler = (message: AutoCompleteMessage) => {
-      if (message.type === "response" && message.requestId === requestId) {
+      if (message.type === 'response' && message.requestId === requestId) {
         this.__autoCompleteChannel.unsubscribe(handler);
         callback(message);
       }
     };
     this.__autoCompleteChannel.subscribe(handler);
     this.__autoCompleteChannel.send({
-      type: "request",
+      type: 'request',
       requestId,
       code,
       row,
@@ -67,7 +67,6 @@ export abstract class BaseAutoCompleteWebPlugin implements IPlugin {
    */
   abstract loadMode(data: SyntaxHighlightData): void;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(_conduit: IConduit, [autoCompleteChannel, syntaxChannel]: IChannel<any>[]) {
     this.__autoCompleteChannel = autoCompleteChannel;
     this.__syntaxChannel = syntaxChannel;
@@ -76,14 +75,14 @@ export abstract class BaseAutoCompleteWebPlugin implements IPlugin {
       {},
     );
     const handler = (message: SyntaxHighlightMessage) => {
-      if (message.type === "response") {
-        this.__syntaxChannel.send({ type: "ack" });
+      if (message.type === 'response') {
+        this.__syntaxChannel.send({ type: 'ack' });
         this.__syntaxChannel.unsubscribe(handler);
         this.loadMode(this.__hydrateMode(message.data));
       }
     };
     this.__syntaxChannel.subscribe(handler);
-    this.__syntaxChannel.send({ type: "request" });
+    this.__syntaxChannel.send({ type: 'request' });
   }
 
   private __hydrateMode(data: TransferredSyntaxHighlightData): SyntaxHighlightData {
@@ -96,7 +95,7 @@ export abstract class BaseAutoCompleteWebPlugin implements IPlugin {
   }
 
   private __hydrateModeFunction(fn: TransferredModeFunction): ModeFunction {
-    if ("rpc" in fn) {
+    if ('rpc' in fn) {
       const remote = this.__modeRpc[fn.rpc];
       return (...args: unknown[]) => remote(...args);
     }

@@ -3,7 +3,14 @@
     "**/.yarn": true,
     "**/.pnp.*": true
   },
-  "typescript.tsdk": ".yarn/sdks/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true,
-  "js/ts.tsdk.path": ".yarn/sdks/typescript/lib"
+  "js/ts.tsdk.promptToUseWorkspaceVersion": true,
+  "js/ts.tsdk.path": ".yarn/sdks/typescript/lib",
+  "eslint.nodePath": ".yarn/sdks",
+  "prettier.prettierPath": ".yarn/sdks/prettier/index.cjs",
+  "json.schemas": [
+    {
+      "fileMatch": ["src/*/*/manifest.json"],
+      "url": "./lib/manifest.schema.json"
+    }
+  ]
 }
