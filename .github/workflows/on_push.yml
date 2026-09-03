@@ -30,7 +30,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Create Release Pull Request or Publish to npm
         id: changesets
-        uses: changesets/action@v1
+        uses: changesets/action@v2.1.1
         with:
           publish: yarn changeset publish
           # changeset version only rewrites package.json/CHANGELOG.md — it never re-runs
