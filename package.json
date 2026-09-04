@@ -18,7 +18,7 @@
     "format:ci": "prettier --list-different \"**/*.{ts,tsx,json,js,mjs}\""
   },
   "devDependencies": {
-    "@changesets/cli": "^2.31.0",
+    "@changesets/cli": "^3.0.0",
     "@sourceacademy/conductor": "^0.8.0",
     "@sourceacademy/plugin-directory": "source-academy/plugin-directory#main",
     "@types/node": "^25.9.1",
