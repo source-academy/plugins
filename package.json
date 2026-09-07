@@ -40,5 +40,8 @@
   "bugs": {
     "url": "https://github.com/source-academy/plugins/issues"
   },
-  "homepage": "https://github.com/source-academy/plugins#readme"
+  "homepage": "https://github.com/source-academy/plugins#readme",
+  "resolutions": {
+    "@sourceacademy/conductor": "^0.5.0"
+  }
 }
