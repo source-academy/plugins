@@ -17,22 +17,22 @@
  */
 
 /** The channel the CSE machine runner and host plugins communicate over. */
-export const CSE_CHANNEL = "__cse";
+export const CSE_CHANNEL = '__cse';
 
 /** The id of the runner (worker-side) CSE machine plugin. */
-export const RUNNER_ID = "__runner_cse";
+export const RUNNER_ID = '__runner_cse';
 
 /** The id of the web/host (browser-side) CSE machine plugin. */
-export const WEB_ID = "__web_cse";
+export const WEB_ID = '__web_cse';
 
 /**
  * The id used to look the CSE machine up in the plugin directory (i.e. the argument to
  * `IRunnerPlugin.hostLoadPlugin`). The host resolves this to the web plugin's bundle URL.
  */
-export const CSE_DIRECTORY_ID = "cse-machine";
+export const CSE_DIRECTORY_ID = 'cse-machine';
 
 /** The {@link CseSnapshotMessage.type} discriminator for a batch of snapshots. */
-export const CSE_MESSAGE_TYPE_SNAPSHOTS = "snapshots";
+export const CSE_MESSAGE_TYPE_SNAPSHOTS = 'snapshots';
 
 /**
  * A single value on the stash or bound in an environment, serialized to plain JSON.

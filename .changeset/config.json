@@ -8,7 +8,7 @@
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
   "ignore": [
-    "@sourceacademy/web-stepper",
-    "@sourceacademy/web-data-visualizer"
+    "@sourceacademy/web-data-visualizer",
+    "@sourceacademy/web-stepper"
   ]
 }

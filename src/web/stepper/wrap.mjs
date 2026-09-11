@@ -7,11 +7,11 @@
 // in `export default require => { ...cjs...; return module.exports }`, shadowing `require`/`module`/
 // `exports` so the bundle's external `require(...)` calls hit the provider. (Mirrors plugins #25's
 // build transform.) Output is written to dist/index.mjs (the file the frontend serves & imports).
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile, writeFile } from 'node:fs/promises';
 
-const cjsUrl = new URL("./dist/index.cjs", import.meta.url);
-const mjsUrl = new URL("./dist/index.mjs", import.meta.url);
+const cjsUrl = new URL('./dist/index.cjs', import.meta.url);
+const mjsUrl = new URL('./dist/index.mjs', import.meta.url);
 
-const cjs = await readFile(cjsUrl, "utf-8");
+const cjs = await readFile(cjsUrl, 'utf-8');
 const wrapped = `export default require => {let module = {exports: {}}; let exports = module.exports;\n${cjs}\n; return module.exports;}`;
 await writeFile(mjsUrl, wrapped);
