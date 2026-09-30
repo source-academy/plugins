@@ -5,8 +5,8 @@ import {
   type RefId,
   type SerializedDataVisualizerNode,
   type SerializedDataVisualizerRow,
-} from "@sourceacademy/common-data-visualizer";
-import type { IChannel, IConduit, IPlugin } from "@sourceacademy/conductor/conduit";
+} from '@sourceacademy/common-data-visualizer';
+import type { IChannel, IConduit, IPlugin } from '@sourceacademy/conductor/conduit';
 
 /**
  * Assigns each distinct compound runtime value (by reference) a stable {@link RefId} the first time
@@ -82,8 +82,8 @@ export abstract class BaseDataVisualizerRunnerPlugin<TValue> implements IPlugin 
     this.__channel = channel;
     this.__channel.subscribe(message => {
       // The host (re)opened the data visualizer tab and wants the latest rows without a re-run.
-      if (message.type === "request") {
-        this.__channel.send({ type: "rows", rows: this.__rows });
+      if (message.type === 'request') {
+        this.__channel.send({ type: 'rows', rows: this.__rows });
       }
     });
   }
@@ -122,7 +122,7 @@ export abstract class BaseDataVisualizerRunnerPlugin<TValue> implements IPlugin 
       this.toNode(value, createRefIdAllocator()),
     );
     this.__rows = [...this.__rows, row];
-    this.__channel.send({ type: "rows", rows: this.__rows });
+    this.__channel.send({ type: 'rows', rows: this.__rows });
   }
 
   /**
@@ -133,6 +133,6 @@ export abstract class BaseDataVisualizerRunnerPlugin<TValue> implements IPlugin 
    */
   resetRun(): void {
     this.__rows = [];
-    this.__channel.send({ type: "rows", rows: this.__rows });
+    this.__channel.send({ type: 'rows', rows: this.__rows });
   }
 }

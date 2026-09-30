@@ -1,22 +1,25 @@
-import { vi, test, expect } from "vitest";
+import type { PySlangMessage } from '@sourceacademy/common-test';
+import { remoteRunnerPlugin } from '@sourceacademy/runner-remote-execution';
+import { expect, test, vi } from 'vitest';
 
-vi.mock("py-slang/src/engines/ev3/EV3Engine", () => ({
-  EV3Engine: class MockEV3Engine {
-    execute(code: string) {
-      return Promise.resolve({ output: `mock: ${code}` });
-    }
-  },
-}));
+vi.mock(
+  import('py-slang/src/engines/ev3/EV3Engine'),
+  () =>
+    ({
+      EV3Engine: class MockEV3Engine {
+        execute(code: string) {
+          return Promise.resolve({ output: `mock: ${code}` });
+        }
+      },
+    }) as any,
+);
 
-import { remoteRunnerPlugin } from "@sourceacademy/runner-remote-execution";
-import type { PySlangMessage } from "@sourceacademy/common-test";
-
-test("plugin subscribes to channel and sends result on run message", async () => {
+test('plugin subscribes to channel and sends result on run message', async () => {
   const sentMessages: PySlangMessage[] = [];
   let messageHandler: (msg: PySlangMessage) => void = () => {};
 
   const mockChannel = {
-    name: "py_slang_channel",
+    name: 'py_slang_channel',
     send: (msg: PySlangMessage) => {
       sentMessages.push(msg);
     },
@@ -27,13 +30,11 @@ test("plugin subscribes to channel and sends result on run message", async () =>
     close: () => {},
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mockConduit = {} as any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   new remoteRunnerPlugin(mockConduit, [mockChannel as any]);
 
-  await messageHandler({ type: "run", code: "1 + 1" });
+  await messageHandler({ type: 'run', code: '1 + 1' });
 
   expect(sentMessages.length).toBeGreaterThan(0);
-  expect(sentMessages[0]).toMatchObject({ type: "result" });
+  expect(sentMessages[0]).toMatchObject({ type: 'result' });
 });

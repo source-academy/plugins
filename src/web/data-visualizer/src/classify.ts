@@ -1,4 +1,4 @@
-import type { RefId, SerializedDataVisualizerNode } from "@sourceacademy/common-data-visualizer";
+import type { RefId, SerializedDataVisualizerNode } from '@sourceacademy/common-data-visualizer';
 
 /**
  * Cycle-detection and pair/list/tree classification for one serialized data-visualizer node tree.
@@ -25,12 +25,12 @@ import type { RefId, SerializedDataVisualizerNode } from "@sourceacademy/common-
 /** A node's "type" for homogeneity comparisons — the closest equivalent to the old code's `typeof`. */
 function typeLabel(node: SerializedDataVisualizerNode): string {
   switch (node.type) {
-    case "leaf":
+    case 'leaf':
       return node.label;
-    case "array":
-    case "empty":
-    case "function":
-    case "ref":
+    case 'array':
+    case 'empty':
+    case 'function':
+    case 'ref':
       return node.type;
   }
 }
@@ -39,8 +39,8 @@ function typeLabel(node: SerializedDataVisualizerNode): string {
  * (non-length-2) list is deliberately never tree/pair-eligible — see this file's module doc comment. */
 function isPairNode(
   node: SerializedDataVisualizerNode,
-): node is Extract<SerializedDataVisualizerNode, { type: "array" }> {
-  return node.type === "array" && node.children.length === 2;
+): node is Extract<SerializedDataVisualizerNode, { type: 'array' }> {
+  return node.type === 'array' && node.children.length === 2;
 }
 
 /**
@@ -60,22 +60,22 @@ function detectCyclesAndSharing(root: SerializedDataVisualizerNode): {
 
   function visit(node: SerializedDataVisualizerNode): void {
     switch (node.type) {
-      case "ref":
+      case 'ref':
         isSharedStructure = true;
         if (onPath.has(node.refId)) {
           isCyclic = true;
         }
         return;
-      case "array":
+      case 'array':
         onPath.add(node.refId);
         for (const child of node.children) {
           visit(child);
         }
         onPath.delete(node.refId);
         return;
-      case "function":
-      case "leaf":
-      case "empty":
+      case 'function':
+      case 'leaf':
+      case 'empty':
         return;
     }
   }
@@ -92,20 +92,20 @@ function detectCyclesAndSharing(root: SerializedDataVisualizerNode): {
  * `"array"`/`"empty"`/leaf/`"function"` node — never a `"ref"`.
  */
 function isBinaryTreeNode(node: SerializedDataVisualizerNode, rootLabel: string | null): boolean {
-  if (node.type === "empty") {
+  if (node.type === 'empty') {
     return true;
   }
   if (!isPairNode(node)) {
     return false;
   }
   const [data, rest] = node.children;
-  if (data.type === "empty") {
+  if (data.type === 'empty') {
     return true;
   }
   if (!isPairNode(rest)) {
     return false;
   }
-  if (rootLabel !== null && data.type !== "array" && typeLabel(data) !== rootLabel) {
+  if (rootLabel !== null && data.type !== 'array' && typeLabel(data) !== rootLabel) {
     return false;
   }
 
@@ -116,7 +116,7 @@ function isBinaryTreeNode(node: SerializedDataVisualizerNode, rootLabel: string 
   let count = 0;
   while (isPairNode(next)) {
     const [head] = next.children;
-    if (head.type !== "array" && typeLabel(head) === typeLabel(data)) {
+    if (head.type !== 'array' && typeLabel(head) === typeLabel(data)) {
       return false;
     }
     count++;
@@ -172,14 +172,14 @@ function isBinaryTreeNode(node: SerializedDataVisualizerNode, rootLabel: string 
  * not required to share one type.
  */
 function isGeneralTreeNode(node: SerializedDataVisualizerNode): boolean {
-  if (node.type === "empty") {
+  if (node.type === 'empty') {
     return true;
   }
   if (!isPairNode(node)) {
     return false;
   }
   const [data, rest] = node.children;
-  if (data.type === "array" && !isGeneralTreeNode(data)) {
+  if (data.type === 'array' && !isGeneralTreeNode(data)) {
     return false;
   }
   return isGeneralTreeNode(rest);
@@ -243,9 +243,9 @@ function computeLayout(root: SerializedDataVisualizerNode): TreeLayout {
  * of where in the structure it appears. */
 function containsFunction(node: SerializedDataVisualizerNode): boolean {
   switch (node.type) {
-    case "function":
+    case 'function':
       return true;
-    case "array":
+    case 'array':
       return node.children.some(containsFunction);
     default:
       return false;

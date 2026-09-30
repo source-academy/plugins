@@ -1,1 +1,1 @@
-export { remoteRunnerPlugin } from "../index";
+export { remoteRunnerPlugin } from '../index';

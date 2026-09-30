@@ -4,20 +4,20 @@ import {
   type SerializedStepperStep,
   type StepperMessage,
   type SyntaxProfile,
-} from "@sourceacademy/common-stepper";
-import type { ITabService, Tab } from "@sourceacademy/common-tabs";
+} from '@sourceacademy/common-stepper';
+import type { ITabService, Tab } from '@sourceacademy/common-tabs';
 import {
   checkIsPluginClass,
   type IChannel,
   type IConduit,
   type IPlugin,
-} from "@sourceacademy/conductor/conduit";
-import { createElement, useSyncExternalStore } from "react";
+} from '@sourceacademy/conductor/conduit';
+import { createElement, useSyncExternalStore } from 'react';
 
-import StepperView from "./SubstVisualizer";
+import StepperView from './SubstVisualizer';
 
 /** The side-content tab id used by the host to show/hide the stepper tab. */
-const TAB_ID = "stepper";
+const TAB_ID = 'stepper';
 
 /**
  * The host (browser-side) half of the stepper. It listens on the stepper channel for steps pushed
@@ -45,19 +45,19 @@ export class StepperHostPlugin implements IPlugin {
   ) {
     this.__stepperChannel = stepperChannel;
     this.__stepperChannel.subscribe(message => {
-      if (message.type === "steps") {
+      if (message.type === 'steps') {
         this.__steps = message.steps;
         this.__profile = message.profile;
         this.__error = null;
         this.__emit();
-      } else if (message.type === "error") {
+      } else if (message.type === 'error') {
         this.__steps = [];
         this.__error = message.error;
         this.__emit();
       }
     });
     // Ask the runner to replay any steps it already computed (e.g. tab opened after a run).
-    this.__stepperChannel.send({ type: "request" });
+    this.__stepperChannel.send({ type: 'request' });
 
     const subscribe = (listener: () => void) => this.subscribe(listener);
     const getSteps = () => this.getSteps();
@@ -70,8 +70,8 @@ export class StepperHostPlugin implements IPlugin {
 
     const tab: Tab = {
       id: TAB_ID,
-      label: "Stepper",
-      iconName: "flow-review",
+      label: 'Stepper',
+      iconName: 'flow-review',
       body: createElement(StepperTab),
     };
     tabService.registerTab(tab);

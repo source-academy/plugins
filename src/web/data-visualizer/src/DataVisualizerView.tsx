@@ -1,14 +1,14 @@
-import { Button, ButtonGroup, Card, Classes } from "@blueprintjs/core";
-import { useEffect, useState } from "react";
+import { Button, ButtonGroup, Card, Classes } from '@blueprintjs/core';
+import type { SerializedDataVisualizerRow } from '@sourceacademy/common-data-visualizer';
+import { useEffect, useState } from 'react';
 
-import type { SerializedDataVisualizerRow } from "@sourceacademy/common-data-visualizer";
-import { Config } from "./Config";
-import { Tree, type ViewMode } from "./tree/Tree";
+import { Config } from './Config';
+import { Tree, type ViewMode } from './tree/Tree';
 
 const VIEW_MODES: { mode: ViewMode; label: string }[] = [
-  { mode: "classic", label: "Classic" },
-  { mode: "binaryTree", label: "Binary Tree" },
-  { mode: "generalTree", label: "General Tree" },
+  { mode: 'classic', label: 'Classic' },
+  { mode: 'binaryTree', label: 'Binary Tree' },
+  { mode: 'generalTree', label: 'General Tree' },
 ];
 
 // To account for overflow to the left/top due to a backward arrow — matches the old code's
@@ -40,7 +40,7 @@ type Props = {
  */
 export default function DataVisualizerView({ rows }: Props) {
   const [currentStep, setCurrentStep] = useState(0);
-  const [viewMode, setViewMode] = useState<ViewMode>("classic");
+  const [viewMode, setViewMode] = useState<ViewMode>('classic');
 
   // Mirrors the old code's `DataVisualizer.init(steps => { ...; setCurrentStep(0); })`: every time a
   // new set of calls arrives (a fresh Run), jump back to the first call.
@@ -57,18 +57,18 @@ export default function DataVisualizerView({ rows }: Props) {
       const active = document.activeElement;
       const isEditable =
         active instanceof HTMLElement &&
-        (active.isContentEditable || active.tagName === "INPUT" || active.tagName === "TEXTAREA");
+        (active.isContentEditable || active.tagName === 'INPUT' || active.tagName === 'TEXTAREA');
       if (isEditable) {
         return;
       }
-      if (event.key === "ArrowLeft") {
+      if (event.key === 'ArrowLeft') {
         setCurrentStep(prev => Math.max(0, prev - 1));
-      } else if (event.key === "ArrowRight") {
+      } else if (event.key === 'ArrowRight') {
         setCurrentStep(prev => Math.min(rows.length - 1, prev + 1));
       }
     }
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
   }, [rows.length]);
 
   const onPrevButtonClick = () => setCurrentStep(prev => Math.max(0, prev - 1));
@@ -81,7 +81,7 @@ export default function DataVisualizerView({ rows }: Props) {
   return (
     <div className={Classes.DARK}>
       {rows.length > 0 ? (
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: 10 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }}>
           <ButtonGroup>
             {VIEW_MODES.map(({ mode, label }) => (
               <Button key={mode} active={viewMode === mode} onClick={() => setViewMode(mode)}>
@@ -95,15 +95,15 @@ export default function DataVisualizerView({ rows }: Props) {
       {rows.length > 1 ? (
         <div
           style={{
-            position: "relative",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
+            position: 'relative',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
             marginBottom: 10,
           }}
         >
           <Button
-            style={{ position: "absolute", left: 0 }}
+            style={{ position: 'absolute', left: 0 }}
             size="large"
             icon="arrow-left"
             onClick={onPrevButtonClick}
@@ -115,7 +115,7 @@ export default function DataVisualizerView({ rows }: Props) {
             Call {currentStep + 1}/{rows.length}
           </h3>
           <Button
-            style={{ position: "absolute", right: 0 }}
+            style={{ position: 'absolute', right: 0 }}
             size="large"
             icon="arrow-right"
             onClick={onNextButtonClick}
@@ -130,18 +130,18 @@ export default function DataVisualizerView({ rows }: Props) {
         <div
           key={step.length}
           style={{
-            display: "flex",
-            flexDirection: "row",
-            overflowX: "auto",
+            display: 'flex',
+            flexDirection: 'row',
+            overflowX: 'auto',
           }}
         >
           {step.map((node, i) => (
-            <div key={i} style={{ margin: step.length > 1 ? 0 : "0 auto" }}>
-              <Card style={{ background: "#1a2530", padding: 10 }}>
+            <div key={i} style={{ margin: step.length > 1 ? 0 : '0 auto' }}>
+              <Card style={{ background: '#1a2530', padding: 10 }}>
                 {step.length > 1 && (
                   <h5
                     className={`${Classes.HEADING} ${Classes.MONOSPACE_TEXT}`}
-                    style={{ marginTop: 0, marginBottom: 20, whiteSpace: "nowrap" }}
+                    style={{ marginTop: 0, marginBottom: 20, whiteSpace: 'nowrap' }}
                   >
                     Structure {i + 1}
                   </h5>
@@ -166,12 +166,12 @@ function DataVisualizerDefaultText() {
       The data visualizer helps you to visualize data structures.
       <br />
       <br />
-      It is activated by calling the function <code>draw_data(x1, x2, ... xn)</code>, where{" "}
-      <code>xk</code> would be the k<sup>th</sup> data structure that you want to visualize and{" "}
+      It is activated by calling the function <code>draw_data(x1, x2, ... xn)</code>, where{' '}
+      <code>xk</code> would be the k<sup>th</sup> data structure that you want to visualize and{' '}
       <code>n</code> is the number of structures.
       <br />
       <br />
-      The data visualizer uses box-and-pointer diagrams, as introduced in{" "}
+      The data visualizer uses box-and-pointer diagrams, as introduced in{' '}
       <a href="https://sicp.sourceacademy.org/json_py/" target="_blank" rel="noreferrer">
         <i>Structure and Interpretation of Computer Programs, Python Edition</i>
       </a>

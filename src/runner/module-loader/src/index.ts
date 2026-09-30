@@ -3,15 +3,15 @@ import {
   ModuleLoaderMessageType,
   RUNNER_ID,
   type ModuleLoaderMessage,
-} from "@sourceacademy/common-module-loader";
+} from '@sourceacademy/common-module-loader';
 import {
   checkIsPluginClass,
   type IChannel,
   type IConduit,
   type IPlugin,
-} from "@sourceacademy/conductor/conduit";
-import type { IModulePlugin } from "@sourceacademy/conductor/module";
-import type { IInterfacableEvaluator, IRunnerPlugin } from "@sourceacademy/conductor/runner";
+} from '@sourceacademy/conductor/conduit';
+import type { IModulePlugin } from '@sourceacademy/conductor/module';
+import type { IInterfacableEvaluator, IRunnerPlugin } from '@sourceacademy/conductor/runner';
 
 export class ModuleLoaderRunnerPlugin implements IPlugin {
   readonly id: string = RUNNER_ID;
@@ -24,7 +24,6 @@ export class ModuleLoaderRunnerPlugin implements IPlugin {
 
   constructor(
     conduit: IConduit,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [moduleRequestChannel]: IChannel<any>[],
     conductor: IRunnerPlugin,
     evaluator: IInterfacableEvaluator,
