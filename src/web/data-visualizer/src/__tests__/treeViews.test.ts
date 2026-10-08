@@ -287,6 +287,30 @@ describe("BinaryTreeDrawer canvas (issue #84)", () => {
   });
 });
 
+describe("BinaryTreeDrawer canvas margin", () => {
+  // DataVisualizerView draws with a 1px margin (Config.StrokeWidth / 2), not 0. With a margin the
+  // root's data slot is also "to the right of" runningX2's initial 0, so it must not be counted as
+  // a right branch: that would widen even a single node's canvas by hundreds of pixels.
+  const margin = Config.StrokeWidth / 2;
+  const leaf1 = (): SerializedDataVisualizerNode => leaf(1);
+  const node = (
+    left: SerializedDataVisualizerNode = empty(),
+    right: SerializedDataVisualizerNode = empty(),
+  ): SerializedDataVisualizerNode => pair(leaf1(), pair(left, pair(right, empty())));
+  const widthAt = (value: SerializedDataVisualizerNode, m: number): number => {
+    const drawer = Tree.fromSerializedNode(value).draw("binaryTree") as BinaryTreeDrawer;
+    return (drawer.draw(m, m, 0) as React.ReactElement<{ width: number }>).props.width;
+  };
+
+  test.each<[string, () => SerializedDataVisualizerNode]>([
+    ["a single node", () => node()],
+    ["a node with a right child", () => node(empty(), node())],
+    ["a node with a left child", () => node(node())],
+  ])("%s: the canvas grows only by the margin, not by a phantom branch", (_: string, make) => {
+    expect(widthAt(make(), margin)).toBe(widthAt(make(), 0) + margin * 2);
+  });
+});
+
 describe("GeneralTreeDrawer", () => {
   test("draws a list of functions as a tree with three data items, not the warning box (issue #113)", () => {
     // draw_data(llist(lambda x : x, lambda y: y, lambda z: z))

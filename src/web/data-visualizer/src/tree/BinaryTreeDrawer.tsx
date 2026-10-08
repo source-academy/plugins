@@ -191,11 +191,18 @@ export class BinaryTreeDrawer extends ClassicDrawer {
           // NEW left branches that stretch towards the left
           this.leftCOUNTER++;
           this.runningX = myX;
-        } else if (x > this.runningX2 && index === 0 && y === parentY) {
+        } else if (
+          x > this.runningX2 &&
+          index === 0 &&
+          y === parentY &&
+          node !== this.tree.rootNode
+        ) {
           // NEW right branches that stretch towards the right. A right branch hangs off a node's
           // third box, which sits level with its parent (y === parentY) - not one step down like the
           // second box a left branch hangs off. Checking the left-branch condition here meant right
-          // branches were never counted, so the canvas was too narrow and they were clipped.
+          // branches were never counted, so the canvas was too narrow and they were clipped. The
+          // root's own first box is also level with its "parent" (draw() passes it its own x/y), but
+          // its index-0 child is the root's data, not a right branch.
           this.rightCOUNTER++;
           this.runningX2 = myX;
         }
