@@ -215,6 +215,78 @@ describe("BinaryTreeDrawer", () => {
   });
 });
 
+describe("BinaryTreeDrawer canvas (issue #84)", () => {
+  // Python value -> wire node, the way py-slang serializes it (2-element list -> pair).
+  type Py = null | number | string | Py[];
+  const py = (v: Py): SerializedDataVisualizerNode =>
+    v === null
+      ? empty()
+      : Array.isArray(v)
+        ? { type: "array", refId: nextRefId++, children: v.map(py) }
+        : typeof v === "number"
+          ? leaf(v)
+          : { type: "leaf", displayValue: v, label: "string" };
+  const N = null;
+
+  test.each<[string, Py]>([
+    [
+      "left-skewed (case 1)",
+      [
+        1,
+        [
+          [
+            2,
+            [
+              [
+                3,
+                [
+                  [4, [N, [N, N]]],
+                  [N, N],
+                ],
+              ],
+              [N, N],
+            ],
+          ],
+          [N, N],
+        ],
+      ],
+    ],
+    [
+      "right-skewed (case 2)",
+      ["A", [N, [["B", [N, [["C", [N, [["D", [N, [N, N]]], N]]], N]]], N]]],
+    ],
+    ["right child only (case 3)", [10, [N, [[15, [N, [N, N]]], N]]]],
+  ])("every box of a %s tree is drawn inside the canvas", (_: string, value: Py) => {
+    const tree = Tree.fromSerializedNode(py(value));
+    const drawer = tree.draw("binaryTree") as BinaryTreeDrawer;
+    const stage = drawer.draw(0, 0, 0) as React.ReactElement<{
+      width: number;
+      height: number;
+      children: React.ReactElement<{ offsetX: number; offsetY: number }>;
+    }>;
+    const { offsetX, offsetY } = stage.props.children.props;
+
+    const boxes: ArrayTreeNode[] = [];
+    const walk = (node: unknown) => {
+      if (node instanceof ArrayTreeNode) {
+        boxes.push(node);
+        node.children?.forEach(walk);
+      }
+    };
+    walk(tree.rootNode);
+    expect(boxes.length).toBeGreaterThan(0);
+    for (const box of boxes) {
+      // The layer is shifted by -offsetX/-offsetY, so that is where each box actually lands.
+      const x = box.drawableX! - offsetX;
+      const y = box.drawableY! - offsetY;
+      expect(x).toBeGreaterThanOrEqual(0);
+      expect(x + Config.BoxWidth * 2).toBeLessThanOrEqual(stage.props.width);
+      expect(y).toBeGreaterThanOrEqual(0);
+      expect(y + Config.BoxHeight).toBeLessThanOrEqual(stage.props.height);
+    }
+  });
+});
+
 describe("GeneralTreeDrawer", () => {
   test("draws a list of functions as a tree with three data items, not the warning box (issue #113)", () => {
     // draw_data(llist(lambda x : x, lambda y: y, lambda z: z))

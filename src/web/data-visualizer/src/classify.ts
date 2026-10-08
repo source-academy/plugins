@@ -111,10 +111,16 @@ function isBinaryTreeNode(node: SerializedDataVisualizerNode, rootLabel: string 
   if (data.type === "empty") {
     return true;
   }
+  // Binary Tree View draws a node's data inside its box and hangs only the left/right subtrees
+  // below it, so it has nowhere to put a compound (list) entry - it would be drawn as if it were a
+  // branch. Such a tree is shown in General Tree View instead.
+  if (data.type === "array") {
+    return false;
+  }
   if (!isPairNode(rest)) {
     return false;
   }
-  if (rootLabel !== null && data.type !== "array" && typeLabel(data) !== rootLabel) {
+  if (rootLabel !== null && typeLabel(data) !== rootLabel) {
     return false;
   }
 

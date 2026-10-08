@@ -191,8 +191,11 @@ export class BinaryTreeDrawer extends ClassicDrawer {
           // NEW left branches that stretch towards the left
           this.leftCOUNTER++;
           this.runningX = myX;
-        } else if (x > this.runningX2 && index === 0 && y === parentY + Config.DistanceY) {
-          // NEW right branches that stretch towards the right
+        } else if (x > this.runningX2 && index === 0 && y === parentY) {
+          // NEW right branches that stretch towards the right. A right branch hangs off a node's
+          // third box, which sits level with its parent (y === parentY) - not one step down like the
+          // second box a left branch hangs off. Checking the left-branch condition here meant right
+          // branches were never counted, so the canvas was too narrow and they were clipped.
           this.rightCOUNTER++;
           this.runningX2 = myX;
         }
