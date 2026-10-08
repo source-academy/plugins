@@ -24,12 +24,14 @@
     }
   },
   "peerDependencies": {
+    "@sourceacademy/common-cse-machine": ">=0.3.0",
     "@sourceacademy/common-stepper": ">=0.0.4"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-terser": "^1.0.0",
     "@rollup/plugin-typescript": "^12.3.0",
+    "@sourceacademy/common-cse-machine": "workspace:*",
     "@sourceacademy/common-stepper": "workspace:*",
     "@types/jest": "^30.0.0",
     "jest": "^30.4.2",

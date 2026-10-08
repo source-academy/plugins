@@ -1,4 +1,5 @@
 import { Button, ButtonGroup, Card, Classes, Pre, Slider } from "@blueprintjs/core";
+import type { CseSnapshot, ICseDiagramService } from "@sourceacademy/common-cse-machine";
 import type {
   EStepperHeapObject,
   EStepperStep,
@@ -22,6 +23,8 @@ type Props = {
   steps: EStepperStep[];
   profile?: SyntaxProfile;
   error?: string | null;
+  /** The host's CSE machine visualization, if it lends one (see `ICseDiagramService`). */
+  cseDiagram?: ICseDiagramService;
 };
 
 function DefaultText() {
@@ -69,7 +72,7 @@ function useSize(): [(element: HTMLElement | null) => void, { width: number; hei
  * strip under it) and the environment diagram — one above the other in a narrow tab, side by side
  * in a wide one. A heap object under the mouse is highlighted in both panes.
  */
-export default function EStepperView({ steps, profile, error }: Props) {
+export default function EStepperView({ steps, profile, error, cseDiagram }: Props) {
   const [stepValue, setStepValue] = useState(1);
   const [hovered, setHovered] = useState<string | null>(null);
   const [programHeight, setProgramHeight] = useState(DEFAULT_PROGRAM_HEIGHT);
@@ -164,6 +167,16 @@ export default function EStepperView({ steps, profile, error }: Props) {
     [programHeight],
   );
 
+  // The host draws the environments when it can, from the steps' CSE snapshots (all steps, so it
+  // can show frames from earlier steps as dead frames); otherwise the plugin's own diagram does.
+  const cseSnapshots = useMemo<CseSnapshot[] | null>(
+    () =>
+      cseDiagram && steps.length > 0 && steps.every(s => s.cse !== undefined)
+        ? steps.map(s => s.cse!)
+        : null,
+    [cseDiagram, steps],
+  );
+
   const explanation = step?.markers?.[0]?.explanation ?? "...";
   const output = step?.output ?? "";
 
@@ -223,7 +236,12 @@ export default function EStepperView({ steps, profile, error }: Props) {
             </div>
             {wide ? null : <div className="estepper-divider" onPointerDown={startResize} />}
             <div className="estepper-diagram" ref={diagramRef}>
-              {diagramSize.width > 0 && diagramSize.height > 0 ? (
+              {cseDiagram && cseSnapshots ? (
+                (cseDiagram.createView({
+                  snapshots: cseSnapshots,
+                  step: Math.min(stepValue, lastStep) - 1,
+                }) as React.ReactNode)
+              ) : diagramSize.width > 0 && diagramSize.height > 0 ? (
                 <EnvDiagram
                   frames={step!.frames}
                   heap={step!.heap}

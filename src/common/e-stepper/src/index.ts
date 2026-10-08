@@ -24,6 +24,7 @@
  *  - {@link RefNode}: a reference to a heap object.
  */
 
+import type { CseSnapshot } from "@sourceacademy/common-cse-machine";
 import type {
   SerializedMarker,
   SerializedStepperNode,
@@ -177,6 +178,13 @@ export interface EStepperStep extends SerializedStepperStep {
   activeFrameId: string;
   /** Bindings this step reads through implicit lookups. */
   lookups?: EStepperLookup[];
+  /**
+   * The same store as a CSE machine snapshot (environments only; control and stash empty), so a
+   * host can draw it with its CSE machine visualization (see `ICseDiagramService` in
+   * `@sourceacademy/common-cse-machine`). Optional: a host without that service, or a runner that
+   * does not produce it, uses `frames` and `heap` instead.
+   */
+  cse?: CseSnapshot;
 }
 
 export type { SerializedMarker, SerializedStepperNode, SyntaxProfile };

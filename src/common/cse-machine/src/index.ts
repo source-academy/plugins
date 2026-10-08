@@ -146,3 +146,38 @@ export interface CseSnapshotMessage {
    */
   breakpointSteps?: number[];
 }
+
+/* -------------------------------------------------------------------------- */
+/*                         Host services for web plugins                      */
+/* -------------------------------------------------------------------------- */
+
+/** What {@link ICseDiagramService.createView} draws. */
+export interface CseDiagramViewProps {
+  /** A run's snapshots; frames from earlier snapshots are shown as dead frames. */
+  snapshots: CseSnapshot[];
+  /** The 0-based index of the snapshot to draw. */
+  step: number;
+}
+
+/**
+ * A host's CSE machine visualization, lent to web plugins that want to draw environments the way
+ * the CSE Machine tab does (arrow routing and filtering, alignment, printable mode, clearing dead
+ * frames, saving, zoom) instead of drawing them themselves — e.g. the environment stepper.
+ */
+export interface ICseDiagramService {
+  /**
+   * Returns an element of the host's UI framework (a React element in the Source Academy frontend,
+   * which also provides React to the plugin) that draws the environments of `snapshots[step]` —
+   * environment only, without control and stash — together with the host's diagram toolbar.
+   */
+  createView(props: CseDiagramViewProps): unknown;
+}
+
+/**
+ * Optional services a host passes to the web plugins it loads, after the tab service:
+ * `registerPlugin(PluginClass, tabService, hostServices)`. Every member is optional, and a plugin
+ * that does not expect the argument simply ignores it.
+ */
+export interface IHostServices {
+  cseDiagram?: ICseDiagramService;
+}

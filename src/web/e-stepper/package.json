@@ -33,6 +33,7 @@
     "@rollup/plugin-replace": "^6.0.3",
     "@rollup/plugin-terser": "^1.0.0",
     "@rollup/plugin-typescript": "^12.3.0",
+    "@sourceacademy/common-cse-machine": "workspace:*",
     "@sourceacademy/common-e-stepper": "workspace:*",
     "@sourceacademy/common-stepper": "workspace:*",
     "@sourceacademy/common-tabs": "workspace:^",
