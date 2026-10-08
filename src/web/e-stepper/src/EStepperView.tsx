@@ -48,7 +48,12 @@ function useSize(): [(element: HTMLElement | null) => void, { width: number; hei
   const [element, setElement] = useState<HTMLElement | null>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
   useEffect(() => {
-    if (!element || typeof ResizeObserver === "undefined") return;
+    if (!element) return;
+    // Measure right away, so the first render does not wait for the observer's first callback
+    // (which a browser may delay, e.g. in a background tab).
+    const initial = element.getBoundingClientRect();
+    setSize({ width: Math.floor(initial.width), height: Math.floor(initial.height) });
+    if (typeof ResizeObserver === "undefined") return;
     const observer = new ResizeObserver(entries => {
       const rect = entries[0].contentRect;
       setSize({ width: Math.floor(rect.width), height: Math.floor(rect.height) });
