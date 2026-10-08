@@ -2006,20 +2006,22 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@sourceacademy/common-e-stepper@workspace:^, @sourceacademy/common-e-stepper@workspace:src/common/e-stepper":
+"@sourceacademy/common-e-stepper@workspace:*, @sourceacademy/common-e-stepper@workspace:src/common/e-stepper":
   version: 0.0.0-use.local
   resolution: "@sourceacademy/common-e-stepper@workspace:src/common/e-stepper"
   dependencies:
     "@rollup/plugin-node-resolve": "npm:^16.0.3"
     "@rollup/plugin-terser": "npm:^1.0.0"
     "@rollup/plugin-typescript": "npm:^12.3.0"
-    "@sourceacademy/common-stepper": "workspace:^"
+    "@sourceacademy/common-stepper": "workspace:*"
     "@types/jest": "npm:^30.0.0"
     jest: "npm:^30.4.2"
     rollup: "npm:^4.60.2"
     ts-jest: "npm:^29.4.11"
     tslib: "npm:^2.8.1"
     typescript: "npm:^6.0.3"
+  peerDependencies:
+    "@sourceacademy/common-stepper": ">=0.0.4"
   languageName: unknown
   linkType: soft
 
@@ -2037,7 +2039,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@sourceacademy/common-stepper@workspace:*, @sourceacademy/common-stepper@workspace:^, @sourceacademy/common-stepper@workspace:src/common/stepper":
+"@sourceacademy/common-stepper@workspace:*, @sourceacademy/common-stepper@workspace:src/common/stepper":
   version: 0.0.0-use.local
   resolution: "@sourceacademy/common-stepper@workspace:src/common/stepper"
   dependencies:
@@ -2171,10 +2173,10 @@ __metadata:
     "@rollup/plugin-node-resolve": "npm:^16.0.3"
     "@rollup/plugin-terser": "npm:^1.0.0"
     "@rollup/plugin-typescript": "npm:^12.3.0"
-    "@sourceacademy/common-e-stepper": "workspace:^"
-    "@sourceacademy/common-stepper": "workspace:^"
+    "@sourceacademy/common-e-stepper": "workspace:*"
+    "@sourceacademy/common-stepper": "workspace:*"
     "@sourceacademy/conductor": "npm:^0.8.0"
-    "@sourceacademy/runner-stepper": "workspace:^"
+    "@sourceacademy/runner-stepper": "workspace:*"
     "@types/jest": "npm:^30.0.0"
     jest: "npm:^30.4.2"
     rollup: "npm:^4.60.2"
@@ -2182,7 +2184,10 @@ __metadata:
     tslib: "npm:^2.8.1"
     typescript: "npm:^6.0.3"
   peerDependencies:
+    "@sourceacademy/common-e-stepper": ">=0.0.0"
+    "@sourceacademy/common-stepper": ">=0.0.4"
     "@sourceacademy/conductor": ^0.8.0
+    "@sourceacademy/runner-stepper": ">=0.0.1"
   languageName: unknown
   linkType: soft
 
@@ -2226,7 +2231,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@sourceacademy/runner-stepper@workspace:^, @sourceacademy/runner-stepper@workspace:src/runner/stepper":
+"@sourceacademy/runner-stepper@workspace:*, @sourceacademy/runner-stepper@workspace:src/runner/stepper":
   version: 0.0.0-use.local
   resolution: "@sourceacademy/runner-stepper@workspace:src/runner/stepper"
   dependencies:

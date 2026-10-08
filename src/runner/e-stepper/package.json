@@ -23,19 +23,20 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "dependencies": {
-    "@sourceacademy/common-e-stepper": "workspace:^",
-    "@sourceacademy/common-stepper": "workspace:^",
-    "@sourceacademy/runner-stepper": "workspace:^"
-  },
   "peerDependencies": {
-    "@sourceacademy/conductor": "^0.8.0"
+    "@sourceacademy/common-e-stepper": ">=0.0.0",
+    "@sourceacademy/common-stepper": ">=0.0.4",
+    "@sourceacademy/conductor": "^0.8.0",
+    "@sourceacademy/runner-stepper": ">=0.0.1"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-terser": "^1.0.0",
     "@rollup/plugin-typescript": "^12.3.0",
+    "@sourceacademy/common-e-stepper": "workspace:*",
+    "@sourceacademy/common-stepper": "workspace:*",
     "@sourceacademy/conductor": "^0.8.0",
+    "@sourceacademy/runner-stepper": "workspace:*",
     "@types/jest": "^30.0.0",
     "jest": "^30.4.2",
     "rollup": "^4.60.2",
