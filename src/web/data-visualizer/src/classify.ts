@@ -44,8 +44,8 @@ function isPairNode(
 }
 
 /**
- * Walks the tree once, tracking which compound (`"array"`/`"function"`) refIds are ancestors of the
- * node currently being visited. Because the runner already collapses every repeat occurrence of a
+ * Walks the tree once, tracking which `"array"` refIds are ancestors of the node currently being
+ * visited. Because the runner already collapses every repeat occurrence of a
  * value into a `"ref"` node (see `RefIdAllocator`), this function never needs its own identity
  * tracking — it only needs to know, at each `"ref"` it encounters, whether that refId is *currently
  * on the path from the root* (a true cycle) or was merely visited and left earlier (harmless sharing).
@@ -55,12 +55,19 @@ function detectCyclesAndSharing(root: SerializedDataVisualizerNode): {
   isSharedStructure: boolean;
 } {
   const onPath = new Set<RefId>();
+  // A function is data, like a number: the same function appearing twice (`llist(f, f)`) is a
+  // repeated data item, not shared structure. Functions have no children, so a ref to one can never
+  // close a cycle either.
+  const functionRefIds = new Set<RefId>();
   let isCyclic = false;
   let isSharedStructure = false;
 
   function visit(node: SerializedDataVisualizerNode): void {
     switch (node.type) {
       case "ref":
+        if (functionRefIds.has(node.refId)) {
+          return;
+        }
         isSharedStructure = true;
         if (onPath.has(node.refId)) {
           isCyclic = true;
@@ -74,6 +81,8 @@ function detectCyclesAndSharing(root: SerializedDataVisualizerNode): {
         onPath.delete(node.refId);
         return;
       case "function":
+        functionRefIds.add(node.refId);
+        return;
       case "leaf":
       case "empty":
         return;
@@ -229,7 +238,22 @@ function computeLayout(root: SerializedDataVisualizerNode): TreeLayout {
     colorByRefId.set(node.refId, nodeColorByDepth[depth]);
 
     treeDepth = Math.max(treeDepth, depth);
-    visit(node.children[0], depth + 1, true);
+    // A function in a data slot is drawn as its own glyph one level below its pair (General Tree
+    // View), unlike a leaf, which sits inside the pair's box. Give it a column on that level, from the
+    // same counter as the pairs there, so it neither overlaps a nested list's boxes nor falls below
+    // the canvas.
+    const head = node.children[0];
+    if (head.type === "function") {
+      const fnDepth = depth + 1;
+      if (nodeCountByDepth[fnDepth] === undefined) {
+        nodeCountByDepth[fnDepth] = 0;
+      }
+      posByRefId.set(head.refId, nodeCountByDepth[fnDepth]);
+      longestNodePos = Math.max(longestNodePos, nodeCountByDepth[fnDepth]);
+      nodeCountByDepth[fnDepth]++;
+      treeDepth = Math.max(treeDepth, fnDepth);
+    }
+    visit(head, depth + 1, true);
     visit(node.children[1], depth, false);
   }
 
@@ -238,9 +262,9 @@ function computeLayout(root: SerializedDataVisualizerNode): TreeLayout {
 }
 
 /** True if a `"function"` node appears anywhere in the tree. Mirrors the old `Tree.fromSourceStructure`'s
- * `constructFunction`, which unconditionally forced both tree flags false the moment it built a
- * function node — a function value disqualifies the whole structure from tree rendering, regardless
- * of where in the structure it appears. */
+ * `constructFunction`, which forced both tree flags false the moment it built a function node. That
+ * now applies to Binary Tree View only: General Tree View treats a function as a data item (see
+ * {@link classify}). */
 function containsFunction(node: SerializedDataVisualizerNode): boolean {
   switch (node.type) {
     case "function":
@@ -276,11 +300,10 @@ export function classify(node: SerializedDataVisualizerNode): ClassificationResu
     return { isCyclic, isSharedStructure, isBinaryTree: false, isGeneralTree: false };
   }
 
-  if (containsFunction(node)) {
-    return { isCyclic, isSharedStructure, isBinaryTree: false, isGeneralTree: false };
-  }
-
-  const isBinTree = isBinaryTreeNode(node, null);
+  // General Tree View treats a function like any other data item, so a tree of functions (e.g.
+  // `llist(lambda x: x, lambda y: y)`) is a valid general tree. Binary Tree View keeps the old tool's
+  // rule that any function disqualifies the structure.
+  const isBinTree = !containsFunction(node) && isBinaryTreeNode(node, null);
   const isGenTree = isGeneralTreeNode(node);
   return {
     isCyclic,
