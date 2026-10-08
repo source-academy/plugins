@@ -24,15 +24,7 @@ import type { RefId, SerializedDataVisualizerNode } from "@sourceacademy/common-
 
 /** A node's "type" for homogeneity comparisons — the closest equivalent to the old code's `typeof`. */
 function typeLabel(node: SerializedDataVisualizerNode): string {
-  switch (node.type) {
-    case "leaf":
-      return node.label;
-    case "array":
-    case "empty":
-    case "function":
-    case "ref":
-      return node.type;
-  }
+  return node.type === "leaf" ? node.label : node.type;
 }
 
 /** True for a node that can be a pair-chain link: an `"array"` with exactly two children. A native
