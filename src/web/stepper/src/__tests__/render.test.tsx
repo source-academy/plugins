@@ -260,3 +260,66 @@ describe("profile-driven rendering", () => {
     expect(text(block)).toBe("a + 1");
   });
 });
+
+describe("popover contents", () => {
+  /** Renders the (lazily rendered) content of every popover in `view`, recursively. */
+  function popoverTexts(view: TestRenderer.ReactTestRenderer, depth = 2): string[] {
+    if (depth === 0) return [];
+    return view.root.findAllByType(Popover).flatMap(p => {
+      let inner!: TestRenderer.ReactTestRenderer;
+      act(() => {
+        inner = TestRenderer.create(p.props.content);
+      });
+      return [text(inner.root), ...popoverTexts(inner, depth - 1)];
+    });
+  }
+
+  test("a Source function value shows its definition, recursively", () => {
+    const fn = n("ArrowFunctionExpression", {
+      name: "fact",
+      params: [id("n")],
+      body: n("CallExpression", { callee: id("fact"), arguments: [id("n")] }),
+    });
+    const texts = popoverTexts(render(n("ExpressionStatement", { expression: fn })));
+    expect(texts[0]).toContain("Function definition");
+    expect(texts[0]).toContain("n => fact(n)");
+    // The recursive reference inside the definition is itself a mu-term with the same popover.
+    expect(texts.filter(t => t.includes("n => fact(n)")).length).toBeGreaterThan(1);
+  });
+
+  test("an anonymous Source lambda refers to nothing by name, so it renders inline", () => {
+    const fn = n("ArrowFunctionExpression", { params: [id("a"), id("b")], body: id("a") });
+    expect(text(render(fn).root)).toBe("(a, b) => a");
+  });
+
+  test("a profile function value, hover text and an image show their popovers", () => {
+    const profile: SyntaxProfile = {
+      templates: {
+        Def: ["def ", { prop: "id.name" }, "(): ", { child: "body" }],
+        Call: [{ child: "callee" }, "(", { list: "arguments", sep: ", " }, ")"],
+        Id: [{ prop: "name" }],
+        Builtin: [{ prop: "name" }],
+        Img: [{ image: "src", altProp: "label" }],
+      },
+      functionValues: [{ type: "Def", nameProp: "name" }],
+      hoverText: [{ type: "Builtin", textProp: "hoverText" }],
+    };
+    const def = n("Def", {
+      name: "f",
+      id: { name: "f" },
+      body: n("Call", { callee: n("Id", { name: "f" }), arguments: [] }),
+    });
+    const ast = n("Call", {
+      callee: n("Builtin", { name: "print", hoverText: "built-in function print" }),
+      arguments: [def, n("Img", { src: "data:image/png;base64,AAAA", label: "Rune" })],
+    });
+    const texts = popoverTexts(render(ast, { profile }));
+    expect(texts).toEqual(
+      expect.arrayContaining([
+        " built-in function print",
+        expect.stringContaining("def f(): f()"),
+        " Rune",
+      ]),
+    );
+  });
+});
