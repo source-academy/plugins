@@ -41,7 +41,7 @@ import { AlreadyParsedTreeNode } from "../tree/AlreadyParsedTreeNode";
 import { BinaryTreeDrawer } from "../tree/BinaryTreeDrawer";
 import { GeneralTreeDrawer } from "../tree/GeneralTreeDrawer";
 import { Tree } from "../tree/Tree";
-import { ArrayTreeNode, FunctionTreeNode } from "../tree/TreeNode";
+import { ArrayTreeNode, DataTreeNode, FunctionTreeNode } from "../tree/TreeNode";
 
 const empty = (): SerializedDataVisualizerNode => ({ type: "empty" });
 const leaf = (n: number): SerializedDataVisualizerNode => ({
@@ -143,6 +143,11 @@ describe("BinaryTreeDrawer", () => {
     expect(() => deep.draw(0, 0, 0)).not.toThrow();
     expect(deep.width).toBeGreaterThan(single.width);
     expect(deep.height).toBeGreaterThan(single.height);
+  });
+
+  test("an empty value carries the language's spelling of it through to the root node", () => {
+    const tree = Tree.fromSerializedNode({ type: "empty", displayValue: "None" });
+    expect((tree.rootNode as DataTreeNode).displayValue).toBe("None");
   });
 
   test("the bare empty terminator is a trivial valid binary tree, drawn via the measured-text branch", () => {
