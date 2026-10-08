@@ -36,6 +36,7 @@ vi.mock("react-konva", () => {
 import { Text } from "react-konva";
 
 import type { ClassificationResult } from "../classify";
+import { Config } from "../Config";
 import { ArrowDrawable, BackwardArrowDrawable } from "../drawable/Drawable";
 import { AlreadyParsedTreeNode } from "../tree/AlreadyParsedTreeNode";
 import { BinaryTreeDrawer } from "../tree/BinaryTreeDrawer";
@@ -228,6 +229,73 @@ describe("GeneralTreeDrawer", () => {
     expect(element.props.width).not.toBe(445);
     const drawn = internals(drawer).drawables;
     expect(drawn.length).toBeGreaterThan(0);
+  });
+
+  test.each([
+    ["llist(f, f, f)", "flat"],
+    ["llist(llist(1, 2), f)", "nestedFirst"],
+    ["llist(1, llist(f, 2), f)", "mixed"],
+    ["llist(llist(llist(f)), f, llist(f, f))", "deep"],
+  ])("functions in %s are drawn inside the canvas without overlapping anything", (_, shape) => {
+    const fn = (): SerializedDataVisualizerNode => ({
+      type: "function",
+      refId: nextRefId++,
+      displayValue: "<function>",
+    });
+    const llist = (...elements: SerializedDataVisualizerNode[]): SerializedDataVisualizerNode =>
+      elements.reduceRight<SerializedDataVisualizerNode>((acc, e) => pair(e, acc), empty());
+    const shapes: Record<string, () => SerializedDataVisualizerNode> = {
+      flat: () => llist(fn(), fn(), fn()),
+      nestedFirst: () => llist(llist(leaf(1), leaf(2)), fn()),
+      mixed: () => llist(leaf(1), llist(fn(), leaf(2)), fn()),
+      deep: () => llist(llist(llist(fn())), fn(), llist(fn(), fn())),
+    };
+    const tree = Tree.fromSerializedNode(shapes[shape]());
+    const drawer = tree.draw("generalTree") as GeneralTreeDrawer;
+    const stage = drawer.draw(0, 0, 0) as React.ReactElement<{ width: number; height: number }>;
+
+    // Every drawn pair (two boxes wide) and function glyph (two large circles wide), with its extent.
+    const boxes: { x: number; y: number; w: number; isFunction: boolean }[] = [];
+    let functionCount = 0;
+    const seen = new Set<unknown>();
+    const walk = (node: unknown) => {
+      if (node === undefined || seen.has(node)) return;
+      seen.add(node);
+      if (node instanceof FunctionTreeNode) {
+        functionCount++;
+        boxes.push({
+          x: node.drawableX!,
+          y: node.drawableY!,
+          w: Config.CircleRadiusLarge * 4 + Config.StrokeWidth,
+          isFunction: true,
+        });
+      }
+      if (node instanceof ArrayTreeNode) {
+        boxes.push({
+          x: node.drawableX!,
+          y: node.drawableY!,
+          w: Config.BoxWidth * 2,
+          isFunction: false,
+        });
+        node.children?.forEach(walk);
+      }
+    };
+    walk(tree.rootNode);
+    expect(functionCount).toBeGreaterThan(0);
+
+    // Bounds are checked for function glyphs only: a pair box in the rightmost column already runs
+    // 1px past the canvas on main (the width formula leaves out leftMargin), unrelated to functions.
+    for (const box of boxes.filter(b => b.isFunction)) {
+      expect(box.x + box.w).toBeLessThanOrEqual(stage.props.width);
+      expect(box.y + Config.BoxHeight).toBeLessThanOrEqual(stage.props.height);
+    }
+    for (const a of boxes) {
+      for (const b of boxes) {
+        if (a !== b && a.y === b.y) {
+          expect(a.x + a.w <= b.x || b.x + b.w <= a.x).toBe(true);
+        }
+      }
+    }
   });
 
   test("a non-general-tree structure draws the fixed-size warning box instead of a tree", () => {

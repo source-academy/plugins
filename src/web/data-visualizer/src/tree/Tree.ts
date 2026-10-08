@@ -90,6 +90,7 @@ export class Tree {
         case "function": {
           const treeNode = new FunctionTreeNode();
           refToTreeNode.set(node.refId, treeNode);
+          treeNode.nodePos = layout?.posByRefId.get(node.refId) ?? 0;
           treeNodes[nodeCount] = treeNode;
           nodeCount++;
           return treeNode;

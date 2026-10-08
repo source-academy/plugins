@@ -238,7 +238,22 @@ function computeLayout(root: SerializedDataVisualizerNode): TreeLayout {
     colorByRefId.set(node.refId, nodeColorByDepth[depth]);
 
     treeDepth = Math.max(treeDepth, depth);
-    visit(node.children[0], depth + 1, true);
+    // A function in a data slot is drawn as its own glyph one level below its pair (General Tree
+    // View), unlike a leaf, which sits inside the pair's box. Give it a column on that level, from the
+    // same counter as the pairs there, so it neither overlaps a nested list's boxes nor falls below
+    // the canvas.
+    const head = node.children[0];
+    if (head.type === "function") {
+      const fnDepth = depth + 1;
+      if (nodeCountByDepth[fnDepth] === undefined) {
+        nodeCountByDepth[fnDepth] = 0;
+      }
+      posByRefId.set(head.refId, nodeCountByDepth[fnDepth]);
+      longestNodePos = Math.max(longestNodePos, nodeCountByDepth[fnDepth]);
+      nodeCountByDepth[fnDepth]++;
+      treeDepth = Math.max(treeDepth, fnDepth);
+    }
+    visit(head, depth + 1, true);
     visit(node.children[1], depth, false);
   }
 
