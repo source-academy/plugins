@@ -215,6 +215,105 @@ describe("BinaryTreeDrawer", () => {
   });
 });
 
+describe("BinaryTreeDrawer canvas (issue #84)", () => {
+  // Python value -> wire node, the way py-slang serializes it (2-element list -> pair).
+  type Py = null | number | string | Py[];
+  const py = (v: Py): SerializedDataVisualizerNode =>
+    v === null
+      ? empty()
+      : Array.isArray(v)
+        ? { type: "array", refId: nextRefId++, children: v.map(py) }
+        : typeof v === "number"
+          ? leaf(v)
+          : { type: "leaf", displayValue: v, label: "string" };
+  const N = null;
+
+  test.each<[string, Py]>([
+    [
+      "left-skewed (case 1)",
+      [
+        1,
+        [
+          [
+            2,
+            [
+              [
+                3,
+                [
+                  [4, [N, [N, N]]],
+                  [N, N],
+                ],
+              ],
+              [N, N],
+            ],
+          ],
+          [N, N],
+        ],
+      ],
+    ],
+    [
+      "right-skewed (case 2)",
+      ["A", [N, [["B", [N, [["C", [N, [["D", [N, [N, N]]], N]]], N]]], N]]],
+    ],
+    ["right child only (case 3)", [10, [N, [[15, [N, [N, N]]], N]]]],
+  ])("every box of a %s tree is drawn inside the canvas", (_: string, value: Py) => {
+    const tree = Tree.fromSerializedNode(py(value));
+    const drawer = tree.draw("binaryTree") as BinaryTreeDrawer;
+    const stage = drawer.draw(0, 0, 0) as React.ReactElement<{
+      width: number;
+      height: number;
+      children: React.ReactElement<{ offsetX: number; offsetY: number }>;
+    }>;
+    const { offsetX, offsetY } = stage.props.children.props;
+
+    const boxes: ArrayTreeNode[] = [];
+    const walk = (node: unknown) => {
+      if (node instanceof ArrayTreeNode) {
+        boxes.push(node);
+        node.children?.forEach(walk);
+      }
+    };
+    walk(tree.rootNode);
+    expect(boxes.length).toBeGreaterThan(0);
+    for (const box of boxes) {
+      // The layer is shifted by -offsetX/-offsetY, so that is where each box actually lands.
+      const x = box.drawableX! - offsetX;
+      const y = box.drawableY! - offsetY;
+      expect(x).toBeGreaterThanOrEqual(0);
+      expect(x + Config.BoxWidth * 2).toBeLessThanOrEqual(stage.props.width);
+      expect(y).toBeGreaterThanOrEqual(0);
+      expect(y + Config.BoxHeight).toBeLessThanOrEqual(stage.props.height);
+    }
+  });
+});
+
+describe("BinaryTreeDrawer canvas margin", () => {
+  // DataVisualizerView draws with a 1px margin (Config.StrokeWidth / 2), not 0. With a margin the
+  // root's data slot is also "to the right of" runningX2's initial 0, so it must not be counted as
+  // a right branch: that would widen even a single node's canvas by hundreds of pixels.
+  const margin = Config.StrokeWidth / 2;
+  const leaf1 = (): SerializedDataVisualizerNode => leaf(1);
+  const node = (
+    left: SerializedDataVisualizerNode = empty(),
+    right: SerializedDataVisualizerNode = empty(),
+  ): SerializedDataVisualizerNode => pair(leaf1(), pair(left, pair(right, empty())));
+  const widthAt = (value: SerializedDataVisualizerNode, m: number): number => {
+    const drawer = Tree.fromSerializedNode(value).draw("binaryTree") as BinaryTreeDrawer;
+    return (drawer.draw(m, m, 0) as React.ReactElement<{ width: number }>).props.width;
+  };
+
+  test.each<[string, () => SerializedDataVisualizerNode]>([
+    ["a single node", () => node()],
+    ["a node with a right child", () => node(empty(), node())],
+    ["a node with a left child", () => node(node())],
+  ])(
+    "%s: the canvas grows only by the margin, not by a phantom branch",
+    (_: string, make: () => SerializedDataVisualizerNode) => {
+      expect(widthAt(make(), margin)).toBe(widthAt(make(), 0) + margin * 2);
+    },
+  );
+});
+
 describe("GeneralTreeDrawer", () => {
   test("draws a list of functions as a tree with three data items, not the warning box (issue #113)", () => {
     // draw_data(llist(lambda x : x, lambda y: y, lambda z: z))
