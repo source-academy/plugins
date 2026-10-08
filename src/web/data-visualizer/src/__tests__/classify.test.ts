@@ -215,3 +215,10 @@ test("a shared pair is still shared structure, even alongside functions", () => 
   expect(result.isSharedStructure).toBe(true);
   expect(result.isGeneralTree).toBe(false);
 });
+
+test("a binary-tree-shaped node whose data is itself a list is not a binary tree (issue #84, case 5)", () => {
+  // draw_data([[1, [None, [None, None]]], [None, [None, None]]])
+  const result = classify(pair(binaryNode(1), pair(empty(), pair(empty(), empty()))));
+  expect(result.isBinaryTree).toBe(false);
+  expect(result.isGeneralTree).toBe(true);
+});
