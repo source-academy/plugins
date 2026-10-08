@@ -2351,6 +2351,41 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@sourceacademy/web-e-stepper@workspace:src/web/e-stepper":
+  version: 0.0.0-use.local
+  resolution: "@sourceacademy/web-e-stepper@workspace:src/web/e-stepper"
+  dependencies:
+    "@blueprintjs/core": "npm:^6.0.0"
+    "@blueprintjs/icons": "npm:^6.0.0"
+    "@rollup/plugin-commonjs": "npm:^28.0.0"
+    "@rollup/plugin-node-resolve": "npm:^16.0.3"
+    "@rollup/plugin-replace": "npm:^6.0.3"
+    "@rollup/plugin-terser": "npm:^1.0.0"
+    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@sourceacademy/common-e-stepper": "workspace:*"
+    "@sourceacademy/common-stepper": "workspace:*"
+    "@sourceacademy/common-tabs": "workspace:^"
+    "@sourceacademy/conductor": "npm:^0.8.0"
+    "@types/react": "npm:^19.0.0"
+    "@types/react-test-renderer": "npm:^19.0.0"
+    classnames: "npm:^2.3.2"
+    konva: "npm:^9.3.0"
+    react: "npm:^19.0.0"
+    react-dom: "npm:^19.0.0"
+    react-konva: "npm:^19.0.0"
+    react-test-renderer: "npm:^19.0.0"
+    rollup: "npm:^4.60.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^6.0.3"
+  peerDependencies:
+    "@blueprintjs/core": ">=5"
+    konva: ">=9"
+    react: ">=18"
+    react-dom: ">=18"
+    react-konva: ">=18"
+  languageName: unknown
+  linkType: soft
+
 "@sourceacademy/web-module-loader@workspace:src/web/module-loader":
   version: 0.0.0-use.local
   resolution: "@sourceacademy/web-module-loader@workspace:src/web/module-loader"
@@ -2386,9 +2421,11 @@ __metadata:
     "@sourceacademy/common-tabs": "workspace:^"
     "@sourceacademy/conductor": "npm:^0.8.0"
     "@types/react": "npm:^19.0.0"
+    "@types/react-test-renderer": "npm:^19.0.0"
     classnames: "npm:^2.3.2"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
+    react-test-renderer: "npm:^19.0.0"
     rollup: "npm:^4.60.2"
     tslib: "npm:^2.8.1"
     typescript: "npm:^6.0.3"
