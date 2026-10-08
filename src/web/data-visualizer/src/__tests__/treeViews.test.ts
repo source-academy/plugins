@@ -215,6 +215,21 @@ describe("BinaryTreeDrawer", () => {
 });
 
 describe("GeneralTreeDrawer", () => {
+  test("draws a list of functions as a tree with three data items, not the warning box (issue #113)", () => {
+    // draw_data(llist(lambda x : x, lambda y: y, lambda z: z))
+    const fn = (): SerializedDataVisualizerNode => ({
+      type: "function",
+      refId: nextRefId++,
+      displayValue: "<function>",
+    });
+    const tree = Tree.fromSerializedNode(pair(fn(), pair(fn(), pair(fn(), empty()))));
+    const drawer = tree.draw("generalTree") as GeneralTreeDrawer;
+    const element = drawer.draw(0, 0, 0) as React.ReactElement<{ width: number }>;
+    expect(element.props.width).not.toBe(445);
+    const drawn = internals(drawer).drawables;
+    expect(drawn.length).toBeGreaterThan(0);
+  });
+
   test("a non-general-tree structure draws the fixed-size warning box instead of a tree", () => {
     // An *improper* list (here, a bare 2-tuple whose second slot is a leaf rather than another pair
     // or the empty terminator) is the only shape General Tree View actually rejects — a binary-tree-
