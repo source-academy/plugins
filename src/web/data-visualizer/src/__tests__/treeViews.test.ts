@@ -306,9 +306,12 @@ describe("BinaryTreeDrawer canvas margin", () => {
     ["a single node", () => node()],
     ["a node with a right child", () => node(empty(), node())],
     ["a node with a left child", () => node(node())],
-  ])("%s: the canvas grows only by the margin, not by a phantom branch", (_: string, make) => {
-    expect(widthAt(make(), margin)).toBe(widthAt(make(), 0) + margin * 2);
-  });
+  ])(
+    "%s: the canvas grows only by the margin, not by a phantom branch",
+    (_: string, make: () => SerializedDataVisualizerNode) => {
+      expect(widthAt(make(), margin)).toBe(widthAt(make(), 0) + margin * 2);
+    },
+  );
 });
 
 describe("GeneralTreeDrawer", () => {
