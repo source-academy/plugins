@@ -72,7 +72,7 @@ export class Tree {
           return already ? new AlreadyParsedTreeNode(already) : DataTreeNode.empty();
         }
         case "empty":
-          return DataTreeNode.empty();
+          return DataTreeNode.empty(node.displayValue);
         case "leaf":
           return DataTreeNode.leaf(node.displayValue, node.label);
         case "array": {
