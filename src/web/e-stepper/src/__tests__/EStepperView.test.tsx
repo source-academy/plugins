@@ -1,26 +1,17 @@
 import type { EStepperStep, SyntaxProfile } from "@sourceacademy/common-e-stepper";
-import { act } from "react";
+import { act, createElement } from "react";
+import { Button } from "@blueprintjs/core";
 import TestRenderer from "react-test-renderer";
 import { describe, expect, test, vi } from "vitest";
 
 // As in the data visualizer's tests: avoid Konva's Node build (it requires the optional `canvas`).
 vi.mock("konva", () => ({ default: {} }));
 vi.mock("react-konva", () => {
-  const stub = (name: string) => {
-    const fn = () => null;
-    Object.defineProperty(fn, "name", { value: name });
-    return fn;
-  };
-  return {
-    Stage: stub("Stage"),
-    Layer: stub("Layer"),
-    Text: stub("Text"),
-    Group: stub("Group"),
-    Line: stub("Line"),
-    Rect: stub("Rect"),
-    Circle: stub("Circle"),
-    Arrow: stub("Arrow"),
-  };
+  const stub = (name: string) => (props: Record<string, unknown>) =>
+    createElement(`konva-${name.toLowerCase()}`, props, props.children as never);
+  return Object.fromEntries(
+    ["Stage", "Layer", "Text", "Group", "Line", "Rect", "Circle", "Arrow"].map(n => [n, stub(n)]),
+  );
 });
 
 import EStepperView from "../EStepperView";
@@ -60,10 +51,13 @@ const withRefs: EStepperStep = {
   },
 };
 
-function render(props: Parameters<typeof EStepperView>[0]) {
+/** Renders the view; every element reports `width` x 600 as its size (there is no DOM here). */
+function render(props: Parameters<typeof EStepperView>[0], width = 600) {
   let renderer!: TestRenderer.ReactTestRenderer;
   act(() => {
-    renderer = TestRenderer.create(<EStepperView {...props} />);
+    renderer = TestRenderer.create(<EStepperView {...props} />, {
+      createNodeMock: () => ({ getBoundingClientRect: () => ({ width, height: 600 }) }),
+    });
   });
   return renderer;
 }
@@ -120,5 +114,70 @@ describe("EStepperView", () => {
     expect(all).toContain("Evaluation complete");
     expect(all).toContain("Output");
     expect(all).toContain("50");
+  });
+
+  test("draws the environment diagram for the current step", () => {
+    const view = render({ steps: [fixture[1]], profile });
+    expect(view.root.findAllByType("konva-stage")).toHaveLength(1);
+  });
+
+  test("stacks the panes in a narrow tab, with a divider that resizes the program pane", () => {
+    const view = render({ steps: [fixture[1]], profile });
+    const main = view.root.find(n => hasClass(n, "estepper-main"));
+    expect(hasClass(main, "narrow")).toBe(true);
+    const listeners: Record<string, (e: { clientY: number }) => void> = {};
+    vi.stubGlobal("window", {
+      addEventListener: (type: string, fn: (e: { clientY: number }) => void) =>
+        (listeners[type] = fn),
+      removeEventListener: (type: string) => delete listeners[type],
+    });
+    const divider = view.root.find(n => hasClass(n, "estepper-divider"));
+    act(() => divider.props.onPointerDown({ clientY: 100 }));
+    act(() => listeners.pointermove({ clientY: 160 }));
+    const left = view.root.find(n => hasClass(n, "estepper-left"));
+    expect(left.props.style.flex).toBe("0 0 300px");
+    act(() => listeners.pointerup({ clientY: 160 }));
+    expect(listeners.pointermove).toBeUndefined();
+    vi.unstubAllGlobals();
+  });
+
+  test("puts the panes side by side in a wide tab", () => {
+    const view = render({ steps: [fixture[1]], profile }, 1200);
+    const main = view.root.find(n => hasClass(n, "estepper-main"));
+    expect(hasClass(main, "narrow")).toBe(false);
+    expect(view.root.findAll(n => hasClass(n, "estepper-divider"))).toHaveLength(0);
+  });
+
+  test("steps with the buttons and the keyboard", () => {
+    const view = render({ steps: fixture, profile });
+    const explanation = () =>
+      text(view.root.findAll(n => n.props.className === "result-output")[0]);
+    const press = (key: string) =>
+      act(() =>
+        view.root
+          .find(n => hasClass(n, "sa-e-stepper"))
+          .props.onKeyDown({ key, preventDefault: () => {} }),
+      );
+    expect(explanation()).toBe("Start of evaluation");
+    press("e");
+    expect(explanation()).toBe("Evaluation complete");
+    press("b");
+    expect(explanation()).toBe("Assigned balance = 50 in frame E1");
+    press("a");
+    expect(explanation()).toBe("Start of evaluation");
+    press("f");
+    expect(explanation()).toBe("Assigned balance = 50 in frame E1");
+    const buttons = view.root.findAllByType(Button);
+    act(() => buttons[3].props.onClick());
+    expect(explanation()).toBe("Evaluation complete");
+    act(() => buttons[0].props.onClick());
+    expect(explanation()).toBe("Start of evaluation");
+  });
+
+  test("the output strip can be collapsed", () => {
+    const view = render({ steps: [fixture[2]], profile });
+    const toggle = view.root.find(n => hasClass(n, "estepper-output-toggle"));
+    act(() => toggle.props.onClick());
+    expect(view.root.findAll(n => hasClass(n, "estepper-output"))).toHaveLength(0);
   });
 });
