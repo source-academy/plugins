@@ -116,7 +116,7 @@ describe("EnvDiagram", () => {
     expect(onHoverFrame).toHaveBeenLastCalledWith(null);
     const highlighted = root
       .findAllByType(konva("konva-rect"))
-      .filter(r => r.props.fill === DiagramColors.frameHover);
+      .filter(r => r.props.fill === DiagramColors.hoverBackground);
     expect(highlighted).toHaveLength(1);
     // Every frame box is filled, so its whole area takes the mouse.
     const boxes = root.findAllByType(konva("konva-rect")).filter(r => r.props.cornerRadius === 6);
@@ -166,12 +166,14 @@ describe("EnvDiagram", () => {
     expect(slashes).toHaveLength(2);
   });
 
-  test("a hovered object is drawn highlighted", () => {
+  test("a hovered object gets a darker background, keeping its outline", () => {
     const { root } = draw({ hovered: "#2" });
-    const hoveredCircles = root
+    const darkened = root
       .findAllByType(konva("konva-circle"))
-      .filter(c => c.props.stroke === DiagramColors.hover);
-    expect(hoveredCircles).toHaveLength(2);
+      .filter(c => c.props.fill === DiagramColors.hoverBackground);
+    // The function object's two circles, outlined as usual.
+    expect(darkened).toHaveLength(2);
+    for (const c of darkened) expect(c.props.stroke).toBe(DiagramColors.stroke);
   });
 
   test("zooms around the pointer with the mouse wheel and remembers a pan", () => {
