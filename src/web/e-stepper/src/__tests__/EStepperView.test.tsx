@@ -1,3 +1,4 @@
+import type { CseDiagramViewProps } from "@sourceacademy/common-cse-machine";
 import type { EStepperStep, SyntaxProfile } from "@sourceacademy/common-e-stepper";
 import { act, createElement } from "react";
 import { Button } from "@blueprintjs/core";
@@ -76,7 +77,6 @@ describe("EStepperView", () => {
   test("shows the welcome text before anything has run", () => {
     const view = render({ steps: [] });
     expect(text(view.root)).toContain("Welcome to the environment stepper");
-    expect(text(view.root)).toContain("Hover over a reference to find its object");
   });
 
   test("shows a runner error", () => {
@@ -191,7 +191,7 @@ describe("EStepperView", () => {
       cse: { stepIndex: i, control: [], stash: [], environments: [] },
     }));
     const service = () => {
-      const createView = vi.fn((props: { snapshots: unknown[]; step: number }) =>
+      const createView = vi.fn((props: CseDiagramViewProps) =>
         createElement("host-cse-view", { "data-step": props.step }),
       );
       return { createView };
@@ -221,10 +221,15 @@ describe("EStepperView", () => {
       expect(view.root.findAllByType(konva("konva-stage"))).toHaveLength(1);
     });
 
-    test("does not promise hover linking with it, which it does not support yet", () => {
-      const view = render({ steps: [], cseDiagram: service() });
-      expect(text(view.root)).toContain("Welcome to the environment stepper");
-      expect(text(view.root)).not.toContain("Hover over a reference");
+    test("shares the hovered object with it", () => {
+      const cseDiagram = service();
+      const view = render({ steps: withCse, profile, cseDiagram });
+      const { onHover } = cseDiagram.createView.mock.calls.at(-1)![0];
+      act(() => onHover!("#1"));
+      expect(cseDiagram.createView.mock.calls.at(-1)![0].hovered).toBe("#1");
+      act(() => onHover!(null));
+      expect(cseDiagram.createView.mock.calls.at(-1)![0].hovered).toBeNull();
+      expect(view.root.findAllByType(konva("konva-stage"))).toHaveLength(0);
     });
   });
 });

@@ -50,6 +50,12 @@ export interface CseSerializedValue {
   tag?: string;
   /** Language-specific extra data (closure frame id, element refs, etc.). */
   metadata?: unknown;
+  /**
+   * For a value that refers to a heap object (a list, a closure): a stable id of that object,
+   * unique within a run, if the evaluator names its objects. A plugin that draws the snapshot
+   * through {@link ICseDiagramService} uses it to refer to the object, e.g. to highlight it.
+   */
+  objectId?: string;
 }
 
 /**
@@ -157,6 +163,13 @@ export interface CseDiagramViewProps {
   snapshots: CseSnapshot[];
   /** The 0-based index of the snapshot to draw. */
   step: number;
+  /** The {@link CseSerializedValue.objectId} of the heap object to highlight, if any. */
+  hovered?: string | null;
+  /**
+   * Called with a heap object's {@link CseSerializedValue.objectId} when the mouse enters the
+   * object in the diagram, and with `null` when it leaves.
+   */
+  onHover?: (objectId: string | null) => void;
 }
 
 /**
