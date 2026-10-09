@@ -32,6 +32,8 @@ import { injectEStepperStyles } from "./styles";
 const WIDE_LAYOUT_MIN_WIDTH = 900;
 const DEFAULT_PROGRAM_HEIGHT = 240;
 const MIN_PANE_HEIGHT = 80;
+/** In a stacked tab: the two 8px gaps around the divider, its 6px, and its two 2px margins. */
+const STACKED_DIVIDER_SPACE = 2 * 8 + 6 + 2 * 2;
 /**
  * In a wide tab, the program pane's share of the width left for the two panes, and the least width
  * of either pane. That width is the tab's less the two 8px gaps around the divider and the
@@ -83,6 +85,26 @@ const MIN_TAB_HEIGHT = 400;
 const BOTTOM_GAP = 16;
 
 /**
+ * What lies between the bottom of `element` and the bottom of the browser window, however the host
+ * lays it out: the bottom margin, padding and border of the element and of every container around
+ * it. A tab that ends short of that by less than this overflows its container, which then shows a
+ * scroll bar (and so does the container around that: the host's panels nest). Without styles to
+ * ask (no DOM), the fixed gap.
+ */
+function bottomInset(element: HTMLElement): number {
+  if (typeof getComputedStyle !== "function") return BOTTOM_GAP;
+  let inset = 0;
+  for (let e: HTMLElement | null = element; e && e !== document.body; e = e.parentElement) {
+    const style = getComputedStyle(e);
+    inset +=
+      (parseFloat(style.marginBottom) || 0) +
+      (parseFloat(style.paddingBottom) || 0) +
+      (parseFloat(style.borderBottomWidth) || 0);
+  }
+  return Math.max(BOTTOM_GAP, Math.ceil(inset));
+}
+
+/**
  * The height that takes `element` from where it starts down to the bottom of the browser window
  * (as the CSE Machine tab does): the side-content area the tab is in does not give it a height of
  * its own to fill. Worked out again when the window is resized, when the element comes into view
@@ -95,7 +117,9 @@ function useFillHeight(element: HTMLElement | null): number | undefined {
     if (!element || typeof window === "undefined") return;
     const top = element.getBoundingClientRect().top;
     if (!Number.isFinite(top)) return;
-    setHeight(Math.max(MIN_TAB_HEIGHT, Math.floor(window.innerHeight - top - BOTTOM_GAP)));
+    setHeight(
+      Math.max(MIN_TAB_HEIGHT, Math.floor(window.innerHeight - top - bottomInset(element))),
+    );
   }, [element]);
   useEffect(() => {
     if (!element || typeof window === "undefined") return;
@@ -168,6 +192,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
     [containerRef],
   );
   const [diagramRef, diagramSize] = useSize();
+  const [mainRef, mainSize] = useSize();
 
   useEffect(() => {
     injectStepperStyles();
@@ -259,12 +284,22 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
     },
   };
 
+  // In a stacked tab the program pane keeps room for the divider and for the least of the diagram
+  // below it, at the tab's current height, however far the divider was dragged: the divider is
+  // always in view, to be dragged back.
+  const maxProgramHeight =
+    mainSize.height > 0
+      ? Math.max(MIN_PANE_HEIGHT, mainSize.height - STACKED_DIVIDER_SPACE - MIN_PANE_HEIGHT)
+      : Infinity;
+  const stackedProgramHeight = Math.min(programHeight, maxProgramHeight);
   const startResize = useCallback(
     (event: React.PointerEvent) => {
       const startY = event.clientY;
-      const startHeight = programHeight;
+      const startHeight = stackedProgramHeight;
       const onMove = (e: PointerEvent) =>
-        setProgramHeight(Math.max(MIN_PANE_HEIGHT, startHeight + e.clientY - startY));
+        setProgramHeight(
+          Math.min(maxProgramHeight, Math.max(MIN_PANE_HEIGHT, startHeight + e.clientY - startY)),
+        );
       const onUp = () => {
         window.removeEventListener("pointermove", onMove);
         window.removeEventListener("pointerup", onUp);
@@ -272,7 +307,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
       window.addEventListener("pointermove", onMove);
       window.addEventListener("pointerup", onUp);
     },
-    [programHeight],
+    [stackedProgramHeight, maxProgramHeight],
   );
 
   // In a wide tab, the divider between the panes sets the program pane's share of the width left
@@ -391,10 +426,12 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
           <Card style={{ ...CARD_STYLE, margin: "8px 0" }}>
             <Pre className="result-output">{explanation}</Pre>
           </Card>
-          <div className={classNames("estepper-main", { narrow: !wide })}>
+          <div ref={mainRef} className={classNames("estepper-main", { narrow: !wide })}>
             <div
               className="estepper-left"
-              style={wide ? { flex: `0 0 ${programWidth}px` } : { flex: `0 0 ${programHeight}px` }}
+              style={
+                wide ? { flex: `0 0 ${programWidth}px` } : { flex: `0 0 ${stackedProgramHeight}px` }
+              }
             >
               <div className="estepper-program" style={{ flex: 1 }}>
                 <CustomASTRenderer {...step!} profile={profile} nodeRenderers={nodeRenderers} />

@@ -152,6 +152,31 @@ describe("EStepperView", () => {
     vi.unstubAllGlobals();
   });
 
+  test("the divider can not be dragged out of view: the diagram below keeps its least height", () => {
+    // The panes' container is 600px high (see `render`'s node mock): 80px stay for the diagram,
+    // and 26px for the divider and its gaps.
+    const view = render({ steps: [fixture[1]], profile });
+    const listeners: Record<string, (e: { clientY: number }) => void> = {};
+    vi.stubGlobal("window", {
+      addEventListener: (type: string, fn: (e: { clientY: number }) => void) =>
+        (listeners[type] = fn),
+      removeEventListener: (type: string) => delete listeners[type],
+    });
+    const divider = view.root.find(n => hasClass(n, "estepper-divider"));
+    act(() => divider.props.onPointerDown({ clientY: 0 }));
+    act(() => listeners.pointermove({ clientY: 100000 }));
+    const left = view.root.find(n => hasClass(n, "estepper-left"));
+    expect(left.props.style.flex).toBe("0 0 494px");
+    act(() => listeners.pointerup({ clientY: 100000 }));
+    // And back: the divider is still there to be dragged.
+    act(() =>
+      view.root.find(n => hasClass(n, "estepper-divider")).props.onPointerDown({ clientY: 0 }),
+    );
+    act(() => listeners.pointermove({ clientY: -100000 }));
+    expect(view.root.find(n => hasClass(n, "estepper-left")).props.style.flex).toBe("0 0 80px");
+    vi.unstubAllGlobals();
+  });
+
   test("puts the panes side by side in a wide tab, with a divider that resizes the program pane", () => {
     // The tab's size, as the ResizeObservers report it (one for the tab, one for the diagram).
     const observers: ((entries: { contentRect: { width: number; height: number } }[]) => void)[] =
@@ -219,6 +244,38 @@ describe("EStepperView", () => {
     browser.innerHeight = 500;
     act(() => renderer.update(<EStepperView steps={[fixture[1]]} profile={profile} />));
     expect(root().props.style).toEqual({ height: 400 });
+    vi.unstubAllGlobals();
+  });
+
+  test("leaves room for the margins and paddings of the containers around it", () => {
+    // As in the Source Academy frontend: a margin on the tab, and margins and paddings on the
+    // panels around it, each of which would make a panel scroll if the tab went down to the
+    // bottom of the window regardless.
+    const margins = [15, 6.4, 0, 6.4, 9.6];
+    const chain = margins.map(m => ({ m }));
+    chain.forEach((link, i) => Object.assign(link, { parentElement: chain[i + 1] ?? null }));
+    const element = {
+      getBoundingClientRect: () => ({ top: 164, width: 600, height: 600 }),
+      ...chain[0],
+    };
+    let renderer!: TestRenderer.ReactTestRenderer;
+    act(() => {
+      renderer = TestRenderer.create(<EStepperView steps={[fixture[1]]} profile={profile} />, {
+        createNodeMock: () => element,
+      });
+    });
+    vi.stubGlobal("window", { innerHeight: 676, addEventListener() {}, removeEventListener() {} });
+    vi.stubGlobal("document", { body: {} });
+    vi.stubGlobal("getComputedStyle", (e: { m: number }) => ({
+      marginBottom: `${e.m}px`,
+      paddingBottom: "0px",
+      borderBottomWidth: "0px",
+    }));
+    act(() => renderer.update(<EStepperView steps={[fixture[1]]} profile={profile} />));
+    // 676 - 164 - ceil(15 + 6.4 + 6.4 + 9.6)
+    expect(renderer.root.find(n => hasClass(n, "sa-e-stepper")).props.style).toEqual({
+      height: 676 - 164 - 38,
+    });
     vi.unstubAllGlobals();
   });
 
