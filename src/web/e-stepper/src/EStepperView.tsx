@@ -65,6 +65,24 @@ export function sliderLabels(last: number): number[] {
   return labels.length > 0 ? labels : [0];
 }
 
+/** Whether the step is a stop for breakpoint navigation: it evaluates a `breakpoint()` statement. */
+const isBreakpoint = (step: EStepperStep): boolean =>
+  step.markers?.some(m => m.redexNodeType === "DebuggerStatement") ?? false;
+
+/** The step value (1-based) of the next breakpoint after `value`, or of the last step. */
+export function nextBreakpoint(steps: EStepperStep[], value: number): number {
+  for (let i = value; i < steps.length; i++) if (isBreakpoint(steps[i])) return i + 1;
+  return Math.max(1, steps.length);
+}
+
+/** The step value (1-based) of the previous breakpoint before `value`, or of the first step. */
+export function previousBreakpoint(steps: EStepperStep[], value: number): number {
+  for (let i = Math.min(value, steps.length) - 2; i >= 0; i--) {
+    if (isBreakpoint(steps[i])) return i + 1;
+  }
+  return 1;
+}
+
 function DefaultText() {
   return (
     <div className={Classes.RUNNING_TEXT}>
@@ -80,7 +98,8 @@ function DefaultText() {
       <br />
       <br />
       Keyboard shortcuts (click on the explanation first): f / b for the next / previous step, a / e
-      for the first / last step.
+      for the previous / next breakpoint (a breakpoint() statement in your program), or the first /
+      last step if there is none.
     </div>
   );
 }
@@ -221,15 +240,17 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
   const step = hasRun ? steps[stepIndex] : undefined;
   const wide = containerSize.width >= WIDE_LAYOUT_MIN_WIDTH;
 
-  const stepFirst = () => setStepValue(1);
-  const stepLast = () => setStepValue(Math.max(1, lastStep));
+  // The double arrows (and `a` / `e`) jump to the previous / next breakpoint, or to the first / last
+  // step when there is none, as in the stepper.
+  const stepPreviousBreakpoint = () => setStepValue(v => previousBreakpoint(steps, v));
+  const stepNextBreakpoint = () => setStepValue(v => nextBreakpoint(steps, v));
   const stepPrevious = () => setStepValue(v => Math.max(1, v - 1));
   const stepNext = () => setStepValue(v => Math.min(lastStep, v + 1));
   const hotkeys: Record<string, () => void> = {
-    a: stepFirst,
+    a: stepPreviousBreakpoint,
     f: stepNext,
     b: stepPrevious,
-    e: stepLast,
+    e: stepNextBreakpoint,
   };
   const onKeyDown = (event: React.KeyboardEvent) => {
     const action = hasRun ? hotkeys[event.key] : undefined;
@@ -394,10 +415,10 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
           />
           <div style={{ display: "flex", justifyContent: "center" }}>
             <ButtonGroup>
-              <Button icon="double-chevron-left" onClick={stepFirst} />
+              <Button icon="double-chevron-left" onClick={stepPreviousBreakpoint} />
               <Button icon="chevron-left" onClick={stepPrevious} />
               <Button icon="chevron-right" onClick={stepNext} />
-              <Button icon="double-chevron-right" onClick={stepLast} />
+              <Button icon="double-chevron-right" onClick={stepNextBreakpoint} />
             </ButtonGroup>
             {usingHostDiagram ? null : (
               // The host's diagram has its own toolbar for these (its arrow filters, "Clear Dead
