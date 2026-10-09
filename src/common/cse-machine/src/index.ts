@@ -95,6 +95,12 @@ export interface CseSerializedEnvFrame {
   id: string;
   /** Display name of the frame (e.g. function name, `"global"`, `"block"`). */
   name: string;
+  /**
+   * The frame's heading, if the evaluator chooses it (e.g. `"Global"` and `"Built-ins"` for
+   * Python's module and builtins frames). Without it, the host derives one from `name` (e.g.
+   * `"Program"` for `"programEnvironment"`).
+   */
+  label?: string;
   /** Id of the lexical parent frame, or `null` for the root. */
   parentId: string | null;
   /** For a closure value's frame: the id of the frame the closure was defined in. */
