@@ -32,6 +32,8 @@ import { injectEStepperStyles } from "./styles";
 const WIDE_LAYOUT_MIN_WIDTH = 900;
 const DEFAULT_PROGRAM_HEIGHT = 240;
 const MIN_PANE_HEIGHT = 80;
+/** In a stacked tab: the two 8px gaps around the divider, its 6px, and its two 2px margins. */
+const STACKED_DIVIDER_SPACE = 2 * 8 + 6 + 2 * 2;
 /**
  * In a wide tab, the program pane's share of the width left for the two panes, and the least width
  * of either pane. That width is the tab's less the two 8px gaps around the divider and the
@@ -168,6 +170,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
     [containerRef],
   );
   const [diagramRef, diagramSize] = useSize();
+  const [mainRef, mainSize] = useSize();
 
   useEffect(() => {
     injectStepperStyles();
@@ -259,12 +262,22 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
     },
   };
 
+  // In a stacked tab the program pane keeps room for the divider and for the least of the diagram
+  // below it, at the tab's current height, however far the divider was dragged: the divider is
+  // always in view, to be dragged back.
+  const maxProgramHeight =
+    mainSize.height > 0
+      ? Math.max(MIN_PANE_HEIGHT, mainSize.height - STACKED_DIVIDER_SPACE - MIN_PANE_HEIGHT)
+      : Infinity;
+  const stackedProgramHeight = Math.min(programHeight, maxProgramHeight);
   const startResize = useCallback(
     (event: React.PointerEvent) => {
       const startY = event.clientY;
-      const startHeight = programHeight;
+      const startHeight = stackedProgramHeight;
       const onMove = (e: PointerEvent) =>
-        setProgramHeight(Math.max(MIN_PANE_HEIGHT, startHeight + e.clientY - startY));
+        setProgramHeight(
+          Math.min(maxProgramHeight, Math.max(MIN_PANE_HEIGHT, startHeight + e.clientY - startY)),
+        );
       const onUp = () => {
         window.removeEventListener("pointermove", onMove);
         window.removeEventListener("pointerup", onUp);
@@ -272,7 +285,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
       window.addEventListener("pointermove", onMove);
       window.addEventListener("pointerup", onUp);
     },
-    [programHeight],
+    [stackedProgramHeight, maxProgramHeight],
   );
 
   // In a wide tab, the divider between the panes sets the program pane's share of the width left
@@ -391,10 +404,12 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
           <Card style={{ ...CARD_STYLE, margin: "8px 0" }}>
             <Pre className="result-output">{explanation}</Pre>
           </Card>
-          <div className={classNames("estepper-main", { narrow: !wide })}>
+          <div ref={mainRef} className={classNames("estepper-main", { narrow: !wide })}>
             <div
               className="estepper-left"
-              style={wide ? { flex: `0 0 ${programWidth}px` } : { flex: `0 0 ${programHeight}px` }}
+              style={
+                wide ? { flex: `0 0 ${programWidth}px` } : { flex: `0 0 ${stackedProgramHeight}px` }
+              }
             >
               <div className="estepper-program" style={{ flex: 1 }}>
                 <CustomASTRenderer {...step!} profile={profile} nodeRenderers={nodeRenderers} />

@@ -54,4 +54,8 @@ test("the dividers between the panes never shrink away, however short the tab is
     css.slice(css.indexOf(selector), css.indexOf("}", css.indexOf(selector)));
   expect(rule(".sa-e-stepper .estepper-divider {")).toContain("flex: 0 0 auto");
   expect(rule(".sa-e-stepper .estepper-divider.vertical")).toContain("flex: 0 0 auto");
+  // Above the arrows from the program (which are drawn over both panes), so they pass under it.
+  expect(rule(".sa-e-stepper .estepper-divider {")).toContain("z-index: 3");
+  // A stacked tab leaves the diagram room for no more than its least height.
+  expect(css).toContain(".estepper-main.narrow .estepper-diagram { min-height: 80px; }");
 });
