@@ -354,7 +354,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
               content={
                 <div className="estepper-options">
                   <Switch
-                    label="Program references"
+                    label="From program"
                     checked={showArrows}
                     onChange={e => setShowArrows(e.currentTarget.checked)}
                   />

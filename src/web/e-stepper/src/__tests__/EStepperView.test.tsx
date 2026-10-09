@@ -268,14 +268,14 @@ describe("EStepperView", () => {
     test("arrows are off by default", () => {
       const view = render({ steps: fixture, profile });
       expect(view.root.findAllByType(ProgramArrows)).toHaveLength(0);
-      expect(options(view)["Program references"].props.checked).toBe(false);
+      expect(options(view)["From program"].props.checked).toBe(false);
     });
 
     test("arrows are drawn once the user turns them on and the diagram reports anchors", () => {
       const view = render({ steps: fixture, profile });
       const diagram = view.root.find(n => n.props.onAnchors && n.props.frames);
       act(() => diagram.props.onAnchors(() => ({ x: 1, y: 2 })));
-      const arrows = options(view)["Program references"];
+      const arrows = options(view)["From program"];
       expect(arrows.props.checked).toBe(false);
       act(() => arrows.props.onChange({ currentTarget: { checked: true } }));
       expect(view.root.findAllByType(ProgramArrows)).toHaveLength(1);
