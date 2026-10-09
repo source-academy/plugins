@@ -27,6 +27,9 @@ interface Props {
   /** The heap object under the mouse (in either pane), or null. */
   hovered: string | null;
   onHover: (objectId: string | null) => void;
+  /** The frame under the mouse (in either pane), or null. */
+  hoveredFrame?: string | null;
+  onHoverFrame?: (frameId: string | null) => void;
   width: number;
   height: number;
 }
@@ -78,6 +81,8 @@ export default function EnvDiagram(props: Props) {
             key={box.frame.id}
             box={box}
             active={box.frame.id === props.activeFrameId}
+            hovered={props.hoveredFrame === box.frame.id}
+            onHover={props.onHoverFrame}
             lookedUp={lookedUp}
           />
         ))}
@@ -97,12 +102,22 @@ export default function EnvDiagram(props: Props) {
   );
 }
 
-function FrameDrawing(props: { box: FrameBox; active: boolean; lookedUp: Set<string> }) {
+function FrameDrawing(props: {
+  box: FrameBox;
+  active: boolean;
+  hovered: boolean;
+  onHover?: (frameId: string | null) => void;
+  lookedUp: Set<string>;
+}) {
   const { box } = props;
   const color = frameColor(box.index);
   const boxTop = box.y + C.headerHeight;
   return (
-    <Group opacity={box.frame.isGarbage ? DiagramColors.garbageOpacity : 1}>
+    <Group
+      opacity={box.frame.isGarbage ? DiagramColors.garbageOpacity : 1}
+      onMouseEnter={() => props.onHover?.(box.frame.id)}
+      onMouseLeave={() => props.onHover?.(null)}
+    >
       <Text
         x={box.x}
         y={box.y + 2}
@@ -119,6 +134,9 @@ function FrameDrawing(props: { box: FrameBox; active: boolean; lookedUp: Set<str
         height={box.height}
         stroke={color}
         strokeWidth={props.active ? 4 : 2}
+        // Filled even when not hovered (transparently), so the whole box takes the mouse, not just
+        // its outline and contents.
+        fill={props.hovered ? DiagramColors.frameHover : "rgba(0, 0, 0, 0)"}
         cornerRadius={6}
         shadowColor={props.active ? color : undefined}
         shadowBlur={props.active ? 10 : 0}
