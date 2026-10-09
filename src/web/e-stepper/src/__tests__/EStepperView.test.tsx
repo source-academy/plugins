@@ -145,11 +145,74 @@ describe("EStepperView", () => {
     vi.unstubAllGlobals();
   });
 
-  test("puts the panes side by side in a wide tab", () => {
+  test("puts the panes side by side in a wide tab, with a divider that resizes the program pane", () => {
+    // The tab's size, as the ResizeObservers report it (one for the tab, one for the diagram).
+    const observers: ((entries: { contentRect: { width: number; height: number } }[]) => void)[] =
+      [];
+    const resize = (width: number) =>
+      observers.forEach(callback => callback([{ contentRect: { width, height: 600 } }]));
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        constructor(callback: (typeof observers)[number]) {
+          observers.push(callback);
+        }
+        observe() {}
+        disconnect() {}
+      },
+    );
     const view = render({ steps: [fixture[1]], profile }, 1200);
     const main = view.root.find(n => hasClass(n, "estepper-main"));
     expect(hasClass(main, "narrow")).toBe(false);
-    expect(view.root.findAll(n => hasClass(n, "estepper-divider"))).toHaveLength(0);
+    const left = () => view.root.find(n => hasClass(n, "estepper-left")).props.style.flex;
+    // 1200px wide, of which 1182px are left for the panes (2 gaps of 8px, and 2px of divider).
+    expect(left()).toBe(`0 0 ${Math.round(0.45 * 1182)}px`);
+    const listeners: Record<string, (e: { clientX: number }) => void> = {};
+    vi.stubGlobal("window", {
+      addEventListener: (type: string, fn: (e: { clientX: number }) => void) =>
+        (listeners[type] = fn),
+      removeEventListener: (type: string) => delete listeners[type],
+    });
+    const divider = view.root.find(n => hasClass(n, "estepper-divider"));
+    expect(hasClass(divider, "vertical")).toBe(true);
+    act(() => divider.props.onPointerDown({ clientX: 600, preventDefault: () => {} }));
+    act(() => listeners.pointermove({ clientX: 480 }));
+    expect(left()).toBe(`0 0 ${Math.round(0.45 * 1182) - 120}px`);
+    // Either pane keeps at least 200px.
+    act(() => listeners.pointermove({ clientX: 0 }));
+    expect(left()).toBe("0 0 200px");
+    act(() => listeners.pointermove({ clientX: 2000 }));
+    expect(left()).toBe(`0 0 ${1182 - 200}px`);
+    act(() => listeners.pointerup({ clientX: 2000 }));
+    expect(listeners.pointermove).toBeUndefined();
+    // ...also when the tab is narrowed afterwards.
+    act(() => resize(900));
+    expect(left()).toBe(`0 0 ${900 - 18 - 200}px`);
+    vi.unstubAllGlobals();
+  });
+
+  test("fills the height down to the bottom of the browser window", () => {
+    let renderer!: TestRenderer.ReactTestRenderer;
+    const element = <EStepperView steps={[fixture[1]]} profile={profile} />;
+    act(() => {
+      renderer = TestRenderer.create(element, {
+        createNodeMock: () => ({
+          getBoundingClientRect: () => ({ top: 200, width: 600, height: 600 }),
+        }),
+      });
+    });
+    const root = () => renderer.root.find(n => hasClass(n, "sa-e-stepper"));
+    // (The test environment has no window until stubbed: then the height is worked out again.)
+    const browser = { innerHeight: 1000, addEventListener() {}, removeEventListener() {} };
+    vi.stubGlobal("window", browser);
+    act(() => renderer.update(<EStepperView steps={[fixture[1]]} profile={profile} />));
+    // From its top (200px) to the window's bottom (1000px), less a 16px gap...
+    expect(root().props.style).toEqual({ height: 784 });
+    // ...but never less than 400px.
+    browser.innerHeight = 500;
+    act(() => renderer.update(<EStepperView steps={[fixture[1]]} profile={profile} />));
+    expect(root().props.style).toEqual({ height: 400 });
+    vi.unstubAllGlobals();
   });
 
   test("steps with the buttons and the keyboard", () => {
@@ -228,11 +291,15 @@ describe("EStepperView", () => {
       const props = () => cseDiagram.createView.mock.calls.at(-1)![0];
       const first = withCse[1];
       expect(Object.keys(props().frameColors ?? {})).toEqual(first.frames.map(f => f.id));
-      // The program's frame labels report hovering...
+      // The program's environment blocks report hovering...
       const label = view.root.findAll(n => hasClass(n, "estepper-envblock-label"))[0];
-      act(() => label.props.onMouseEnter());
+      const block = view.root.findAll(n => hasClass(n, "estepper-envblock"))[0];
+      const stopPropagation = vi.fn();
+      act(() => block.props.onMouseOver({ stopPropagation }));
       expect(props().hoveredFrame).toBe(text(label));
-      act(() => label.props.onMouseLeave());
+      // (the innermost block under the mouse: the event goes no further)
+      expect(stopPropagation).toHaveBeenCalled();
+      act(() => block.props.onMouseLeave());
       expect(props().hoveredFrame).toBeNull();
       // ...and a frame hovered in the diagram is highlighted in the program.
       act(() => props().onHoverFrame!(text(label)));
