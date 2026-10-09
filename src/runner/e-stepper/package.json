@@ -1,8 +1,8 @@
 {
-  "name": "@sourceacademy/common-stepper",
-  "version": "0.0.4",
+  "name": "@sourceacademy/runner-e-stepper",
+  "version": "0.0.1",
   "packageManager": "yarn@4.18.0",
-  "description": "Shared, language-agnostic protocol for the Source Academy stepper plugin pair",
+  "description": "Language-agnostic runner plugin for the Source Academy environment stepper (e-stepper)",
   "scripts": {
     "build": "rollup -c",
     "prepack": "yarn build",
@@ -23,10 +23,20 @@
       "types": "./dist/index.d.ts"
     }
   },
+  "peerDependencies": {
+    "@sourceacademy/common-e-stepper": ">=0.0.0",
+    "@sourceacademy/common-stepper": ">=0.0.4",
+    "@sourceacademy/conductor": "^0.8.0",
+    "@sourceacademy/runner-stepper": ">=0.0.1"
+  },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-terser": "^1.0.0",
     "@rollup/plugin-typescript": "^12.3.0",
+    "@sourceacademy/common-e-stepper": "workspace:*",
+    "@sourceacademy/common-stepper": "workspace:*",
+    "@sourceacademy/conductor": "^0.8.0",
+    "@sourceacademy/runner-stepper": "workspace:*",
     "@types/jest": "^30.0.0",
     "jest": "^30.4.2",
     "rollup": "^4.60.2",

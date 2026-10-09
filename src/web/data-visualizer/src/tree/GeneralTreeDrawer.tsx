@@ -158,7 +158,13 @@ export class GeneralTreeDrawer extends ClassicDrawer {
 
         if (index == 0) {
           myY = y + Config.DistanceY * 2;
-          myX = originX;
+          // A function data item goes in its own column on the level below (see computeLayout).
+          // originX only tracks where nested lists go, so using it here would stack every function
+          // in the tree at the same x.
+          myX =
+            childNode instanceof FunctionTreeNode
+              ? this.leftMargin + (Config.NWidth + Config.BoxWidth) * childNode.nodePos
+              : originX;
         } else {
           myY = y;
           myX = x + Config.NWidth + Config.BoxWidth;

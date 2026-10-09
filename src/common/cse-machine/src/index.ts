@@ -50,6 +50,12 @@ export interface CseSerializedValue {
   tag?: string;
   /** Language-specific extra data (closure frame id, element refs, etc.). */
   metadata?: unknown;
+  /**
+   * For a value that refers to a heap object (a list, a closure): a stable id of that object,
+   * unique within a run, if the evaluator names its objects. A plugin that draws the snapshot
+   * through {@link ICseDiagramService} uses it to refer to the object, e.g. to highlight it.
+   */
+  objectId?: string;
 }
 
 /**
@@ -89,6 +95,12 @@ export interface CseSerializedEnvFrame {
   id: string;
   /** Display name of the frame (e.g. function name, `"global"`, `"block"`). */
   name: string;
+  /**
+   * The frame's heading, if the evaluator chooses it (e.g. `"Global"` and `"Built-ins"` for
+   * Python's module and builtins frames). Without it, the host derives one from `name` (e.g.
+   * `"Program"` for `"programEnvironment"`).
+   */
+  label?: string;
   /** Id of the lexical parent frame, or `null` for the root. */
   parentId: string | null;
   /** For a closure value's frame: the id of the frame the closure was defined in. */
@@ -145,4 +157,56 @@ export interface CseSnapshotMessage {
    * runners that predate this field remain valid `CseSnapshotMessage`s.
    */
   breakpointSteps?: number[];
+}
+
+/* -------------------------------------------------------------------------- */
+/*                         Host services for web plugins                      */
+/* -------------------------------------------------------------------------- */
+
+/** What {@link ICseDiagramService.createView} draws. */
+export interface CseDiagramViewProps {
+  /** A run's snapshots; frames from earlier snapshots are shown as dead frames. */
+  snapshots: CseSnapshot[];
+  /** The 0-based index of the snapshot to draw. */
+  step: number;
+  /** The {@link CseSerializedValue.objectId} of the heap object to highlight, if any. */
+  hovered?: string | null;
+  /**
+   * Called with a heap object's {@link CseSerializedValue.objectId} when the mouse enters the
+   * object in the diagram, and with `null` when it leaves.
+   */
+  onHover?: (objectId: string | null) => void;
+  /**
+   * Colours for frames, by {@link CseSerializedEnvFrame.id}, e.g. to match the plugin's own
+   * colouring of environments. A host draws a coloured frame's box in its colour, and the active
+   * frame in its colour with a wider outline, instead of its own colour for the active frame.
+   */
+  frameColors?: Record<string, string>;
+  /** The {@link CseSerializedEnvFrame.id} of the frame to highlight, if any. */
+  hoveredFrame?: string | null;
+  /** Called with a frame's id when the mouse enters the frame in the diagram, `null` when it leaves. */
+  onHoverFrame?: (frameId: string | null) => void;
+}
+
+/**
+ * A host's CSE machine visualization, lent to web plugins that want to draw environments the way
+ * the CSE Machine tab does (arrow routing and filtering, alignment, printable mode, clearing dead
+ * frames, saving, zoom) instead of drawing them themselves — e.g. the environment stepper.
+ */
+export interface ICseDiagramService {
+  /**
+   * Returns an element of the host's UI framework (a React element in the Source Academy frontend,
+   * which also provides React to the plugin) that draws the environments of `snapshots[step]` —
+   * environment only, without control and stash — together with the host's diagram toolbar.
+   */
+  createView(props: CseDiagramViewProps): unknown;
+}
+
+/**
+ * Optional services a host passes to the web plugins it loads, after the tab service:
+ * `registerPlugin(PluginClass, tabService, hostServices)`. Every member is optional, and a plugin
+ * that does not expect the argument simply ignores it.
+ */
+export interface IHostServices {
+  cseDiagram?: ICseDiagramService;
 }
