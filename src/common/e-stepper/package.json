@@ -1,7 +1,7 @@
 {
   "name": "@sourceacademy/common-e-stepper",
-  "version": "0.0.1",
-  "packageManager": "yarn@4.18.0",
+  "version": "0.0.2",
+  "packageManager": "yarn@4.18.1",
   "description": "Shared, language-agnostic protocol for the Source Academy environment stepper (e-stepper) plugin pair",
   "scripts": {
     "build": "rollup -c",
@@ -24,12 +24,14 @@
     }
   },
   "peerDependencies": {
+    "@sourceacademy/common-cse-machine": ">=0.3.1",
     "@sourceacademy/common-stepper": ">=0.0.4"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-terser": "^1.0.0",
     "@rollup/plugin-typescript": "^12.3.0",
+    "@sourceacademy/common-cse-machine": "workspace:*",
     "@sourceacademy/common-stepper": "workspace:*",
     "@types/jest": "^30.0.0",
     "jest": "^30.4.2",

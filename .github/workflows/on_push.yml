@@ -30,6 +30,8 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Create Release Pull Request or Publish to npm
         id: changesets
+        # v1 goes with @changesets/cli v2 (package.json). changesets/action v2 requires CLI v3 and
+        # renames the inputs below to publish-script/version-script; upgrade both together.
         uses: changesets/action@v1
         with:
           publish: yarn changeset publish

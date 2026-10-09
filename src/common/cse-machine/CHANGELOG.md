@@ -1,5 +1,13 @@
 # @sourceacademy/common-cse-machine
 
+## 0.3.1
+
+### Patch Changes
+
+- 1019b58: `CseDiagramViewProps` takes `frameColors` (frame colours by frame id; the active frame keeps its colour, with a wider outline), and `hoveredFrame` / `onHoverFrame`, so a plugin and the host's diagram highlight the same frame.
+- ddd6b9e: Add `ICseDiagramService` and `IHostServices` to `common-cse-machine`: a host can lend web plugins its CSE machine visualization, passed as `registerPlugin(PluginClass, tabService, hostServices)`. Add an optional `cse` snapshot to `EStepperStep`, so a host can draw an e-stepper step's environments with that visualization. A value may carry an `objectId` naming the heap object it refers to, and `CseDiagramViewProps` takes the `hovered` object and an `onHover` callback, so the plugin and the host's diagram highlight the same object.
+- 7574efc: Add an optional `label` to `CseSerializedEnvFrame`: the frame's heading, chosen by the evaluator (e.g. Python's `"Global"` and `"Built-ins"`) instead of derived by the host from the frame's `name`.
+
 ## 0.3.0
 
 ### Minor Changes
