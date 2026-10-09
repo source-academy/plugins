@@ -5,7 +5,7 @@
  */
 const E_STEPPER_CSS = `
 .sa-e-stepper { display: flex; flex-direction: column; height: 100%; min-height: 400px; outline: none; }
-.sa-e-stepper .estepper-main { display: flex; flex: 1; min-height: 0; gap: 8px; }
+.sa-e-stepper .estepper-main { position: relative; display: flex; flex: 1; min-height: 0; gap: 8px; }
 .sa-e-stepper .estepper-main.narrow { flex-direction: column; }
 .sa-e-stepper .estepper-left { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
 .sa-e-stepper .estepper-program {
@@ -41,6 +41,12 @@ const E_STEPPER_CSS = `
   border-left-width: 5px; background: rgba(0, 0, 0, 0.45);
   box-shadow: inset 0 0 0 1px var(--estepper-frame-color);
 }
+.sa-e-stepper .estepper-program-arrows {
+  position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible;
+  pointer-events: none; z-index: 2;
+}
+.sa-e-stepper .estepper-options { padding: 8px 12px; min-width: 230px; }
+.sa-e-stepper .estepper-options .bp6-switch { margin-bottom: 6px; }
 .sa-e-stepper .estepper-ref { cursor: default; border-radius: 3px; }
 .sa-e-stepper .estepper-ref-badge {
   display: inline-block; padding: 0 3px; border-radius: 3px; font-size: 12px;

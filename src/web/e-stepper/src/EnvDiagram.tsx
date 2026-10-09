@@ -1,3 +1,4 @@
+import type { CseDiagramAnchorResolver } from "@sourceacademy/common-cse-machine";
 import type {
   EStepperFrame,
   EStepperHeapObject,
@@ -33,6 +34,13 @@ interface Props {
   onHoverFrame?: (frameId: string | null) => void;
   width: number;
   height: number;
+  /** Draw dead frames as their label alone, and leave out dead objects. */
+  collapseDead?: boolean;
+  /**
+   * Called with a function that finds where an object or frame is drawn now (in this component's
+   * coordinates, with the user's pan and zoom), whenever that changes; with `null` on unmount.
+   */
+  onAnchors?: (resolve: CseDiagramAnchorResolver | null) => void;
 }
 
 /**
@@ -40,7 +48,10 @@ interface Props {
  * (drag) and zoomable (mouse wheel); it is fitted to the available space whenever a new run arrives.
  */
 export default function EnvDiagram(props: Props) {
-  const layout = useMemo(() => layoutDiagram(props.frames, props.heap), [props.frames, props.heap]);
+  const layout = useMemo(
+    () => layoutDiagram(props.frames, props.heap, { collapseDead: props.collapseDead }),
+    [props.frames, props.heap, props.collapseDead],
+  );
   const fitScale = Math.min(1, props.width / layout.width, props.height / layout.height);
   const [view, setView] = useState({ scale: fitScale, x: 0, y: 0 });
 
@@ -49,6 +60,24 @@ export default function EnvDiagram(props: Props) {
   useEffect(() => {
     setView(v => (v.scale > fitScale ? { scale: fitScale, x: 0, y: 0 } : v));
   }, [fitScale]);
+
+  const { onAnchors } = props;
+  useEffect(() => {
+    onAnchors?.(({ kind, id }) => {
+      // Arrows end at the left edge of an object, and at the left edge of a frame's box.
+      const at =
+        kind === "object"
+          ? layout.objects.find(b => b.object.id === id)
+          : layout.frames.find(b => b.frame.id === id);
+      if (!at) return null;
+      const point =
+        "object" in at
+          ? { x: at.x, y: at.y + at.height / 2 }
+          : { x: at.x, y: at.y + C.headerHeight + at.height / 2 };
+      return { x: view.x + point.x * view.scale, y: view.y + point.y * view.scale };
+    });
+  }, [onAnchors, layout, view]);
+  useEffect(() => () => onAnchors?.(null), [onAnchors]);
 
   const lookedUp = new Set(props.lookups.map(l => `${l.frameId}\u0000${l.name}`));
 
@@ -61,6 +90,7 @@ export default function EnvDiagram(props: Props) {
       y={view.y}
       scaleX={view.scale}
       scaleY={view.scale}
+      onDragMove={e => setView(v => ({ ...v, x: e.target.x(), y: e.target.y() }))}
       onDragEnd={e => setView(v => ({ ...v, x: e.target.x(), y: e.target.y() }))}
       onWheel={e => {
         e.evt.preventDefault();
@@ -122,7 +152,10 @@ function FrameDrawing(props: {
       <Text
         x={box.x}
         y={box.y + 2}
-        text={box.frame.name === "global" ? box.frame.id : `${box.frame.id}  ${box.frame.name}`}
+        text={
+          (box.frame.name === "global" ? box.frame.id : `${box.frame.id}  ${box.frame.name}`) +
+          (box.collapsed ? "  …" : "")
+        }
         fontFamily={FONT}
         fontSize={FONT_SIZE}
         fontStyle="bold"

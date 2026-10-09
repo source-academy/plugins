@@ -125,3 +125,36 @@ test("the global frame is neutral, other frames get distinct colours", () => {
   const colors = [0, 1, 2, 3].map(frameColor);
   expect(new Set(colors).size).toBe(4);
 });
+
+describe("layoutDiagram with dead frames collapsed", () => {
+  const full = layoutDiagram(last.frames, last.heap);
+  const collapsed = layoutDiagram(last.frames, last.heap, { collapseDead: true });
+
+  test("a garbage frame keeps its label but loses its bindings", () => {
+    const dead = last.frames.filter(f => f.isGarbage);
+    expect(dead.length).toBeGreaterThan(0);
+    for (const f of dead) {
+      const box = collapsed.frames.find(b => b.frame.id === f.id)!;
+      expect(box.collapsed).toBe(true);
+      expect(box.rows).toEqual([]);
+      expect(box.height).toBeLessThanOrEqual(full.frames.find(b => b.frame.id === f.id)!.height);
+    }
+  });
+
+  test("live frames are untouched, and garbage objects are left out", () => {
+    for (const b of collapsed.frames.filter(b => !b.frame.isGarbage)) {
+      expect(b.collapsed).toBe(false);
+      expect(b.rows.length).toBe(full.frames.find(f => f.frame.id === b.frame.id)!.rows.length);
+    }
+    const garbage = last.heap.filter(o => o.isGarbage).map(o => o.id);
+    expect(collapsed.objects.map(o => o.object.id)).toEqual(
+      full.objects.map(o => o.object.id).filter(id => !garbage.includes(id)),
+    );
+  });
+
+  test("nothing changes when nothing is dead", () => {
+    const live = last.frames.map(f => ({ ...f, isGarbage: false }));
+    const heap = last.heap.map(o => ({ ...o, isGarbage: false }));
+    expect(layoutDiagram(live, heap, { collapseDead: true })).toEqual(layoutDiagram(live, heap));
+  });
+});

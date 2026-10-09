@@ -1,5 +1,18 @@
-import { Button, ButtonGroup, Card, Classes, Pre, Slider } from "@blueprintjs/core";
-import type { CseSnapshot, ICseDiagramService } from "@sourceacademy/common-cse-machine";
+import {
+  Button,
+  ButtonGroup,
+  Card,
+  Classes,
+  Popover,
+  Pre,
+  Slider,
+  Switch,
+} from "@blueprintjs/core";
+import type {
+  CseDiagramAnchorResolver,
+  CseSnapshot,
+  ICseDiagramService,
+} from "@sourceacademy/common-cse-machine";
 import type {
   EStepperHeapObject,
   EStepperStep,
@@ -12,6 +25,7 @@ import { CustomASTRenderer, type NodeRenderers, type StepperNode } from "../../s
 import { injectStepperStyles } from "../../stepper/src/styles";
 import { frameColor } from "./colors";
 import EnvDiagram from "./EnvDiagram";
+import ProgramArrows, { ENV_ATTRIBUTE, REF_ATTRIBUTE } from "./ProgramArrows";
 import { injectEStepperStyles } from "./styles";
 
 /** Width (px) from which the program and the diagram are shown side by side. */
@@ -34,6 +48,18 @@ type Props = {
   /** The host's CSE machine visualization, if it lends one (see `ICseDiagramService`). */
   cseDiagram?: ICseDiagramService;
 };
+
+/**
+ * The indices of the steps to show. A step that only looks a name up (it has `lookups`) is left
+ * out unless lookups are shown; the first and last steps always stay.
+ */
+export function visibleStepIndices(steps: EStepperStep[], showLookups: boolean): number[] {
+  const indices: number[] = [];
+  steps.forEach((step, i) => {
+    if (showLookups || i === 0 || i === steps.length - 1 || !step.lookups?.length) indices.push(i);
+  });
+  return indices;
+}
 
 function DefaultText() {
   return (
@@ -132,6 +158,17 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
   const [programHeight, setProgramHeight] = useState(DEFAULT_PROGRAM_HEIGHT);
   const [programShare, setProgramShare] = useState(DEFAULT_PROGRAM_SHARE);
   const [outputOpen, setOutputOpen] = useState(true);
+  // Display options. Arrows from the program into the diagram are off until the user asks.
+  const [showArrows, setShowArrows] = useState(false);
+  const [showLookups, setShowLookups] = useState(true);
+  const [collapseDead, setCollapseDead] = useState(false);
+  const [anchors, setAnchors] = useState<{ resolve: CseDiagramAnchorResolver | null }>({
+    resolve: null,
+  });
+  const onAnchors = useCallback(
+    (resolve: CseDiagramAnchorResolver | null) => setAnchors({ resolve }),
+    [],
+  );
   const [containerRef, containerSize] = useSize();
   const [root, setRoot] = useState<HTMLElement | null>(null);
   const fillHeight = useFillHeight(root);
@@ -150,9 +187,18 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
   }, []);
   useEffect(() => setStepValue(1), [steps]);
 
-  const lastStep = steps.length;
+  const visible = useMemo(() => visibleStepIndices(steps, showLookups), [steps, showLookups]);
+  const lastStep = visible.length;
   const hasRun = lastStep > 0;
-  const step = hasRun ? steps[Math.min(stepValue, lastStep) - 1] : undefined;
+  const stepIndex = hasRun ? visible[Math.min(stepValue, lastStep) - 1] : 0;
+  const step = hasRun ? steps[stepIndex] : undefined;
+  // Hiding lookups keeps the step in view, or moves to the next one that stays.
+  const changeShowLookups = (show: boolean) => {
+    const next = visibleStepIndices(steps, show);
+    const position = next.findIndex(i => i >= stepIndex);
+    setStepValue(position < 0 ? Math.max(1, next.length) : position + 1);
+    setShowLookups(show);
+  };
   const wide = containerSize.width >= WIDE_LAYOUT_MIN_WIDTH;
 
   const stepFirst = () => setStepValue(1);
@@ -201,7 +247,11 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
           }}
           onMouseLeave={() => setHoveredFrame(null)}
         >
-          <span className="estepper-envblock-label" style={{ background: color }}>
+          <span
+            className="estepper-envblock-label"
+            style={{ background: color }}
+            {...{ [ENV_ATTRIBUTE]: envId }}
+          >
             {envId}
           </span>
           {Array.isArray(body)
@@ -217,6 +267,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
       return (
         <span
           className={classNames("estepper-ref", { hovered: hovered === id })}
+          {...{ [REF_ATTRIBUTE]: id }}
           onMouseEnter={() => setHovered(id)}
           onMouseLeave={() => setHovered(null)}
         >
@@ -286,6 +337,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
     [cseDiagram, steps],
   );
 
+  const usingHostDiagram = cseDiagram !== undefined && cseSnapshots !== null;
   const explanation = step?.markers?.[0]?.explanation ?? "...";
   const output = step?.output ?? "";
 
@@ -312,6 +364,32 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
           <Button disabled={!hasRun} icon="chevron-right" onClick={stepNext} />
           <Button disabled={!hasRun} icon="double-chevron-right" onClick={stepLast} />
         </ButtonGroup>
+        <Popover
+          placement="bottom-end"
+          content={
+            <div className="estepper-options">
+              <Switch
+                label="Arrows from the program into the diagram"
+                checked={showArrows}
+                disabled={anchors.resolve === null}
+                onChange={e => setShowArrows(e.currentTarget.checked)}
+              />
+              <Switch
+                label="Each name lookup is a step"
+                checked={showLookups}
+                onChange={e => changeShowLookups(e.currentTarget.checked)}
+              />
+              <Switch
+                label="Collapse finished frames"
+                checked={collapseDead}
+                disabled={usingHostDiagram}
+                onChange={e => setCollapseDead(e.currentTarget.checked)}
+              />
+            </div>
+          }
+        >
+          <Button icon="settings" style={{ marginLeft: 8 }} aria-label="Display options" />
+        </Popover>
       </div>
       {error ? (
         <Card style={{ ...CARD_STYLE, marginTop: 8 }}>
@@ -353,12 +431,13 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
               {cseDiagram && cseSnapshots ? (
                 (cseDiagram.createView({
                   snapshots: cseSnapshots,
-                  step: Math.min(stepValue, lastStep) - 1,
+                  step: stepIndex,
                   hovered,
                   onHover: setHovered,
                   frameColors,
                   hoveredFrame,
                   onHoverFrame: setHoveredFrame,
+                  onAnchors,
                 }) as React.ReactNode)
               ) : diagramSize.width > 0 && diagramSize.height > 0 ? (
                 <EnvDiagram
@@ -372,9 +451,19 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
                   onHoverFrame={setHoveredFrame}
                   width={diagramSize.width}
                   height={diagramSize.height}
+                  collapseDead={collapseDead}
+                  onAnchors={onAnchors}
                 />
               ) : null}
             </div>
+            {showArrows ? (
+              <ProgramArrows
+                resolve={anchors.resolve}
+                hovered={hovered}
+                hoveredFrame={hoveredFrame}
+                colorOfFrame={colorOf}
+              />
+            ) : null}
           </div>
         </>
       )}

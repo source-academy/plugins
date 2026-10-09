@@ -62,6 +62,8 @@ export interface FrameBox {
   width: number;
   height: number;
   rows: BindingRow[];
+  /** Whether the frame is drawn as its label alone (a dead frame, collapsed). */
+  collapsed: boolean;
 }
 
 export interface ObjectBox {
@@ -126,7 +128,23 @@ function arrowTarget(box: ObjectBox): Point {
   return { x: box.x, y: box.y + box.height / 2 };
 }
 
-export function layoutDiagram(frames: EStepperFrame[], heap: EStepperHeapObject[]): DiagramLayout {
+export interface LayoutOptions {
+  /**
+   * Collapse what is dead: a garbage frame is drawn as its label alone (no bindings), and garbage
+   * heap objects are left out, so a long run does not fill the diagram with finished calls.
+   */
+  collapseDead?: boolean;
+}
+
+export function layoutDiagram(
+  allFrames: EStepperFrame[],
+  allHeap: EStepperHeapObject[],
+  options: LayoutOptions = {},
+): DiagramLayout {
+  const frames = options.collapseDead
+    ? allFrames.map(f => (f.isGarbage ? { ...f, bindings: [] } : f))
+    : allFrames;
+  const heap = options.collapseDead ? allHeap.filter(o => !o.isGarbage) : allHeap;
   const frameById = new Map(frames.map(f => [f.id, f]));
   const objectById = new Map(heap.map(o => [o.id, o]));
 
@@ -200,6 +218,7 @@ export function layoutDiagram(frames: EStepperFrame[], heap: EStepperHeapObject[
         width: frameWidth,
         height: frameHeight,
         rows,
+        collapsed: options.collapseDead === true && frame.isGarbage,
       });
 
       // This frame's objects, stacked to its right.
