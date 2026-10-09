@@ -2,6 +2,7 @@ import type {
   EStepperFrame,
   EStepperHeapObject,
   EStepperLookup,
+  EStepperValue,
 } from "@sourceacademy/common-e-stepper";
 import { useEffect, useMemo, useState } from "react";
 import { Arrow, Circle, Group, Layer, Line, Rect, Stage, Text } from "react-konva";
@@ -273,6 +274,19 @@ function ObjectDrawing(props: {
                 radius={C.dotRadius}
                 fill={stroke}
               />
+            ) : isNone(element) ? (
+              // As in box-and-pointer diagrams: None (the empty list) is a slash through the box.
+              <Line
+                key={`v${i}`}
+                points={[
+                  box.x + i * C.cellWidth,
+                  box.y + box.height,
+                  box.x + (i + 1) * C.cellWidth,
+                  box.y,
+                ]}
+                stroke={stroke}
+                strokeWidth={strokeWidth}
+              />
             ) : (
               <Text
                 key={`v${i}`}
@@ -293,6 +307,11 @@ function ObjectDrawing(props: {
       )}
     </Group>
   );
+}
+
+/** Python's None, drawn in a list's box as a slash. */
+function isNone(value: EStepperValue): boolean {
+  return value.kind === "primitive" && value.label === "None";
 }
 
 function ArrowDrawing(props: { arrow: ArrowSpec }) {

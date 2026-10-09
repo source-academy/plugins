@@ -124,6 +124,43 @@ describe("EnvDiagram", () => {
     for (const box of boxes) expect(box.props.fill).toBeTruthy();
   });
 
+  test("draws None in a list's box as a slash, not as text", () => {
+    const { root } = draw({
+      frames: [
+        {
+          id: "Global",
+          name: "global",
+          parentId: null,
+          isGarbage: false,
+          bindings: [
+            { name: "xs", value: { kind: "ref", objectId: "#1" } },
+            { name: "y", value: { kind: "primitive", display: "None", label: "None" } },
+          ],
+        },
+      ],
+      heap: [
+        {
+          kind: "list",
+          id: "#1",
+          isGarbage: false,
+          elements: [
+            { kind: "primitive", display: "3", label: "int" },
+            { kind: "primitive", display: "None", label: "None" },
+          ],
+        },
+      ] as never,
+      activeFrameId: "Global",
+    });
+    const texts = root.findAllByType(konva("konva-text")).map(t => t.props.text);
+    // The binding y shows None; the list's box does not.
+    expect(texts.filter(t => t === "None")).toHaveLength(1);
+    expect(texts).toContain("3");
+    const slashes = root
+      .findAllByType(konva("konva-line"))
+      .filter(l => l.props.points[1] > l.props.points[3]);
+    expect(slashes).toHaveLength(1);
+  });
+
   test("a hovered object is drawn highlighted", () => {
     const { root } = draw({ hovered: "#2" });
     const hoveredCircles = root
