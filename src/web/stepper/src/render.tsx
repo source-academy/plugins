@@ -891,14 +891,12 @@ function expressionNeedsParenthesis(
   const opPrecedence = profile?.operatorPrecedence ?? OPERATOR_PRECEDENCE;
 
   const nodePrecedence = exprPrecedence[node.type as keyof typeof exprPrecedence] as
-    | number
-    | undefined;
+    number | undefined;
   if (nodePrecedence === NEEDS_PARENTHESES) {
     return true;
   }
   const parentNodePrecedence = exprPrecedence[parentNode.type as keyof typeof exprPrecedence] as
-    | number
-    | undefined;
+    number | undefined;
   if (nodePrecedence === undefined || parentNodePrecedence === undefined) {
     return false;
   }

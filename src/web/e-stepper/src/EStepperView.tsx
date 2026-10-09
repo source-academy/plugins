@@ -18,6 +18,14 @@ import { injectEStepperStyles } from "./styles";
 const WIDE_LAYOUT_MIN_WIDTH = 900;
 const DEFAULT_PROGRAM_HEIGHT = 240;
 const MIN_PANE_HEIGHT = 80;
+/**
+ * In a wide tab, the program pane's share of the width left for the two panes, and the least width
+ * of either pane. That width is the tab's less the two 8px gaps around the divider and the
+ * divider's own 2px (6px wide, with -2px margins; see styles.ts).
+ */
+const DEFAULT_PROGRAM_SHARE = 0.45;
+const MIN_PANE_WIDTH = 200;
+const DIVIDER_SPACE = 2 * 8 + 2;
 
 type Props = {
   steps: EStepperStep[];
@@ -38,13 +46,57 @@ function DefaultText() {
       marked with the frame it is evaluated in (a coloured bracket labelled E1, E2, ...), and lists
       and function objects are shown as references (#1, #2, ...) to the objects drawn in the
       environment diagram below the program. Hover over a reference to find its object, and over a
-      frame label to find its frame.
+      bracketed body to find its frame.
       <br />
       <br />
       Keyboard shortcuts (click on the explanation first): f / b for the next / previous step, a / e
       for the first / last step.
     </div>
   );
+}
+
+/**
+ * The explanation and error cards take the height of their text. The host's side content styles
+ * its own cards to fill it (the Source Academy frontend: `.workspace .side-content .bp6-card {
+ * display: flex; height: 100% }`), and these are inside the side content too; now that the tab has
+ * a height, that would make the explanation as tall as the tab. Inline, so it outranks any
+ * stylesheet.
+ */
+const CARD_STYLE: React.CSSProperties = { height: "auto", flex: "0 0 auto" };
+
+/** The least height of the tab, and the gap it leaves below itself in the browser window. */
+const MIN_TAB_HEIGHT = 400;
+const BOTTOM_GAP = 16;
+
+/**
+ * The height that takes `element` from where it starts down to the bottom of the browser window
+ * (as the CSE Machine tab does): the side-content area the tab is in does not give it a height of
+ * its own to fill. Worked out again when the window is resized, when the element comes into view
+ * (a tab that is not selected is not laid out), and at every render (cheap; it changes only when
+ * the result does).
+ */
+function useFillHeight(element: HTMLElement | null): number | undefined {
+  const [height, setHeight] = useState<number | undefined>(undefined);
+  const fit = useCallback(() => {
+    if (!element || typeof window === "undefined") return;
+    const top = element.getBoundingClientRect().top;
+    if (!Number.isFinite(top)) return;
+    setHeight(Math.max(MIN_TAB_HEIGHT, Math.floor(window.innerHeight - top - BOTTOM_GAP)));
+  }, [element]);
+  useEffect(() => {
+    if (!element || typeof window === "undefined") return;
+    fit();
+    window.addEventListener("resize", fit);
+    const observer =
+      typeof IntersectionObserver === "undefined" ? undefined : new IntersectionObserver(fit);
+    observer?.observe(element);
+    return () => {
+      window.removeEventListener("resize", fit);
+      observer?.disconnect();
+    };
+  }, [element, fit]);
+  useEffect(fit);
+  return height;
 }
 
 /** Tracks an element's size; attach the returned callback as the element's `ref`. */
@@ -78,8 +130,18 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
   const [hovered, setHovered] = useState<string | null>(null);
   const [hoveredFrame, setHoveredFrame] = useState<string | null>(null);
   const [programHeight, setProgramHeight] = useState(DEFAULT_PROGRAM_HEIGHT);
+  const [programShare, setProgramShare] = useState(DEFAULT_PROGRAM_SHARE);
   const [outputOpen, setOutputOpen] = useState(true);
   const [containerRef, containerSize] = useSize();
+  const [root, setRoot] = useState<HTMLElement | null>(null);
+  const fillHeight = useFillHeight(root);
+  const rootRef = useCallback(
+    (element: HTMLElement | null) => {
+      containerRef(element);
+      setRoot(element);
+    },
+    [containerRef],
+  );
   const [diagramRef, diagramSize] = useSize();
 
   useEffect(() => {
@@ -128,16 +190,18 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
       const color = colorOf(envId);
       const body = node.body as StepperNode | StepperNode[];
       return (
+        // The whole block is hoverable; in nested blocks, the innermost one under the mouse wins
+        // (`mouseover` bubbles from it, and stops there).
         <span
           className={classNames("estepper-envblock", { hovered: hoveredFrame === envId })}
           style={{ borderColor: color, ["--estepper-frame-color" as string]: color }}
+          onMouseOver={event => {
+            event.stopPropagation();
+            setHoveredFrame(envId);
+          }}
+          onMouseLeave={() => setHoveredFrame(null)}
         >
-          <span
-            className="estepper-envblock-label"
-            style={{ background: color }}
-            onMouseEnter={() => setHoveredFrame(envId)}
-            onMouseLeave={() => setHoveredFrame(null)}
-          >
+          <span className="estepper-envblock-label" style={{ background: color }}>
             {envId}
           </span>
           {Array.isArray(body)
@@ -179,6 +243,37 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
     [programHeight],
   );
 
+  // In a wide tab, the divider between the panes sets the program pane's share of the width left
+  // for the panes (a share, not pixels, so the split keeps its proportions when the tab is
+  // resized). The pane's width is worked out at every render, so either pane keeps its least
+  // width at the tab's current size, however the share was set.
+  const paneSpace = Math.max(0, containerSize.width - DIVIDER_SPACE);
+  const programWidthFor = (share: number) =>
+    Math.round(Math.min(paneSpace - MIN_PANE_WIDTH, Math.max(MIN_PANE_WIDTH, share * paneSpace)));
+  const programWidth = programWidthFor(programShare);
+  const startWidthResize = useCallback(
+    (event: React.PointerEvent) => {
+      event.preventDefault();
+      if (paneSpace <= 2 * MIN_PANE_WIDTH) return;
+      const startX = event.clientX;
+      const startWidth = programWidth;
+      const onMove = (e: PointerEvent) => {
+        const width = Math.min(
+          paneSpace - MIN_PANE_WIDTH,
+          Math.max(MIN_PANE_WIDTH, startWidth + e.clientX - startX),
+        );
+        setProgramShare(width / paneSpace);
+      };
+      const onUp = () => {
+        window.removeEventListener("pointermove", onMove);
+        window.removeEventListener("pointerup", onUp);
+      };
+      window.addEventListener("pointermove", onMove);
+      window.addEventListener("pointerup", onUp);
+    },
+    [paneSpace, programWidth],
+  );
+
   // The host draws the environments when it can, from the steps' CSE snapshots (all steps, so it
   // can show frames from earlier steps as dead frames); otherwise the plugin's own diagram does.
   // The snapshots' values carry the e-stepper's object ids (`#3`) as their `objectId`, so the
@@ -196,7 +291,8 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
 
   return (
     <div
-      ref={containerRef}
+      ref={rootRef}
+      style={fillHeight === undefined ? undefined : { height: fillHeight }}
       className={classNames("sa-substituter", "sa-e-stepper", Classes.DARK)}
       onKeyDown={onKeyDown}
       tabIndex={-1}
@@ -218,7 +314,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
         </ButtonGroup>
       </div>
       {error ? (
-        <Card style={{ marginTop: 8 }}>
+        <Card style={{ ...CARD_STYLE, marginTop: 8 }}>
           <Pre className="result-output">{error}</Pre>
         </Card>
       ) : null}
@@ -228,13 +324,13 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
         )
       ) : (
         <>
-          <Card style={{ margin: "8px 0" }}>
+          <Card style={{ ...CARD_STYLE, margin: "8px 0" }}>
             <Pre className="result-output">{explanation}</Pre>
           </Card>
           <div className={classNames("estepper-main", { narrow: !wide })}>
             <div
               className="estepper-left"
-              style={wide ? { flex: "0 0 45%" } : { flex: `0 0 ${programHeight}px` }}
+              style={wide ? { flex: `0 0 ${programWidth}px` } : { flex: `0 0 ${programHeight}px` }}
             >
               <div className="estepper-program" style={{ flex: 1 }}>
                 <CustomASTRenderer {...step!} profile={profile} nodeRenderers={nodeRenderers} />
@@ -248,7 +344,11 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
                 </div>
               ) : null}
             </div>
-            {wide ? null : <div className="estepper-divider" onPointerDown={startResize} />}
+            {wide ? (
+              <div className="estepper-divider vertical" onPointerDown={startWidthResize} />
+            ) : (
+              <div className="estepper-divider" onPointerDown={startResize} />
+            )}
             <div className="estepper-diagram" ref={diagramRef}>
               {cseDiagram && cseSnapshots ? (
                 (cseDiagram.createView({

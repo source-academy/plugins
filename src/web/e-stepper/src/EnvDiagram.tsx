@@ -2,6 +2,7 @@ import type {
   EStepperFrame,
   EStepperHeapObject,
   EStepperLookup,
+  EStepperValue,
 } from "@sourceacademy/common-e-stepper";
 import { useEffect, useMemo, useState } from "react";
 import { Arrow, Circle, Group, Layer, Line, Rect, Stage, Text } from "react-konva";
@@ -136,7 +137,7 @@ function FrameDrawing(props: {
         strokeWidth={props.active ? 4 : 2}
         // Filled even when not hovered (transparently), so the whole box takes the mouse, not just
         // its outline and contents.
-        fill={props.hovered ? DiagramColors.frameHover : "rgba(0, 0, 0, 0)"}
+        fill={props.hovered ? DiagramColors.hoverBackground : "rgba(0, 0, 0, 0)"}
         cornerRadius={6}
         shadowColor={props.active ? color : undefined}
         shadowBlur={props.active ? 10 : 0}
@@ -192,8 +193,10 @@ function ObjectDrawing(props: {
 }) {
   const { box } = props;
   const object = box.object;
-  const stroke = props.hovered ? DiagramColors.hover : DiagramColors.stroke;
-  const strokeWidth = props.hovered ? 3 : 2;
+  // A hovered object keeps its outline and gets a darker background (its circles, its boxes).
+  const stroke = DiagramColors.stroke;
+  const strokeWidth = 2;
+  const fill = props.hovered ? DiagramColors.hoverBackground : undefined;
   const label =
     object.kind === "function" && object.name ? `${object.id} ${object.name}` : object.id;
   return (
@@ -208,7 +211,7 @@ function ObjectDrawing(props: {
         text={label}
         fontFamily={FONT}
         fontSize={FONT_SIZE - 1}
-        fill={props.hovered ? DiagramColors.hover : DiagramColors.dimText}
+        fill={props.hovered ? DiagramColors.text : DiagramColors.dimText}
       />
       {object.kind === "function" ? (
         <>
@@ -218,6 +221,7 @@ function ObjectDrawing(props: {
             radius={C.functionRadius}
             stroke={stroke}
             strokeWidth={strokeWidth}
+            fill={fill}
           />
           <Circle
             x={box.x + 3 * C.functionRadius}
@@ -225,6 +229,7 @@ function ObjectDrawing(props: {
             radius={C.functionRadius}
             stroke={stroke}
             strokeWidth={strokeWidth}
+            fill={fill}
           />
           <Circle
             x={box.x + C.functionRadius}
@@ -248,6 +253,7 @@ function ObjectDrawing(props: {
             height={box.height}
             stroke={stroke}
             strokeWidth={strokeWidth}
+            fill={fill}
           />
           {object.elements.map((element, i) =>
             i === 0 ? null : (
@@ -273,6 +279,19 @@ function ObjectDrawing(props: {
                 radius={C.dotRadius}
                 fill={stroke}
               />
+            ) : isNone(element) ? (
+              // As in box-and-pointer diagrams: None (the empty list) is a slash through the box.
+              <Line
+                key={`v${i}`}
+                points={[
+                  box.x + i * C.cellWidth,
+                  box.y + box.height,
+                  box.x + (i + 1) * C.cellWidth,
+                  box.y,
+                ]}
+                stroke={stroke}
+                strokeWidth={strokeWidth}
+              />
             ) : (
               <Text
                 key={`v${i}`}
@@ -293,6 +312,14 @@ function ObjectDrawing(props: {
       )}
     </Group>
   );
+}
+
+/**
+ * Python's None, drawn in a list's box as a slash. Told by its rendered text, not its type tag
+ * (whatever a producer calls the type): a string reads `'None'`, with quotes.
+ */
+function isNone(value: EStepperValue): boolean {
+  return value.kind === "primitive" && value.display === "None";
 }
 
 function ArrowDrawing(props: { arrow: ArrowSpec }) {
