@@ -215,6 +215,12 @@ describe("EStepperView", () => {
     vi.unstubAllGlobals();
   });
 
+  test("the explanation takes the height of its text, whatever the host's styles", () => {
+    const view = render({ steps: [fixture[1]], profile });
+    const card = view.root.findAll(n => hasClass(n, "bp6-card") || hasClass(n, "bp5-card"))[0];
+    expect(card.props.style).toMatchObject({ height: "auto", flex: "0 0 auto" });
+  });
+
   test("steps with the buttons and the keyboard", () => {
     const view = render({ steps: fixture, profile });
     const explanation = () =>

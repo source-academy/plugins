@@ -32,7 +32,7 @@ jobs:
         id: changesets
         # v1 goes with @changesets/cli v2 (package.json). changesets/action v2 requires CLI v3 and
         # renames the inputs below to publish-script/version-script; upgrade both together.
-        uses: changesets/action@v2.1.2
+        uses: changesets/action@v1
         with:
           publish: yarn changeset publish
           # changeset version only rewrites package.json/CHANGELOG.md — it never re-runs

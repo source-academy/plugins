@@ -1,4 +1,11 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"]
+  "extends": ["config:recommended"],
+  "packageRules": [
+    {
+      "description": "changesets/action v2 requires @changesets/cli v3 and renames the publish/version inputs (on_push.yml); upgrading it alone breaks every push to main and the Pages deploy. Upgrade both together, by hand.",
+      "matchPackageNames": ["changesets/action"],
+      "allowedVersions": "<2"
+    }
+  ]
 }
