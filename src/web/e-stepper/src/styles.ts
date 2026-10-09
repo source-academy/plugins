@@ -4,7 +4,7 @@
  * the host.
  */
 const E_STEPPER_CSS = `
-.sa-e-stepper { display: flex; flex-direction: column; height: 100%; min-height: 600px; outline: none; }
+.sa-e-stepper { display: flex; flex-direction: column; height: 100%; min-height: 400px; outline: none; }
 .sa-e-stepper .estepper-main { display: flex; flex: 1; min-height: 0; gap: 8px; }
 .sa-e-stepper .estepper-main.narrow { flex-direction: column; }
 .sa-e-stepper .estepper-left { display: flex; flex-direction: column; min-width: 0; min-height: 0; }

@@ -191,6 +191,30 @@ describe("EStepperView", () => {
     vi.unstubAllGlobals();
   });
 
+  test("fills the height down to the bottom of the browser window", () => {
+    let renderer!: TestRenderer.ReactTestRenderer;
+    const element = <EStepperView steps={[fixture[1]]} profile={profile} />;
+    act(() => {
+      renderer = TestRenderer.create(element, {
+        createNodeMock: () => ({
+          getBoundingClientRect: () => ({ top: 200, width: 600, height: 600 }),
+        }),
+      });
+    });
+    const root = () => renderer.root.find(n => hasClass(n, "sa-e-stepper"));
+    // (The test environment has no window until stubbed: then the height is worked out again.)
+    const browser = { innerHeight: 1000, addEventListener() {}, removeEventListener() {} };
+    vi.stubGlobal("window", browser);
+    act(() => renderer.update(<EStepperView steps={[fixture[1]]} profile={profile} />));
+    // From its top (200px) to the window's bottom (1000px), less a 16px gap...
+    expect(root().props.style).toEqual({ height: 784 });
+    // ...but never less than 400px.
+    browser.innerHeight = 500;
+    act(() => renderer.update(<EStepperView steps={[fixture[1]]} profile={profile} />));
+    expect(root().props.style).toEqual({ height: 400 });
+    vi.unstubAllGlobals();
+  });
+
   test("steps with the buttons and the keyboard", () => {
     const view = render({ steps: fixture, profile });
     const explanation = () =>
