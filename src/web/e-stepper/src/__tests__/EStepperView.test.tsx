@@ -145,11 +145,50 @@ describe("EStepperView", () => {
     vi.unstubAllGlobals();
   });
 
-  test("puts the panes side by side in a wide tab", () => {
+  test("puts the panes side by side in a wide tab, with a divider that resizes the program pane", () => {
+    // The tab's size, as the ResizeObservers report it (one for the tab, one for the diagram).
+    const observers: ((entries: { contentRect: { width: number; height: number } }[]) => void)[] =
+      [];
+    const resize = (width: number) =>
+      observers.forEach(callback => callback([{ contentRect: { width, height: 600 } }]));
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        constructor(callback: (typeof observers)[number]) {
+          observers.push(callback);
+        }
+        observe() {}
+        disconnect() {}
+      },
+    );
     const view = render({ steps: [fixture[1]], profile }, 1200);
     const main = view.root.find(n => hasClass(n, "estepper-main"));
     expect(hasClass(main, "narrow")).toBe(false);
-    expect(view.root.findAll(n => hasClass(n, "estepper-divider"))).toHaveLength(0);
+    const left = () => view.root.find(n => hasClass(n, "estepper-left")).props.style.flex;
+    // 1200px wide, of which 1182px are left for the panes (2 gaps of 8px, and 2px of divider).
+    expect(left()).toBe(`0 0 ${Math.round(0.45 * 1182)}px`);
+    const listeners: Record<string, (e: { clientX: number }) => void> = {};
+    vi.stubGlobal("window", {
+      addEventListener: (type: string, fn: (e: { clientX: number }) => void) =>
+        (listeners[type] = fn),
+      removeEventListener: (type: string) => delete listeners[type],
+    });
+    const divider = view.root.find(n => hasClass(n, "estepper-divider"));
+    expect(hasClass(divider, "vertical")).toBe(true);
+    act(() => divider.props.onPointerDown({ clientX: 600, preventDefault: () => {} }));
+    act(() => listeners.pointermove({ clientX: 480 }));
+    expect(left()).toBe(`0 0 ${Math.round(0.45 * 1182) - 120}px`);
+    // Either pane keeps at least 200px.
+    act(() => listeners.pointermove({ clientX: 0 }));
+    expect(left()).toBe("0 0 200px");
+    act(() => listeners.pointermove({ clientX: 2000 }));
+    expect(left()).toBe(`0 0 ${1182 - 200}px`);
+    act(() => listeners.pointerup({ clientX: 2000 }));
+    expect(listeners.pointermove).toBeUndefined();
+    // ...also when the tab is narrowed afterwards.
+    act(() => resize(900));
+    expect(left()).toBe(`0 0 ${900 - 18 - 200}px`);
+    vi.unstubAllGlobals();
   });
 
   test("steps with the buttons and the keyboard", () => {
