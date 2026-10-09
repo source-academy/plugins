@@ -176,6 +176,16 @@ export interface CseDiagramViewProps {
    * object in the diagram, and with `null` when it leaves.
    */
   onHover?: (objectId: string | null) => void;
+  /**
+   * Colours for frames, by {@link CseSerializedEnvFrame.id}, e.g. to match the plugin's own
+   * colouring of environments. A host draws a coloured frame's box in its colour, and the active
+   * frame in its colour with a wider outline, instead of its own colour for the active frame.
+   */
+  frameColors?: Record<string, string>;
+  /** The {@link CseSerializedEnvFrame.id} of the frame to highlight, if any. */
+  hoveredFrame?: string | null;
+  /** Called with a frame's id when the mouse enters the frame in the diagram, `null` when it leaves. */
+  onHoverFrame?: (frameId: string | null) => void;
 }
 
 /**

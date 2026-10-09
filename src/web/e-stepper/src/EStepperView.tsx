@@ -37,7 +37,8 @@ function DefaultText() {
       program is rewritten one step at a time. In addition, a function body being evaluated is
       marked with the frame it is evaluated in (a coloured bracket labelled E1, E2, ...), and lists
       and function objects are shown as references (#1, #2, ...) to the objects drawn in the
-      environment diagram below the program. Hover over a reference to find its object.
+      environment diagram below the program. Hover over a reference to find its object, and over a
+      frame label to find its frame.
       <br />
       <br />
       Keyboard shortcuts (click on the explanation first): f / b for the next / previous step, a / e
@@ -70,11 +71,12 @@ function useSize(): [(element: HTMLElement | null) => void, { width: number; hei
 /**
  * The e-stepper tab: the step slider and explanation on top, then the program (with the output
  * strip under it) and the environment diagram — one above the other in a narrow tab, side by side
- * in a wide one. A heap object under the mouse is highlighted in both panes.
+ * in a wide one. A heap object or frame under the mouse is highlighted in both panes.
  */
 export default function EStepperView({ steps, profile, error, cseDiagram }: Props) {
   const [stepValue, setStepValue] = useState(1);
   const [hovered, setHovered] = useState<string | null>(null);
+  const [hoveredFrame, setHoveredFrame] = useState<string | null>(null);
   const [programHeight, setProgramHeight] = useState(DEFAULT_PROGRAM_HEIGHT);
   const [outputOpen, setOutputOpen] = useState(true);
   const [containerRef, containerSize] = useSize();
@@ -110,10 +112,11 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
   };
 
   // Frame colours by id, for the program's environment brackets (the diagram uses the same order).
-  const colorOf = useMemo(() => {
-    const colors = new Map((step?.frames ?? []).map((f, i) => [f.id, frameColor(i)]));
-    return (frameId: string) => colors.get(frameId) ?? frameColor(1);
-  }, [step]);
+  const frameColors = useMemo(
+    () => Object.fromEntries((step?.frames ?? []).map((f, i) => [f.id, frameColor(i)])),
+    [step],
+  );
+  const colorOf = (frameId: string) => frameColors[frameId] ?? frameColor(1);
   const objectOf = useMemo(() => {
     const objects = new Map<string, EStepperHeapObject>((step?.heap ?? []).map(o => [o.id, o]));
     return (id: string) => objects.get(id);
@@ -121,12 +124,21 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
 
   const nodeRenderers: NodeRenderers = {
     EnvBlock: (node: StepperNode, renderChild) => {
-      const color = colorOf(String(node.envId));
+      const envId = String(node.envId);
+      const color = colorOf(envId);
       const body = node.body as StepperNode | StepperNode[];
       return (
-        <span className="estepper-envblock" style={{ borderColor: color }}>
-          <span className="estepper-envblock-label" style={{ background: color }}>
-            {String(node.envId)}
+        <span
+          className={classNames("estepper-envblock", { hovered: hoveredFrame === envId })}
+          style={{ borderColor: color, ["--estepper-frame-color" as string]: color }}
+        >
+          <span
+            className="estepper-envblock-label"
+            style={{ background: color }}
+            onMouseEnter={() => setHoveredFrame(envId)}
+            onMouseLeave={() => setHoveredFrame(null)}
+          >
+            {envId}
           </span>
           {Array.isArray(body)
             ? body.map((statement, i) => <div key={i}>{renderChild(statement)}</div>)
@@ -244,6 +256,9 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
                   step: Math.min(stepValue, lastStep) - 1,
                   hovered,
                   onHover: setHovered,
+                  frameColors,
+                  hoveredFrame,
+                  onHoverFrame: setHoveredFrame,
                 }) as React.ReactNode)
               ) : diagramSize.width > 0 && diagramSize.height > 0 ? (
                 <EnvDiagram
@@ -253,6 +268,8 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
                   lookups={step!.lookups ?? []}
                   hovered={hovered}
                   onHover={setHovered}
+                  hoveredFrame={hoveredFrame}
+                  onHoverFrame={setHoveredFrame}
                   width={diagramSize.width}
                   height={diagramSize.height}
                 />
