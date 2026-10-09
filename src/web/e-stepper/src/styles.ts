@@ -47,7 +47,9 @@ const E_STEPPER_CSS = `
   background: rgba(255, 255, 255, 0.12); color: #c5cbd3; vertical-align: 1px;
 }
 .sa-e-stepper .estepper-ref-name { font-weight: bold; margin-right: 2px; }
-.sa-e-stepper .estepper-ref.hovered .estepper-ref-badge { background: #ffd54f; color: #10161a; }
+.sa-e-stepper .estepper-ref.hovered .estepper-ref-badge {
+  background: #000000; color: #ffffff; box-shadow: 0 0 0 1px #c5cbd3;
+}
 `;
 
 const STYLE_ELEMENT_ID = "sa-e-stepper-styles";
