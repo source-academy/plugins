@@ -166,3 +166,59 @@ test("a general tree whose head element is itself an improper (non-general-tree)
   const result = classify(tree);
   expect(result.isGeneralTree).toBe(false);
 });
+
+// `llist(...)` encoding: a proper list `[e0, [e1, ... <end>]]`.
+const llist = (...elements: SerializedDataVisualizerNode[]): SerializedDataVisualizerNode =>
+  elements.reduceRight<SerializedDataVisualizerNode>((acc, e) => pair(e, acc), empty());
+const fn = (): SerializedDataVisualizerNode => ({
+  type: "function",
+  refId: nextRefId++,
+  displayValue: "<function>",
+});
+
+test("a list of functions is a general tree with functions as data items (issue #113)", () => {
+  // draw_data(llist(lambda x : x, lambda y: y, lambda z: z))
+  const result = classify(llist(fn(), fn(), fn()));
+  expect(result.isGeneralTree).toBe(true);
+  expect(result.layout).toBeDefined();
+});
+
+test("functions still disqualify Binary Tree View", () => {
+  const result = classify(pair(fn(), pair(empty(), pair(empty(), empty()))));
+  expect(result.isBinaryTree).toBe(false);
+});
+
+test("a general tree may mix functions with other data, at any depth", () => {
+  const result = classify(llist(leaf(1), llist(fn(), leaf(2)), fn()));
+  expect(result.isGeneralTree).toBe(true);
+});
+
+test("the same function appearing twice is repeated data, not shared structure", () => {
+  const f = fn();
+  const ref: SerializedDataVisualizerNode = {
+    type: "ref",
+    refId: (f as Extract<SerializedDataVisualizerNode, { type: "function" }>).refId,
+  };
+  const result = classify(llist(f, ref));
+  expect(result.isSharedStructure).toBe(false);
+  expect(result.isCyclic).toBe(false);
+  expect(result.isGeneralTree).toBe(true);
+});
+
+test("a shared pair is still shared structure, even alongside functions", () => {
+  const shared = pair(leaf(1), empty());
+  const ref: SerializedDataVisualizerNode = {
+    type: "ref",
+    refId: (shared as Extract<SerializedDataVisualizerNode, { type: "array" }>).refId,
+  };
+  const result = classify(llist(fn(), shared, ref));
+  expect(result.isSharedStructure).toBe(true);
+  expect(result.isGeneralTree).toBe(false);
+});
+
+test("a binary-tree-shaped node whose data is itself a list is not a binary tree (issue #84, case 5)", () => {
+  // draw_data([[1, [None, [None, None]]], [None, [None, None]]])
+  const result = classify(pair(binaryNode(1), pair(empty(), pair(empty(), empty()))));
+  expect(result.isBinaryTree).toBe(false);
+  expect(result.isGeneralTree).toBe(true);
+});

@@ -60,7 +60,15 @@ export type RefId = number;
  */
 export type SerializedDataVisualizerNode =
   | { type: "array"; refId: RefId; children: SerializedDataVisualizerNode[] }
-  | { type: "empty" }
+  | {
+      type: "empty";
+      /**
+       * How the language writes its empty value (e.g. `"None"` for Python), shown when the empty value
+       * is drawn on its own. Inside a pair/array it is always drawn as a diagonal slash instead. Omit it
+       * to get `"null"` (Source).
+       */
+      displayValue?: string;
+    }
   | { type: "leaf"; displayValue: string; label: string }
   | { type: "function"; refId: RefId; displayValue: string }
   | { type: "ref"; refId: RefId };

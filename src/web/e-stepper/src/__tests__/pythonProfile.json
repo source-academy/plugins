@@ -1,0 +1,415 @@
+{
+  "templates": {
+    "Program": [
+      {
+        "lines": "body"
+      }
+    ],
+    "ExpressionStatement": [
+      {
+        "child": "expression"
+      }
+    ],
+    "VariableDeclaration": [
+      {
+        "list": "declarations",
+        "sep": ", "
+      }
+    ],
+    "VariableDeclarator": [
+      {
+        "child": "id"
+      },
+      " = ",
+      {
+        "child": "init"
+      }
+    ],
+    "FunctionDeclaration": [
+      {
+        "token": "def ",
+        "cls": "identifier"
+      },
+      {
+        "prop": "id.name",
+        "cls": "identifier"
+      },
+      "(",
+      {
+        "list": "params",
+        "sep": ", "
+      },
+      "):",
+      {
+        "child": "body"
+      }
+    ],
+    "BlockStatement": [
+      {
+        "block": "body"
+      }
+    ],
+    "ReturnStatement": [
+      {
+        "token": "return ",
+        "cls": "operator"
+      },
+      {
+        "child": "argument"
+      }
+    ],
+    "IfStatement": [
+      {
+        "token": "if ",
+        "cls": "identifier"
+      },
+      {
+        "child": "test"
+      },
+      {
+        "token": ":",
+        "cls": "identifier"
+      },
+      {
+        "child": "consequent"
+      },
+      {
+        "when": "alternate",
+        "parts": [
+          {
+            "token": "else:",
+            "cls": "identifier"
+          },
+          {
+            "child": "alternate"
+          }
+        ]
+      }
+    ],
+    "PassStatement": [
+      {
+        "token": "pass",
+        "cls": "identifier"
+      }
+    ],
+    "ImportStatement": [
+      {
+        "prop": "raw",
+        "cls": "identifier"
+      }
+    ],
+    "Literal": [
+      {
+        "prop": "raw",
+        "cls": "literal"
+      }
+    ],
+    "Identifier": [
+      {
+        "prop": "name"
+      }
+    ],
+    "ModuleFunction": [
+      {
+        "prop": "name"
+      }
+    ],
+    "Builtin": [
+      {
+        "prop": "name"
+      }
+    ],
+    "BinaryExpression": [
+      {
+        "child": "left"
+      },
+      " ",
+      {
+        "prop": "operator",
+        "cls": "operator"
+      },
+      " ",
+      {
+        "child": "right",
+        "isRight": true
+      }
+    ],
+    "LogicalExpression": [
+      {
+        "child": "left"
+      },
+      " ",
+      {
+        "prop": "operator",
+        "cls": "operator"
+      },
+      " ",
+      {
+        "child": "right",
+        "isRight": true
+      }
+    ],
+    "UnaryExpression": [
+      {
+        "prop": "operator",
+        "cls": "operator"
+      },
+      {
+        "child": "argument"
+      }
+    ],
+    "ConditionalExpression": [
+      {
+        "child": "consequent"
+      },
+      {
+        "token": " if ",
+        "cls": "conditional"
+      },
+      {
+        "child": "test"
+      },
+      {
+        "token": " else ",
+        "cls": "conditional"
+      },
+      {
+        "child": "alternate"
+      }
+    ],
+    "CallExpression": [
+      {
+        "child": "callee"
+      },
+      "(",
+      {
+        "list": "arguments",
+        "sep": ", "
+      },
+      ")"
+    ],
+    "ArrowFunctionExpression": [
+      {
+        "token": "lambda",
+        "cls": "identifier"
+      },
+      {
+        "list": "params",
+        "sep": ", ",
+        "prefix": " "
+      },
+      {
+        "token": ": ",
+        "cls": "identifier"
+      },
+      {
+        "child": "body"
+      }
+    ],
+    "ArrayExpression": [
+      "[",
+      {
+        "list": "elements",
+        "sep": ", "
+      },
+      "]"
+    ],
+    "Opaque": [
+      {
+        "image": "dataUrl",
+        "altProp": "label"
+      },
+      {
+        "unless": "dataUrl",
+        "parts": [
+          {
+            "token": "<",
+            "cls": "identifier"
+          },
+          {
+            "prop": "label",
+            "cls": "identifier"
+          },
+          ">"
+        ]
+      }
+    ],
+    "MemberExpression": [
+      {
+        "child": "object"
+      },
+      "[",
+      {
+        "child": "property"
+      },
+      "]"
+    ],
+    "AssignmentStatement": [
+      {
+        "child": "target"
+      },
+      " = ",
+      {
+        "child": "value"
+      }
+    ],
+    "SpreadElement": [
+      {
+        "token": "*",
+        "cls": "operator"
+      },
+      {
+        "child": "argument"
+      }
+    ],
+    "WhileStatement": [
+      {
+        "token": "while ",
+        "cls": "identifier"
+      },
+      {
+        "child": "test"
+      },
+      {
+        "token": ":",
+        "cls": "identifier"
+      },
+      {
+        "child": "body"
+      }
+    ],
+    "ForStatement": [
+      {
+        "token": "for ",
+        "cls": "identifier"
+      },
+      {
+        "child": "target"
+      },
+      {
+        "token": " in ",
+        "cls": "identifier"
+      },
+      {
+        "child": "iter"
+      },
+      {
+        "token": ":",
+        "cls": "identifier"
+      },
+      {
+        "child": "body"
+      }
+    ],
+    "LoopIteration": [
+      {
+        "lines": "statements"
+      }
+    ],
+    "BreakStatement": [
+      {
+        "token": "break",
+        "cls": "identifier"
+      }
+    ],
+    "ContinueStatement": [
+      {
+        "token": "continue",
+        "cls": "identifier"
+      }
+    ],
+    "GlobalStatement": [
+      {
+        "token": "global ",
+        "cls": "identifier"
+      },
+      {
+        "prop": "names"
+      }
+    ],
+    "NonlocalStatement": [
+      {
+        "token": "nonlocal ",
+        "cls": "identifier"
+      },
+      {
+        "prop": "names"
+      }
+    ],
+    "EnvBlock": [
+      {
+        "token": "⟦",
+        "cls": "operator"
+      },
+      {
+        "prop": "envId",
+        "cls": "identifier"
+      },
+      {
+        "token": "⟧",
+        "cls": "operator"
+      }
+    ],
+    "Ref": [
+      {
+        "prop": "objectId",
+        "cls": "literal"
+      }
+    ]
+  },
+  "operatorPrecedence": {
+    "or": 2,
+    "and": 4,
+    "==": 8,
+    "!=": 8,
+    "<": 9,
+    ">": 9,
+    "<=": 9,
+    ">=": 9,
+    "+": 11,
+    "-": 11,
+    "*": 12,
+    "/": 12,
+    "//": 12,
+    "%": 12,
+    "**": 13
+  },
+  "expressionPrecedence": {
+    "Identifier": 20,
+    "ArrayExpression": 20,
+    "Opaque": 20,
+    "ModuleFunction": 20,
+    "Builtin": 20,
+    "Literal": 18,
+    "CallExpression": 18,
+    "UnaryExpression": 15,
+    "BinaryExpression": 14,
+    "LogicalExpression": 13,
+    "ConditionalExpression": 4,
+    "ArrowFunctionExpression": 1,
+    "FunctionDeclaration": 1,
+    "MemberExpression": 20,
+    "Ref": 20,
+    "EnvBlock": 20
+  },
+  "functionValues": [
+    {
+      "type": "ArrowFunctionExpression",
+      "nameProp": "name"
+    },
+    {
+      "type": "FunctionDeclaration",
+      "nameProp": "name"
+    }
+  ],
+  "hoverText": [
+    {
+      "type": "Builtin",
+      "textProp": "hoverText"
+    },
+    {
+      "type": "ModuleFunction",
+      "textProp": "hoverText"
+    }
+  ]
+}
