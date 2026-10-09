@@ -281,6 +281,19 @@ describe("EStepperView", () => {
       expect(view.root.findAllByType(ProgramArrows)).toHaveLength(1);
     });
 
+    test("Clear dead frames is also available when only a heap object is dead", () => {
+      const onlyObject: EStepperStep = {
+        ...fixture[2],
+        frames: fixture[2].frames.map(f => ({ ...f, isGarbage: false })),
+        heap: fixture[2].heap.map((o, i) => ({ ...o, isGarbage: i === 0 })),
+      };
+      const view = render({ steps: [onlyObject], profile });
+      const clear = view.root
+        .findAllByType(Button)
+        .find(b => b.props.text === "Clear dead frames")!;
+      expect(clear.props.disabled).toBe(false);
+    });
+
     test("Clear dead frames clears them from the diagram until the step changes", () => {
       const view = render({ steps: fixture, profile });
       const diagram = () => view.root.find(n => n.props.onAnchors && n.props.frames);

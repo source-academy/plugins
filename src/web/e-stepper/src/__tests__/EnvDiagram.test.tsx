@@ -120,6 +120,23 @@ describe("EnvDiagram", () => {
     expect(arrows).toContain(DiagramColors.stroke);
   });
 
+  test("draws the values in a dead frame grey too, not just its names", () => {
+    const frame = (id: string, parentId: string | null, isGarbage: boolean) => ({
+      id,
+      name: id === "Global" ? "global" : "f",
+      parentId,
+      bindings: [{ name: "n", value: { kind: "primitive" as const, display: "77", label: "int" } }],
+      isGarbage,
+    });
+    const { root } = draw({
+      frames: [frame("Global", null, false), frame("E1", "Global", true)],
+      heap: [],
+      activeFrameId: "Global",
+    });
+    const values = root.findAllByType(konva("konva-text")).filter(t => t.props.text === "77");
+    expect(values.map(t => t.props.fill)).toEqual([DiagramColors.text, DiagramColors.garbage]);
+  });
+
   test("reports hovering over a frame, and draws a hovered frame highlighted", () => {
     const onHoverFrame = vi.fn();
     const { root } = draw({ onHoverFrame, hoveredFrame: "E2" });

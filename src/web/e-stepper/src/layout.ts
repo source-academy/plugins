@@ -208,7 +208,9 @@ export function layoutDiagram(
       const frameHeight = Math.max(C.rowHeight, frame.bindings.length * C.rowHeight) + C.padding;
       frameBoxes.push({
         frame,
-        index: frames.indexOf(frame),
+        // The frame's colour index is its place in the step's whole frame list, dead frames
+        // included, so it keeps its colour when the dead ones are left out.
+        index: allFrames.indexOf(frame),
         x,
         y,
         width: frameWidth,

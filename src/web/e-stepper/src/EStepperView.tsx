@@ -367,7 +367,11 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
               icon="eraser"
               style={{ marginLeft: 8 }}
               text="Clear dead frames"
-              disabled={!hasRun || clearDead || !step?.frames.some(f => f.isGarbage)}
+              disabled={
+                !hasRun ||
+                clearDead ||
+                !(step?.frames.some(f => f.isGarbage) || step?.heap.some(o => o.isGarbage))
+              }
               onClick={() => setClearDead(true)}
             />
           </>

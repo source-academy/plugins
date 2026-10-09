@@ -152,4 +152,24 @@ describe("layoutDiagram with dead frames cleared", () => {
     const heap = last.heap.map(o => ({ ...o, isGarbage: false }));
     expect(layoutDiagram(live, heap, { clearDead: true })).toEqual(layoutDiagram(live, heap));
   });
+
+  test("a live frame keeps its colour index when dead frames before it are left out", () => {
+    const frame = (id: string, isGarbage: boolean) => ({
+      id,
+      name: "f",
+      parentId: "Global",
+      bindings: [],
+      isGarbage,
+    });
+    const frames = [
+      { ...frame("Global", false), name: "global", parentId: null },
+      frame("E1", true),
+      frame("E2", false),
+    ];
+    const layout = layoutDiagram(frames, [], { clearDead: true });
+    expect(layout.frames.map(b => [b.frame.id, b.index])).toEqual([
+      ["Global", 0],
+      ["E2", 2],
+    ]);
+  });
 });

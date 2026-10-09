@@ -209,7 +209,13 @@ function FrameDrawing(props: {
               text={valueLabel(row.value)}
               fontFamily={FONT}
               fontSize={FONT_SIZE}
-              fill={row.value.kind === "unassigned" ? DiagramColors.dimText : DiagramColors.text}
+              fill={
+                dead
+                  ? DiagramColors.garbage
+                  : row.value.kind === "unassigned"
+                    ? DiagramColors.dimText
+                    : DiagramColors.text
+              }
               fontStyle={row.value.kind === "builtin" ? "italic" : "normal"}
             />
           )}
