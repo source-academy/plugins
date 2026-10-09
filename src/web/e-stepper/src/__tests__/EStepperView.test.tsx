@@ -107,6 +107,16 @@ describe("EStepperView", () => {
     expect(slider().props.value).toBe(0);
   });
 
+  test("a run of one step gives the slider a valid range, disabled", () => {
+    const view = render({ steps: [fixture[0]], profile });
+    const slider = view.root.findByType(Slider);
+    expect(slider.props.min).toBe(0);
+    expect(slider.props.max).toBe(1);
+    expect(slider.props.disabled).toBe(true);
+    expect(slider.props.value).toBe(0);
+    expect(render({ steps: fixture, profile }).root.findByType(Slider).props.disabled).toBe(false);
+  });
+
   test("labels the ends of the slider and a round step in between, never crowding the end", () => {
     expect(sliderLabels(0)).toEqual([0]);
     expect(sliderLabels(1)).toEqual([0, 1]);
