@@ -2022,7 +2022,7 @@ __metadata:
     tslib: "npm:^2.8.1"
     typescript: "npm:^6.0.3"
   peerDependencies:
-    "@sourceacademy/common-cse-machine": ">=0.3.0"
+    "@sourceacademy/common-cse-machine": ">=0.3.1"
     "@sourceacademy/common-stepper": ">=0.0.4"
   languageName: unknown
   linkType: soft
@@ -2143,7 +2143,7 @@ __metadata:
     typescript: "npm:^6.0.3"
     vitest: "npm:^4.1.9"
   peerDependencies:
-    "@sourceacademy/common-cse-machine": ">=0.3.0"
+    "@sourceacademy/common-cse-machine": ">=0.3.1"
     "@sourceacademy/conductor": ^0.8.0
   languageName: unknown
   linkType: soft
@@ -2315,7 +2315,7 @@ __metadata:
     typescript: "npm:^6.0.3"
     vitest: "npm:^4.1.9"
   peerDependencies:
-    "@sourceacademy/common-cse-machine": ">=0.3.0"
+    "@sourceacademy/common-cse-machine": ">=0.3.1"
     "@sourceacademy/conductor": ^0.8.0
   languageName: unknown
   linkType: soft
