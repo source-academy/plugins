@@ -13,6 +13,7 @@ const E_STEPPER_CSS = `
 }
 .sa-e-stepper .estepper-divider {
   height: 6px; margin: 2px 0; cursor: row-resize; border-radius: 3px; background: rgba(255, 255, 255, 0.15);
+  flex: 0 0 auto;
 }
 .sa-e-stepper .estepper-divider.vertical {
   height: auto; width: 6px; margin: 0 -2px; align-self: stretch; cursor: col-resize; flex: 0 0 auto;
