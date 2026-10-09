@@ -55,6 +55,15 @@ function DefaultText() {
   );
 }
 
+/**
+ * The explanation and error cards take the height of their text. The host's side content styles
+ * its own cards to fill it (the Source Academy frontend: `.workspace .side-content .bp6-card {
+ * display: flex; height: 100% }`), and these are inside the side content too; now that the tab has
+ * a height, that would make the explanation as tall as the tab. Inline, so it outranks any
+ * stylesheet.
+ */
+const CARD_STYLE: React.CSSProperties = { height: "auto", flex: "0 0 auto" };
+
 /** The least height of the tab, and the gap it leaves below itself in the browser window. */
 const MIN_TAB_HEIGHT = 400;
 const BOTTOM_GAP = 16;
@@ -305,7 +314,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
         </ButtonGroup>
       </div>
       {error ? (
-        <Card style={{ marginTop: 8 }}>
+        <Card style={{ ...CARD_STYLE, marginTop: 8 }}>
           <Pre className="result-output">{error}</Pre>
         </Card>
       ) : null}
@@ -315,7 +324,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
         )
       ) : (
         <>
-          <Card style={{ margin: "8px 0" }}>
+          <Card style={{ ...CARD_STYLE, margin: "8px 0" }}>
             <Pre className="result-output">{explanation}</Pre>
           </Card>
           <div className={classNames("estepper-main", { narrow: !wide })}>
