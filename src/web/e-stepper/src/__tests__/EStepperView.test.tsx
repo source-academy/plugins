@@ -294,29 +294,51 @@ describe("EStepperView", () => {
       expect(clear.props.disabled).toBe(false);
     });
 
-    test("Clear dead frames clears them from the diagram until the step changes", () => {
+    test("Clear dead frames clears the dead frames and objects for good", () => {
       const view = render({ steps: fixture, profile });
       const diagram = () => view.root.find(n => n.props.onAnchors && n.props.frames);
       const clear = () =>
         view.root.findAllByType(Button).find(b => b.props.text === "Clear dead frames")!;
+      const press = (key: string) =>
+        act(() =>
+          view.root
+            .find(n => hasClass(n, "sa-e-stepper"))
+            .props.onKeyDown({ key, preventDefault: () => {} }),
+        );
       // Only the last step has dead frames (E2).
       expect(clear().props.disabled).toBe(true);
+      press("e");
+      expect(clear().props.disabled).toBe(false);
+      expect(diagram().props.cleared.frames.size).toBe(0);
+      act(() => clear().props.onClick());
+      const dead = fixture[2].frames.filter(f => f.isGarbage).map(f => f.id);
+      expect([...diagram().props.cleared.frames]).toEqual(dead);
+      expect(clear().props.disabled).toBe(true);
+      // Stepping does not bring them back (nothing more to clear either)...
+      press("b");
+      expect([...diagram().props.cleared.frames]).toEqual(dead);
+      press("e");
+      expect([...diagram().props.cleared.frames]).toEqual(dead);
+      expect(clear().props.disabled).toBe(true);
+    });
+
+    test("a new run starts with nothing cleared", () => {
+      const view = render({ steps: fixture, profile });
       act(() =>
         view.root
           .find(n => hasClass(n, "sa-e-stepper"))
           .props.onKeyDown({ key: "e", preventDefault: () => {} }),
       );
-      expect(diagram().props.clearDead).toBe(false);
-      expect(clear().props.disabled).toBe(false);
+      const clear = () =>
+        view.root.findAllByType(Button).find(b => b.props.text === "Clear dead frames")!;
       act(() => clear().props.onClick());
-      expect(diagram().props.clearDead).toBe(true);
-      expect(clear().props.disabled).toBe(true);
+      act(() => view.update(<EStepperView steps={[...fixture]} profile={profile} />));
       act(() =>
         view.root
           .find(n => hasClass(n, "sa-e-stepper"))
-          .props.onKeyDown({ key: "b", preventDefault: () => {} }),
+          .props.onKeyDown({ key: "e", preventDefault: () => {} }),
       );
-      expect(diagram().props.clearDead).toBe(false);
+      expect(clear().props.disabled).toBe(false);
     });
   });
 
