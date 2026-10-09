@@ -11,7 +11,6 @@ import { Arrow, Circle, Group, Layer, Line, Rect, Stage, Text } from "react-konv
 import { DiagramColors, frameColor } from "./colors";
 import {
   type ArrowSpec,
-  type Cleared,
   type FrameBox,
   layoutDiagram,
   LayoutConfig as C,
@@ -35,8 +34,8 @@ interface Props {
   onHoverFrame?: (frameId: string | null) => void;
   width: number;
   height: number;
-  /** The dead frames and objects the user cleared: left out. */
-  cleared?: Cleared;
+  /** Leave out the dead frames and objects. */
+  clearDead?: boolean;
   /**
    * Called with a function that finds where an object or frame is drawn now (in this component's
    * coordinates, with the user's pan and zoom), whenever that changes; with `null` on unmount.
@@ -50,8 +49,8 @@ interface Props {
  */
 export default function EnvDiagram(props: Props) {
   const layout = useMemo(
-    () => layoutDiagram(props.frames, props.heap, { cleared: props.cleared }),
-    [props.frames, props.heap, props.cleared],
+    () => layoutDiagram(props.frames, props.heap, { clearDead: props.clearDead }),
+    [props.frames, props.heap, props.clearDead],
   );
   const fitScale = Math.min(1, props.width / layout.width, props.height / layout.height);
   const [view, setView] = useState({ scale: fitScale, x: 0, y: 0 });

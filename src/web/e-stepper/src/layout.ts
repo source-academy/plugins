@@ -128,17 +128,10 @@ function arrowTarget(box: ObjectBox): Point {
 
 export interface LayoutOptions {
   /**
-   * Frames and heap objects the user has cleared (by id): they are left out wherever they are dead.
-   * Where they are still live (an earlier step), they are drawn. A live frame's ancestors are
+   * Leave out what is dead: garbage frames and garbage heap objects. A live frame's ancestors are
    * live, so the frames left are still a tree.
    */
-  cleared?: Cleared;
-}
-
-/** The ids of the dead frames and heap objects the user cleared. */
-export interface Cleared {
-  frames: ReadonlySet<string>;
-  objects: ReadonlySet<string>;
+  clearDead?: boolean;
 }
 
 export function layoutDiagram(
@@ -146,11 +139,8 @@ export function layoutDiagram(
   allHeap: EStepperHeapObject[],
   options: LayoutOptions = {},
 ): DiagramLayout {
-  const { cleared } = options;
-  const frames = cleared
-    ? allFrames.filter(f => !(f.isGarbage && cleared.frames.has(f.id)))
-    : allFrames;
-  const heap = cleared ? allHeap.filter(o => !(o.isGarbage && cleared.objects.has(o.id))) : allHeap;
+  const frames = options.clearDead ? allFrames.filter(f => !f.isGarbage) : allFrames;
+  const heap = options.clearDead ? allHeap.filter(o => !o.isGarbage) : allHeap;
   const frameById = new Map(frames.map(f => [f.id, f]));
   const objectById = new Map(heap.map(o => [o.id, o]));
 

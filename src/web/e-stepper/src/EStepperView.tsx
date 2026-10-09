@@ -26,7 +26,6 @@ import { injectStepperStyles } from "../../stepper/src/styles";
 import { frameColor } from "./colors";
 import EnvDiagram from "./EnvDiagram";
 import ProgramArrows, { ENV_ATTRIBUTE, REF_ATTRIBUTE } from "./ProgramArrows";
-import type { Cleared } from "./layout";
 import { injectEStepperStyles } from "./styles";
 
 /** Width (px) from which the program and the diagram are shown side by side. */
@@ -49,26 +48,6 @@ type Props = {
   /** The host's CSE machine visualization, if it lends one (see `ICseDiagramService`). */
   cseDiagram?: ICseDiagramService;
 };
-
-const NOTHING_CLEARED: Cleared = { frames: new Set(), objects: new Set() };
-
-const deadFrames = (step: EStepperStep, cleared: Cleared) =>
-  step.frames.filter(f => f.isGarbage && !cleared.frames.has(f.id));
-const deadObjects = (step: EStepperStep, cleared: Cleared) =>
-  step.heap.filter(o => o.isGarbage && !cleared.objects.has(o.id));
-
-/** Whether the step has dead frames or objects that are not cleared yet. */
-export function hasDeadToClear(step: EStepperStep, cleared: Cleared): boolean {
-  return deadFrames(step, cleared).length > 0 || deadObjects(step, cleared).length > 0;
-}
-
-/** What is cleared once the dead frames and objects of `step` are: for good, in every step. */
-export function clearDeadIn(step: EStepperStep, cleared: Cleared): Cleared {
-  return {
-    frames: new Set([...cleared.frames, ...deadFrames(step, cleared).map(f => f.id)]),
-    objects: new Set([...cleared.objects, ...deadObjects(step, cleared).map(o => o.id)]),
-  };
-}
 
 function DefaultText() {
   return (
@@ -169,8 +148,8 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
   const [outputOpen, setOutputOpen] = useState(true);
   // Display options. Program references (arrows from the program into the diagram) are off until the user asks.
   const [showArrows, setShowArrows] = useState(false);
-  // What "Clear dead frames" has cleared: for good, until the next run replaces the steps.
-  const [cleared, setCleared] = useState<Cleared>(NOTHING_CLEARED);
+  // "Clear dead frames" lasts until the step changes, as in the CSE machine.
+  const [clearDead, setClearDead] = useState(false);
   const [anchors, setAnchors] = useState<{ resolve: CseDiagramAnchorResolver | null }>({
     resolve: null,
   });
@@ -195,7 +174,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
     injectEStepperStyles();
   }, []);
   useEffect(() => setStepValue(1), [steps]);
-  useEffect(() => setCleared(NOTHING_CLEARED), [steps]);
+  useEffect(() => setClearDead(false), [steps, stepValue]);
 
   const lastStep = steps.length;
   const hasRun = lastStep > 0;
@@ -388,8 +367,12 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
               icon="eraser"
               style={{ marginLeft: 8 }}
               text="Clear dead frames"
-              disabled={!step || !hasDeadToClear(step, cleared)}
-              onClick={() => step && setCleared(clearDeadIn(step, cleared))}
+              disabled={
+                !hasRun ||
+                clearDead ||
+                !(step?.frames.some(f => f.isGarbage) || step?.heap.some(o => o.isGarbage))
+              }
+              onClick={() => setClearDead(true)}
             />
           </>
         )}
@@ -454,7 +437,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
                   onHoverFrame={setHoveredFrame}
                   width={diagramSize.width}
                   height={diagramSize.height}
-                  cleared={cleared}
+                  clearDead={clearDead}
                   onAnchors={onAnchors}
                 />
               ) : null}
