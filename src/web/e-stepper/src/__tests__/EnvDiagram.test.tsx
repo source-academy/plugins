@@ -104,6 +104,106 @@ describe("EnvDiagram", () => {
     expect(onHover).toHaveBeenLastCalledWith(null);
   });
 
+  test("draws dead frames, their data and their arrows grey, and live ones in their colours", () => {
+    const last = (steps as unknown as EStepperStep[])[2];
+    const { root } = draw({ frames: last.frames, heap: last.heap, activeFrameId: "Global" });
+    const outlines = root
+      .findAllByType(konva("konva-rect"))
+      .filter(r => r.props.cornerRadius === 6)
+      .map(r => r.props.stroke);
+    expect(outlines.filter(c => c === DiagramColors.garbage)).toHaveLength(
+      last.frames.filter(f => f.isGarbage).length,
+    );
+    expect(new Set(outlines).size).toBeGreaterThan(1);
+    const arrows = root.findAllByType(konva("konva-arrow")).map(a => a.props.stroke);
+    expect(arrows).toContain(DiagramColors.garbage);
+    expect(arrows).toContain(DiagramColors.stroke);
+  });
+
+  test("draws the values in a dead frame grey too, not just its names", () => {
+    const frame = (id: string, parentId: string | null, isGarbage: boolean) => ({
+      id,
+      name: id === "Global" ? "global" : "f",
+      parentId,
+      bindings: [{ name: "n", value: { kind: "primitive" as const, display: "77", label: "int" } }],
+      isGarbage,
+    });
+    const { root } = draw({
+      frames: [frame("Global", null, false), frame("E1", "Global", true)],
+      heap: [],
+      activeFrameId: "Global",
+    });
+    const values = root.findAllByType(konva("konva-text")).filter(t => t.props.text === "77");
+    expect(values.map(t => t.props.fill)).toEqual([DiagramColors.text, DiagramColors.garbage]);
+  });
+
+  describe("anchors for arrows from the program", () => {
+    const anchored = () => {
+      const onAnchors = vi.fn();
+      const view = draw({ onAnchors });
+      const latest = () => onAnchors.mock.calls.at(-1)![0];
+      return { ...view, onAnchors, latest };
+    };
+
+    test("tell where an object or a frame is drawn, and where it is not", () => {
+      const { latest } = anchored();
+      const resolve = latest();
+      const frame = resolve({ kind: "frame", id: "E1" });
+      const object = resolve({ kind: "object", id: "#1" });
+      expect(frame).toEqual({ x: expect.any(Number), y: expect.any(Number) });
+      expect(object).toEqual({ x: expect.any(Number), y: expect.any(Number) });
+      expect(resolve({ kind: "frame", id: "nope" })).toBeNull();
+      expect(resolve({ kind: "object", id: "nope" })).toBeNull();
+    });
+
+    test("follow the user's pan and zoom, and go away with the diagram", () => {
+      const { root, onAnchors, latest } = anchored();
+      const before = latest()({ kind: "frame", id: "E1" });
+      act(() =>
+        root
+          .findByType(konva("konva-stage"))
+          .props.onDragMove({ target: { x: () => 30, y: () => 40 } }),
+      );
+      const panned = latest()({ kind: "frame", id: "E1" });
+      expect(panned).toEqual({ x: before.x + 30, y: before.y + 40 });
+      act(() =>
+        root
+          .findByType(konva("konva-stage"))
+          .props.onDragEnd({ target: { x: () => 30, y: () => 40 } }),
+      );
+      const wheel = {
+        evt: { deltaY: -1, preventDefault: vi.fn() },
+        target: { getStage: () => ({ getPointerPosition: () => ({ x: 0, y: 0 }) }) },
+      };
+      act(() => root.findByType(konva("konva-stage")).props.onWheel(wheel));
+      expect(wheel.evt.preventDefault).toHaveBeenCalled();
+      expect(latest()({ kind: "frame", id: "E1" })).not.toEqual(panned);
+      expect(onAnchors).not.toHaveBeenLastCalledWith(null);
+    });
+
+    test("end when the diagram unmounts", () => {
+      const onAnchors = vi.fn();
+      let renderer!: TestRenderer.ReactTestRenderer;
+      act(() => {
+        renderer = TestRenderer.create(
+          <EnvDiagram
+            frames={step.frames}
+            heap={step.heap}
+            activeFrameId="Global"
+            lookups={[]}
+            hovered={null}
+            onHover={vi.fn()}
+            width={800}
+            height={600}
+            onAnchors={onAnchors}
+          />,
+        );
+      });
+      act(() => renderer.unmount());
+      expect(onAnchors).toHaveBeenLastCalledWith(null);
+    });
+  });
+
   test("reports hovering over a frame, and draws a hovered frame highlighted", () => {
     const onHoverFrame = vi.fn();
     const { root } = draw({ onHoverFrame, hoveredFrame: "E2" });

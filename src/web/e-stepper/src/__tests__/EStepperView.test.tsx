@@ -1,7 +1,7 @@
 import type { CseDiagramViewProps } from "@sourceacademy/common-cse-machine";
 import type { EStepperStep, SyntaxProfile } from "@sourceacademy/common-e-stepper";
 import { act, createElement } from "react";
-import { Button } from "@blueprintjs/core";
+import { Button, Popover, Switch } from "@blueprintjs/core";
 import TestRenderer from "react-test-renderer";
 import { describe, expect, test, vi } from "vitest";
 
@@ -15,7 +15,14 @@ vi.mock("react-konva", () => {
   );
 });
 
+// Blueprint's overlays need a DOM; the tests read the options menu's content from the props.
+vi.mock("@blueprintjs/core", async (importOriginal: () => Promise<object>) => ({
+  ...(await importOriginal()),
+  Popover: (props: Record<string, unknown>) => createElement("popover-stub", props),
+}));
+
 import EStepperView from "../EStepperView";
+import ProgramArrows from "../ProgramArrows";
 import steps from "./makeWithdrawSteps.json";
 
 /** A stubbed Konva shape's host element type (see the react-konva mock above). */
@@ -247,6 +254,72 @@ describe("EStepperView", () => {
     expect(explanation()).toBe("Start of evaluation");
   });
 
+  describe("display options", () => {
+    /** The options menu's switches, by label; the menu's content is rendered on its own. */
+    function options(view: TestRenderer.ReactTestRenderer) {
+      let menu!: TestRenderer.ReactTestRenderer;
+      act(() => {
+        menu = TestRenderer.create(view.root.findByType(Popover).props.content);
+      });
+      return Object.fromEntries(
+        menu.root.findAllByType(Switch).map(sw => [sw.props.label as string, sw]),
+      );
+    }
+    test("arrows are off by default", () => {
+      const view = render({ steps: fixture, profile });
+      expect(view.root.findAllByType(ProgramArrows)).toHaveLength(0);
+      expect(options(view)["From program"].props.checked).toBe(false);
+    });
+
+    test("arrows are drawn once the user turns them on and the diagram reports anchors", () => {
+      const view = render({ steps: fixture, profile });
+      const diagram = view.root.find(n => n.props.onAnchors && n.props.frames);
+      act(() => diagram.props.onAnchors(() => ({ x: 1, y: 2 })));
+      const arrows = options(view)["From program"];
+      expect(arrows.props.checked).toBe(false);
+      act(() => arrows.props.onChange({ currentTarget: { checked: true } }));
+      expect(view.root.findAllByType(ProgramArrows)).toHaveLength(1);
+    });
+
+    test("Clear dead frames is also available when only a heap object is dead", () => {
+      const onlyObject: EStepperStep = {
+        ...fixture[2],
+        frames: fixture[2].frames.map(f => ({ ...f, isGarbage: false })),
+        heap: fixture[2].heap.map((o, i) => ({ ...o, isGarbage: i === 0 })),
+      };
+      const view = render({ steps: [onlyObject], profile });
+      const clear = view.root
+        .findAllByType(Button)
+        .find(b => b.props.text === "Clear dead frames")!;
+      expect(clear.props.disabled).toBe(false);
+    });
+
+    test("Clear dead frames clears them from the diagram until the step changes", () => {
+      const view = render({ steps: fixture, profile });
+      const diagram = () => view.root.find(n => n.props.onAnchors && n.props.frames);
+      const clear = () =>
+        view.root.findAllByType(Button).find(b => b.props.text === "Clear dead frames")!;
+      // Only the last step has dead frames (E2).
+      expect(clear().props.disabled).toBe(true);
+      act(() =>
+        view.root
+          .find(n => hasClass(n, "sa-e-stepper"))
+          .props.onKeyDown({ key: "e", preventDefault: () => {} }),
+      );
+      expect(diagram().props.clearDead).toBe(false);
+      expect(clear().props.disabled).toBe(false);
+      act(() => clear().props.onClick());
+      expect(diagram().props.clearDead).toBe(true);
+      expect(clear().props.disabled).toBe(true);
+      act(() =>
+        view.root
+          .find(n => hasClass(n, "sa-e-stepper"))
+          .props.onKeyDown({ key: "b", preventDefault: () => {} }),
+      );
+      expect(diagram().props.clearDead).toBe(false);
+    });
+  });
+
   test("the output strip can be collapsed", () => {
     const view = render({ steps: [fixture[2]], profile });
     const toggle = view.root.find(n => hasClass(n, "estepper-output-toggle"));
@@ -265,6 +338,19 @@ describe("EStepperView", () => {
       );
       return { createView };
     };
+
+    test("leaves the arrows to the host's arrow menu, and draws them while it reports anchors", () => {
+      const cseDiagram = service();
+      const view = render({ steps: withCse, profile, cseDiagram });
+      // The host has its own toolbar; the plugin's options menu is for its own diagram.
+      expect(view.root.findAllByType(Popover)).toHaveLength(0);
+      expect(view.root.findAllByType(ProgramArrows)).toHaveLength(0);
+      const { onAnchors } = cseDiagram.createView.mock.calls.at(-1)![0];
+      act(() => onAnchors!(() => ({ x: 1, y: 2 })));
+      expect(view.root.findAllByType(ProgramArrows)).toHaveLength(1);
+      act(() => onAnchors!(null));
+      expect(view.root.findAllByType(ProgramArrows)).toHaveLength(0);
+    });
 
     test("draws the environments with it, at the current step", () => {
       const cseDiagram = service();

@@ -163,6 +163,23 @@ export interface CseSnapshotMessage {
 /*                         Host services for web plugins                      */
 /* -------------------------------------------------------------------------- */
 
+/** A point in a diagram view's own coordinates: pixels from the view's top-left corner. */
+export interface CseDiagramPoint {
+  x: number;
+  y: number;
+}
+
+/**
+ * Finds where a heap object or a frame is in a diagram view, as it is drawn right now (with the
+ * user's pan and zoom): the point an arrow pointing at it should end at. `null` if it is not
+ * drawn, e.g. when it is scrolled or collapsed out of the view.
+ */
+export type CseDiagramAnchorResolver = (target: {
+  kind: "object" | "frame";
+  /** A {@link CseSerializedValue.objectId} or a {@link CseSerializedEnvFrame.id}. */
+  id: string;
+}) => CseDiagramPoint | null;
+
 /** What {@link ICseDiagramService.createView} draws. */
 export interface CseDiagramViewProps {
   /** A run's snapshots; frames from earlier snapshots are shown as dead frames. */
@@ -186,6 +203,14 @@ export interface CseDiagramViewProps {
   hoveredFrame?: string | null;
   /** Called with a frame's id when the mouse enters the frame in the diagram, `null` when it leaves. */
   onHoverFrame?: (frameId: string | null) => void;
+  /**
+   * Asks the view to report where its objects and frames are, so the plugin can draw arrows into
+   * the diagram from its own panes (the environment stepper's program pane). Called whenever the
+   * drawing moves (a new step, pan, zoom, resize), and with `null` when the view no longer has
+   * anchors to give: when it unmounts, or when the host's arrow menu turns such arrows off.
+   * Optional: a host that does not support it never calls it, and the plugin draws no arrows.
+   */
+  onAnchors?: (resolve: CseDiagramAnchorResolver | null) => void;
 }
 
 /**

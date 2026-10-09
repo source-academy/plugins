@@ -1,5 +1,18 @@
-import { Button, ButtonGroup, Card, Classes, Pre, Slider } from "@blueprintjs/core";
-import type { CseSnapshot, ICseDiagramService } from "@sourceacademy/common-cse-machine";
+import {
+  Button,
+  ButtonGroup,
+  Card,
+  Classes,
+  Popover,
+  Pre,
+  Slider,
+  Switch,
+} from "@blueprintjs/core";
+import type {
+  CseDiagramAnchorResolver,
+  CseSnapshot,
+  ICseDiagramService,
+} from "@sourceacademy/common-cse-machine";
 import type {
   EStepperHeapObject,
   EStepperStep,
@@ -12,6 +25,7 @@ import { CustomASTRenderer, type NodeRenderers, type StepperNode } from "../../s
 import { injectStepperStyles } from "../../stepper/src/styles";
 import { frameColor } from "./colors";
 import EnvDiagram from "./EnvDiagram";
+import ProgramArrows, { ENV_ATTRIBUTE, REF_ATTRIBUTE } from "./ProgramArrows";
 import { injectEStepperStyles } from "./styles";
 
 /** Width (px) from which the program and the diagram are shown side by side. */
@@ -132,6 +146,17 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
   const [programHeight, setProgramHeight] = useState(DEFAULT_PROGRAM_HEIGHT);
   const [programShare, setProgramShare] = useState(DEFAULT_PROGRAM_SHARE);
   const [outputOpen, setOutputOpen] = useState(true);
+  // Display options. Program references (arrows from the program into the diagram) are off until the user asks.
+  const [showArrows, setShowArrows] = useState(false);
+  // "Clear dead frames" lasts until the step changes, as in the CSE machine.
+  const [clearDead, setClearDead] = useState(false);
+  const [anchors, setAnchors] = useState<{ resolve: CseDiagramAnchorResolver | null }>({
+    resolve: null,
+  });
+  const onAnchors = useCallback(
+    (resolve: CseDiagramAnchorResolver | null) => setAnchors({ resolve }),
+    [],
+  );
   const [containerRef, containerSize] = useSize();
   const [root, setRoot] = useState<HTMLElement | null>(null);
   const fillHeight = useFillHeight(root);
@@ -149,10 +174,12 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
     injectEStepperStyles();
   }, []);
   useEffect(() => setStepValue(1), [steps]);
+  useEffect(() => setClearDead(false), [steps, stepValue]);
 
   const lastStep = steps.length;
   const hasRun = lastStep > 0;
-  const step = hasRun ? steps[Math.min(stepValue, lastStep) - 1] : undefined;
+  const stepIndex = hasRun ? Math.min(stepValue, lastStep) - 1 : 0;
+  const step = hasRun ? steps[stepIndex] : undefined;
   const wide = containerSize.width >= WIDE_LAYOUT_MIN_WIDTH;
 
   const stepFirst = () => setStepValue(1);
@@ -201,7 +228,11 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
           }}
           onMouseLeave={() => setHoveredFrame(null)}
         >
-          <span className="estepper-envblock-label" style={{ background: color }}>
+          <span
+            className="estepper-envblock-label"
+            style={{ background: color }}
+            {...{ [ENV_ATTRIBUTE]: envId }}
+          >
             {envId}
           </span>
           {Array.isArray(body)
@@ -217,6 +248,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
       return (
         <span
           className={classNames("estepper-ref", { hovered: hovered === id })}
+          {...{ [REF_ATTRIBUTE]: id }}
           onMouseEnter={() => setHovered(id)}
           onMouseLeave={() => setHovered(null)}
         >
@@ -286,6 +318,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
     [cseDiagram, steps],
   );
 
+  const usingHostDiagram = cseDiagram !== undefined && cseSnapshots !== null;
   const explanation = step?.markers?.[0]?.explanation ?? "...";
   const output = step?.output ?? "";
 
@@ -312,6 +345,37 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
           <Button disabled={!hasRun} icon="chevron-right" onClick={stepNext} />
           <Button disabled={!hasRun} icon="double-chevron-right" onClick={stepLast} />
         </ButtonGroup>
+        {usingHostDiagram ? null : (
+          // The host's diagram has its own toolbar for these (its arrow filters, "Clear Dead
+          // Frames"); these are for the plugin's own diagram.
+          <>
+            <Popover
+              placement="bottom-end"
+              content={
+                <div className="estepper-options">
+                  <Switch
+                    label="From program"
+                    checked={showArrows}
+                    onChange={e => setShowArrows(e.currentTarget.checked)}
+                  />
+                </div>
+              }
+            >
+              <Button icon="settings" style={{ marginLeft: 8 }} aria-label="Display options" />
+            </Popover>
+            <Button
+              icon="eraser"
+              style={{ marginLeft: 8 }}
+              text="Clear dead frames"
+              disabled={
+                !hasRun ||
+                clearDead ||
+                !(step?.frames.some(f => f.isGarbage) || step?.heap.some(o => o.isGarbage))
+              }
+              onClick={() => setClearDead(true)}
+            />
+          </>
+        )}
       </div>
       {error ? (
         <Card style={{ ...CARD_STYLE, marginTop: 8 }}>
@@ -353,12 +417,13 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
               {cseDiagram && cseSnapshots ? (
                 (cseDiagram.createView({
                   snapshots: cseSnapshots,
-                  step: Math.min(stepValue, lastStep) - 1,
+                  step: stepIndex,
                   hovered,
                   onHover: setHovered,
                   frameColors,
                   hoveredFrame,
                   onHoverFrame: setHoveredFrame,
+                  onAnchors,
                 }) as React.ReactNode)
               ) : diagramSize.width > 0 && diagramSize.height > 0 ? (
                 <EnvDiagram
@@ -372,9 +437,19 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
                   onHoverFrame={setHoveredFrame}
                   width={diagramSize.width}
                   height={diagramSize.height}
+                  clearDead={clearDead}
+                  onAnchors={onAnchors}
                 />
               ) : null}
             </div>
+            {(usingHostDiagram ? anchors.resolve !== null : showArrows) ? (
+              <ProgramArrows
+                resolve={anchors.resolve}
+                hovered={hovered}
+                hoveredFrame={hoveredFrame}
+                colorOfFrame={colorOf}
+              />
+            ) : null}
           </div>
         </>
       )}

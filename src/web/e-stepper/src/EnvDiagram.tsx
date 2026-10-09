@@ -1,3 +1,4 @@
+import type { CseDiagramAnchorResolver } from "@sourceacademy/common-cse-machine";
 import type {
   EStepperFrame,
   EStepperHeapObject,
@@ -33,6 +34,13 @@ interface Props {
   onHoverFrame?: (frameId: string | null) => void;
   width: number;
   height: number;
+  /** Leave out the dead frames and objects. */
+  clearDead?: boolean;
+  /**
+   * Called with a function that finds where an object or frame is drawn now (in this component's
+   * coordinates, with the user's pan and zoom), whenever that changes; with `null` on unmount.
+   */
+  onAnchors?: (resolve: CseDiagramAnchorResolver | null) => void;
 }
 
 /**
@@ -40,7 +48,10 @@ interface Props {
  * (drag) and zoomable (mouse wheel); it is fitted to the available space whenever a new run arrives.
  */
 export default function EnvDiagram(props: Props) {
-  const layout = useMemo(() => layoutDiagram(props.frames, props.heap), [props.frames, props.heap]);
+  const layout = useMemo(
+    () => layoutDiagram(props.frames, props.heap, { clearDead: props.clearDead }),
+    [props.frames, props.heap, props.clearDead],
+  );
   const fitScale = Math.min(1, props.width / layout.width, props.height / layout.height);
   const [view, setView] = useState({ scale: fitScale, x: 0, y: 0 });
 
@@ -49,6 +60,24 @@ export default function EnvDiagram(props: Props) {
   useEffect(() => {
     setView(v => (v.scale > fitScale ? { scale: fitScale, x: 0, y: 0 } : v));
   }, [fitScale]);
+
+  const { onAnchors } = props;
+  useEffect(() => {
+    onAnchors?.(({ kind, id }) => {
+      // Arrows end at the left edge of an object, and at the left edge of a frame's box.
+      const at =
+        kind === "object"
+          ? layout.objects.find(b => b.object.id === id)
+          : layout.frames.find(b => b.frame.id === id);
+      if (!at) return null;
+      const point =
+        "object" in at
+          ? { x: at.x, y: at.y + at.height / 2 }
+          : { x: at.x, y: at.y + C.headerHeight + at.height / 2 };
+      return { x: view.x + point.x * view.scale, y: view.y + point.y * view.scale };
+    });
+  }, [onAnchors, layout, view]);
+  useEffect(() => () => onAnchors?.(null), [onAnchors]);
 
   const lookedUp = new Set(props.lookups.map(l => `${l.frameId}\u0000${l.name}`));
 
@@ -61,6 +90,7 @@ export default function EnvDiagram(props: Props) {
       y={view.y}
       scaleX={view.scale}
       scaleY={view.scale}
+      onDragMove={e => setView(v => ({ ...v, x: e.target.x(), y: e.target.y() }))}
       onDragEnd={e => setView(v => ({ ...v, x: e.target.x(), y: e.target.y() }))}
       onWheel={e => {
         e.evt.preventDefault();
@@ -111,7 +141,10 @@ function FrameDrawing(props: {
   lookedUp: Set<string>;
 }) {
   const { box } = props;
-  const color = frameColor(box.index);
+  // What is dead is grey: the frame, its bindings and the arrows from it.
+  const dead = box.frame.isGarbage;
+  const color = dead ? DiagramColors.garbage : frameColor(box.index);
+  const textColor = dead ? DiagramColors.garbage : DiagramColors.text;
   const boxTop = box.y + C.headerHeight;
   return (
     <Group
@@ -160,14 +193,14 @@ function FrameDrawing(props: {
             text={`${row.name}:`}
             fontFamily={FONT}
             fontSize={FONT_SIZE}
-            fill={DiagramColors.text}
+            fill={textColor}
           />
           {row.value.kind === "ref" ? (
             <Circle
               x={row.valueX + C.dotRadius}
               y={row.y}
               radius={C.dotRadius}
-              fill={DiagramColors.stroke}
+              fill={dead ? DiagramColors.garbage : DiagramColors.stroke}
             />
           ) : (
             <Text
@@ -176,7 +209,13 @@ function FrameDrawing(props: {
               text={valueLabel(row.value)}
               fontFamily={FONT}
               fontSize={FONT_SIZE}
-              fill={row.value.kind === "unassigned" ? DiagramColors.dimText : DiagramColors.text}
+              fill={
+                dead
+                  ? DiagramColors.garbage
+                  : row.value.kind === "unassigned"
+                    ? DiagramColors.dimText
+                    : DiagramColors.text
+              }
               fontStyle={row.value.kind === "builtin" ? "italic" : "normal"}
             />
           )}
@@ -194,7 +233,9 @@ function ObjectDrawing(props: {
   const { box } = props;
   const object = box.object;
   // A hovered object keeps its outline and gets a darker background (its circles, its boxes).
-  const stroke = DiagramColors.stroke;
+  const dead = object.isGarbage;
+  const stroke = dead ? DiagramColors.garbage : DiagramColors.stroke;
+  const textColor = dead ? DiagramColors.garbage : DiagramColors.text;
   const strokeWidth = 2;
   const fill = props.hovered ? DiagramColors.hoverBackground : undefined;
   const label =
@@ -211,7 +252,7 @@ function ObjectDrawing(props: {
         text={label}
         fontFamily={FONT}
         fontSize={FONT_SIZE - 1}
-        fill={props.hovered ? DiagramColors.text : DiagramColors.dimText}
+        fill={props.hovered ? textColor : DiagramColors.dimText}
       />
       {object.kind === "function" ? (
         <>
@@ -302,7 +343,7 @@ function ObjectDrawing(props: {
                 text={valueLabel(element)}
                 fontFamily={FONT}
                 fontSize={FONT_SIZE}
-                fill={DiagramColors.text}
+                fill={textColor}
                 wrap="none"
                 ellipsis
               />
@@ -324,11 +365,12 @@ function isNone(value: EStepperValue): boolean {
 
 function ArrowDrawing(props: { arrow: ArrowSpec }) {
   const { arrow } = props;
+  const color = arrow.garbage ? DiagramColors.garbage : DiagramColors.stroke;
   return (
     <Arrow
       points={[arrow.from.x, arrow.from.y, arrow.to.x, arrow.to.y]}
-      stroke={DiagramColors.stroke}
-      fill={DiagramColors.stroke}
+      stroke={color}
+      fill={color}
       strokeWidth={1.5}
       pointerLength={7}
       pointerWidth={6}

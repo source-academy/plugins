@@ -125,3 +125,51 @@ test("the global frame is neutral, other frames get distinct colours", () => {
   const colors = [0, 1, 2, 3].map(frameColor);
   expect(new Set(colors).size).toBe(4);
 });
+
+describe("layoutDiagram with dead frames cleared", () => {
+  const full = layoutDiagram(last.frames, last.heap);
+  const cleared = layoutDiagram(last.frames, last.heap, { clearDead: true });
+  const deadObjects = last.heap.filter(o => o.isGarbage).map(o => o.id);
+
+  test("garbage frames and objects are left out, and the rest stays", () => {
+    const dead = last.frames.filter(f => f.isGarbage).map(f => f.id);
+    expect(dead.length).toBeGreaterThan(0);
+    expect(cleared.frames.map(b => b.frame.id)).toEqual(
+      full.frames.map(b => b.frame.id).filter(id => !dead.includes(id)),
+    );
+    expect(cleared.objects.map(o => o.object.id)).toEqual(
+      full.objects.map(o => o.object.id).filter(id => !deadObjects.includes(id)),
+    );
+  });
+
+  test("no arrow starts or ends at something that is gone", () => {
+    expect(cleared.arrows.length).toBeLessThan(full.arrows.length);
+    expect(cleared.arrows.every(a => !a.garbage)).toBe(true);
+  });
+
+  test("nothing changes when nothing is dead", () => {
+    const live = last.frames.map(f => ({ ...f, isGarbage: false }));
+    const heap = last.heap.map(o => ({ ...o, isGarbage: false }));
+    expect(layoutDiagram(live, heap, { clearDead: true })).toEqual(layoutDiagram(live, heap));
+  });
+
+  test("a live frame keeps its colour index when dead frames before it are left out", () => {
+    const frame = (id: string, isGarbage: boolean) => ({
+      id,
+      name: "f",
+      parentId: "Global",
+      bindings: [],
+      isGarbage,
+    });
+    const frames = [
+      { ...frame("Global", false), name: "global", parentId: null },
+      frame("E1", true),
+      frame("E2", false),
+    ];
+    const layout = layoutDiagram(frames, [], { clearDead: true });
+    expect(layout.frames.map(b => [b.frame.id, b.index])).toEqual([
+      ["Global", 0],
+      ["E2", 2],
+    ]);
+  });
+});
