@@ -309,9 +309,12 @@ function ObjectDrawing(props: {
   );
 }
 
-/** Python's None, drawn in a list's box as a slash. */
+/**
+ * Python's None, drawn in a list's box as a slash. Told by its rendered text, not its type tag
+ * (whatever a producer calls the type): a string reads `'None'`, with quotes.
+ */
 function isNone(value: EStepperValue): boolean {
-  return value.kind === "primitive" && value.label === "None";
+  return value.kind === "primitive" && value.display === "None";
 }
 
 function ArrowDrawing(props: { arrow: ArrowSpec }) {
