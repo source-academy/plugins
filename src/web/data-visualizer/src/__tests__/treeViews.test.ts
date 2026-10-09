@@ -36,12 +36,13 @@ vi.mock("react-konva", () => {
 import { Text } from "react-konva";
 
 import type { ClassificationResult } from "../classify";
+import { Config } from "../Config";
 import { ArrowDrawable, BackwardArrowDrawable } from "../drawable/Drawable";
 import { AlreadyParsedTreeNode } from "../tree/AlreadyParsedTreeNode";
 import { BinaryTreeDrawer } from "../tree/BinaryTreeDrawer";
 import { GeneralTreeDrawer } from "../tree/GeneralTreeDrawer";
 import { Tree } from "../tree/Tree";
-import { ArrayTreeNode, FunctionTreeNode } from "../tree/TreeNode";
+import { ArrayTreeNode, DataTreeNode, FunctionTreeNode } from "../tree/TreeNode";
 
 const empty = (): SerializedDataVisualizerNode => ({ type: "empty" });
 const leaf = (n: number): SerializedDataVisualizerNode => ({
@@ -145,6 +146,11 @@ describe("BinaryTreeDrawer", () => {
     expect(deep.height).toBeGreaterThan(single.height);
   });
 
+  test("an empty value carries the language's spelling of it through to the root node", () => {
+    const tree = Tree.fromSerializedNode({ type: "empty", displayValue: "None" });
+    expect((tree.rootNode as DataTreeNode).displayValue).toBe("None");
+  });
+
   test("the bare empty terminator is a trivial valid binary tree, drawn via the measured-text branch", () => {
     // Per isBinaryTreeNode: a binary tree is `null`, or a 3-element list — a bare *leaf* value is
     // neither, so (unlike this case) it fails classification and hits the warning box instead.
@@ -209,7 +215,191 @@ describe("BinaryTreeDrawer", () => {
   });
 });
 
+describe("BinaryTreeDrawer canvas (issue #84)", () => {
+  // Python value -> wire node, the way py-slang serializes it (2-element list -> pair).
+  type Py = null | number | string | Py[];
+  const py = (v: Py): SerializedDataVisualizerNode =>
+    v === null
+      ? empty()
+      : Array.isArray(v)
+        ? { type: "array", refId: nextRefId++, children: v.map(py) }
+        : typeof v === "number"
+          ? leaf(v)
+          : { type: "leaf", displayValue: v, label: "string" };
+  const N = null;
+
+  test.each<[string, Py]>([
+    [
+      "left-skewed (case 1)",
+      [
+        1,
+        [
+          [
+            2,
+            [
+              [
+                3,
+                [
+                  [4, [N, [N, N]]],
+                  [N, N],
+                ],
+              ],
+              [N, N],
+            ],
+          ],
+          [N, N],
+        ],
+      ],
+    ],
+    [
+      "right-skewed (case 2)",
+      ["A", [N, [["B", [N, [["C", [N, [["D", [N, [N, N]]], N]]], N]]], N]]],
+    ],
+    ["right child only (case 3)", [10, [N, [[15, [N, [N, N]]], N]]]],
+  ])("every box of a %s tree is drawn inside the canvas", (_: string, value: Py) => {
+    const tree = Tree.fromSerializedNode(py(value));
+    const drawer = tree.draw("binaryTree") as BinaryTreeDrawer;
+    const stage = drawer.draw(0, 0, 0) as React.ReactElement<{
+      width: number;
+      height: number;
+      children: React.ReactElement<{ offsetX: number; offsetY: number }>;
+    }>;
+    const { offsetX, offsetY } = stage.props.children.props;
+
+    const boxes: ArrayTreeNode[] = [];
+    const walk = (node: unknown) => {
+      if (node instanceof ArrayTreeNode) {
+        boxes.push(node);
+        node.children?.forEach(walk);
+      }
+    };
+    walk(tree.rootNode);
+    expect(boxes.length).toBeGreaterThan(0);
+    for (const box of boxes) {
+      // The layer is shifted by -offsetX/-offsetY, so that is where each box actually lands.
+      const x = box.drawableX! - offsetX;
+      const y = box.drawableY! - offsetY;
+      expect(x).toBeGreaterThanOrEqual(0);
+      expect(x + Config.BoxWidth * 2).toBeLessThanOrEqual(stage.props.width);
+      expect(y).toBeGreaterThanOrEqual(0);
+      expect(y + Config.BoxHeight).toBeLessThanOrEqual(stage.props.height);
+    }
+  });
+});
+
+describe("BinaryTreeDrawer canvas margin", () => {
+  // DataVisualizerView draws with a 1px margin (Config.StrokeWidth / 2), not 0. With a margin the
+  // root's data slot is also "to the right of" runningX2's initial 0, so it must not be counted as
+  // a right branch: that would widen even a single node's canvas by hundreds of pixels.
+  const margin = Config.StrokeWidth / 2;
+  const leaf1 = (): SerializedDataVisualizerNode => leaf(1);
+  const node = (
+    left: SerializedDataVisualizerNode = empty(),
+    right: SerializedDataVisualizerNode = empty(),
+  ): SerializedDataVisualizerNode => pair(leaf1(), pair(left, pair(right, empty())));
+  const widthAt = (value: SerializedDataVisualizerNode, m: number): number => {
+    const drawer = Tree.fromSerializedNode(value).draw("binaryTree") as BinaryTreeDrawer;
+    return (drawer.draw(m, m, 0) as React.ReactElement<{ width: number }>).props.width;
+  };
+
+  test.each<[string, () => SerializedDataVisualizerNode]>([
+    ["a single node", () => node()],
+    ["a node with a right child", () => node(empty(), node())],
+    ["a node with a left child", () => node(node())],
+  ])(
+    "%s: the canvas grows only by the margin, not by a phantom branch",
+    (_: string, make: () => SerializedDataVisualizerNode) => {
+      expect(widthAt(make(), margin)).toBe(widthAt(make(), 0) + margin * 2);
+    },
+  );
+});
+
 describe("GeneralTreeDrawer", () => {
+  test("draws a list of functions as a tree with three data items, not the warning box (issue #113)", () => {
+    // draw_data(llist(lambda x : x, lambda y: y, lambda z: z))
+    const fn = (): SerializedDataVisualizerNode => ({
+      type: "function",
+      refId: nextRefId++,
+      displayValue: "<function>",
+    });
+    const tree = Tree.fromSerializedNode(pair(fn(), pair(fn(), pair(fn(), empty()))));
+    const drawer = tree.draw("generalTree") as GeneralTreeDrawer;
+    const element = drawer.draw(0, 0, 0) as React.ReactElement<{ width: number }>;
+    expect(element.props.width).not.toBe(445);
+    const drawn = internals(drawer).drawables;
+    expect(drawn.length).toBeGreaterThan(0);
+  });
+
+  test.each([
+    ["llist(f, f, f)", "flat"],
+    ["llist(llist(1, 2), f)", "nestedFirst"],
+    ["llist(1, llist(f, 2), f)", "mixed"],
+    ["llist(llist(llist(f)), f, llist(f, f))", "deep"],
+  ])(
+    "functions in %s are drawn inside the canvas without overlapping anything",
+    (_: string, shape: string) => {
+      const fn = (): SerializedDataVisualizerNode => ({
+        type: "function",
+        refId: nextRefId++,
+        displayValue: "<function>",
+      });
+      const llist = (...elements: SerializedDataVisualizerNode[]): SerializedDataVisualizerNode =>
+        elements.reduceRight<SerializedDataVisualizerNode>((acc, e) => pair(e, acc), empty());
+      const shapes: Record<string, () => SerializedDataVisualizerNode> = {
+        flat: () => llist(fn(), fn(), fn()),
+        nestedFirst: () => llist(llist(leaf(1), leaf(2)), fn()),
+        mixed: () => llist(leaf(1), llist(fn(), leaf(2)), fn()),
+        deep: () => llist(llist(llist(fn())), fn(), llist(fn(), fn())),
+      };
+      const tree = Tree.fromSerializedNode(shapes[shape]());
+      const drawer = tree.draw("generalTree") as GeneralTreeDrawer;
+      const stage = drawer.draw(0, 0, 0) as React.ReactElement<{ width: number; height: number }>;
+
+      // Every drawn pair (two boxes wide) and function glyph (two large circles wide), with its extent.
+      const boxes: { x: number; y: number; w: number; isFunction: boolean }[] = [];
+      let functionCount = 0;
+      const seen = new Set<unknown>();
+      const walk = (node: unknown) => {
+        if (node === undefined || seen.has(node)) return;
+        seen.add(node);
+        if (node instanceof FunctionTreeNode) {
+          functionCount++;
+          boxes.push({
+            x: node.drawableX!,
+            y: node.drawableY!,
+            w: Config.CircleRadiusLarge * 4 + Config.StrokeWidth,
+            isFunction: true,
+          });
+        }
+        if (node instanceof ArrayTreeNode) {
+          boxes.push({
+            x: node.drawableX!,
+            y: node.drawableY!,
+            w: Config.BoxWidth * 2,
+            isFunction: false,
+          });
+          node.children?.forEach(walk);
+        }
+      };
+      walk(tree.rootNode);
+      expect(functionCount).toBeGreaterThan(0);
+
+      // Bounds are checked for function glyphs only: a pair box in the rightmost column already runs
+      // 1px past the canvas on main (the width formula leaves out leftMargin), unrelated to functions.
+      for (const box of boxes.filter(b => b.isFunction)) {
+        expect(box.x + box.w).toBeLessThanOrEqual(stage.props.width);
+        expect(box.y + Config.BoxHeight).toBeLessThanOrEqual(stage.props.height);
+      }
+      for (const a of boxes) {
+        for (const b of boxes) {
+          if (a !== b && a.y === b.y) {
+            expect(a.x + a.w <= b.x || b.x + b.w <= a.x).toBe(true);
+          }
+        }
+      }
+    },
+  );
+
   test("a non-general-tree structure draws the fixed-size warning box instead of a tree", () => {
     // An *improper* list (here, a bare 2-tuple whose second slot is a leaf rather than another pair
     // or the empty terminator) is the only shape General Tree View actually rejects — a binary-tree-
