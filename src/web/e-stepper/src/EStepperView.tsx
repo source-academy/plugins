@@ -365,53 +365,56 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
       onKeyDown={onKeyDown}
       tabIndex={-1}
     >
-      <Slider
-        disabled={!hasRun}
-        min={1}
-        max={Math.max(1, lastStep)}
-        labelStepSize={Math.max(1, Math.ceil(lastStep / 10))}
-        onChange={setStepValue}
-        value={Math.min(stepValue, Math.max(1, lastStep))}
-      />
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <ButtonGroup>
-          <Button disabled={!hasRun} icon="double-chevron-left" onClick={stepFirst} />
-          <Button disabled={!hasRun} icon="chevron-left" onClick={stepPrevious} />
-          <Button disabled={!hasRun} icon="chevron-right" onClick={stepNext} />
-          <Button disabled={!hasRun} icon="double-chevron-right" onClick={stepLast} />
-        </ButtonGroup>
-        {usingHostDiagram ? null : (
-          // The host's diagram has its own toolbar for these (its arrow filters, "Clear Dead
-          // Frames"); these are for the plugin's own diagram.
-          <>
-            <Popover
-              placement="bottom-end"
-              content={
-                <div className="estepper-options">
-                  <Switch
-                    label="From program"
-                    checked={showArrows}
-                    onChange={e => setShowArrows(e.currentTarget.checked)}
-                  />
-                </div>
-              }
-            >
-              <Button icon="settings" style={{ marginLeft: 8 }} aria-label="Display options" />
-            </Popover>
-            <Button
-              icon="eraser"
-              style={{ marginLeft: 8 }}
-              text="Clear dead frames"
-              disabled={
-                !hasRun ||
-                clearDead ||
-                !(step?.frames.some(f => f.isGarbage) || step?.heap.some(o => o.isGarbage))
-              }
-              onClick={() => setClearDead(true)}
-            />
-          </>
-        )}
-      </div>
+      {/* The step controls are for a run: before one there is nothing to step through. */}
+      {hasRun ? (
+        <>
+          <Slider
+            min={1}
+            max={Math.max(1, lastStep)}
+            labelStepSize={Math.max(1, Math.ceil(lastStep / 10))}
+            onChange={setStepValue}
+            value={Math.min(stepValue, Math.max(1, lastStep))}
+          />
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <ButtonGroup>
+              <Button icon="double-chevron-left" onClick={stepFirst} />
+              <Button icon="chevron-left" onClick={stepPrevious} />
+              <Button icon="chevron-right" onClick={stepNext} />
+              <Button icon="double-chevron-right" onClick={stepLast} />
+            </ButtonGroup>
+            {usingHostDiagram ? null : (
+              // The host's diagram has its own toolbar for these (its arrow filters, "Clear Dead
+              // Frames"); these are for the plugin's own diagram.
+              <>
+                <Popover
+                  placement="bottom-end"
+                  content={
+                    <div className="estepper-options">
+                      <Switch
+                        label="From program"
+                        checked={showArrows}
+                        onChange={e => setShowArrows(e.currentTarget.checked)}
+                      />
+                    </div>
+                  }
+                >
+                  <Button icon="settings" style={{ marginLeft: 8 }} aria-label="Display options" />
+                </Popover>
+                <Button
+                  icon="eraser"
+                  style={{ marginLeft: 8 }}
+                  text="Clear dead frames"
+                  disabled={
+                    clearDead ||
+                    !(step?.frames.some(f => f.isGarbage) || step?.heap.some(o => o.isGarbage))
+                  }
+                  onClick={() => setClearDead(true)}
+                />
+              </>
+            )}
+          </div>
+        </>
+      ) : null}
       {error ? (
         <Card style={{ ...CARD_STYLE, marginTop: 8 }}>
           <Pre className="result-output">{error}</Pre>

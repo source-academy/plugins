@@ -1,7 +1,7 @@
 import type { CseDiagramViewProps } from "@sourceacademy/common-cse-machine";
 import type { EStepperStep, SyntaxProfile } from "@sourceacademy/common-e-stepper";
 import { act, createElement } from "react";
-import { Button, Popover, Switch } from "@blueprintjs/core";
+import { Button, Popover, Slider, Switch } from "@blueprintjs/core";
 import TestRenderer from "react-test-renderer";
 import { describe, expect, test, vi } from "vitest";
 
@@ -84,6 +84,15 @@ describe("EStepperView", () => {
   test("shows the welcome text before anything has run", () => {
     const view = render({ steps: [] });
     expect(text(view.root)).toContain("Welcome to the environment stepper");
+  });
+
+  test("has no step controls before anything has run, and has them once there are steps", () => {
+    const before = render({ steps: [] });
+    expect(before.root.findAllByType(Slider)).toHaveLength(0);
+    expect(before.root.findAllByType(Button)).toHaveLength(0);
+    const after = render({ steps: fixture, profile });
+    expect(after.root.findAllByType(Slider)).toHaveLength(1);
+    expect(after.root.findAllByType(Button).length).toBeGreaterThan(0);
   });
 
   test("shows a runner error", () => {
