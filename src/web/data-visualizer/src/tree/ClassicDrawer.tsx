@@ -2,7 +2,7 @@ import Konva from "konva";
 import { Layer, Stage, Text } from "react-konva";
 
 import { Config } from "../Config";
-import { formatLeaf } from "../format";
+import { formatRoot } from "../format";
 import { ArrowDrawable, BackwardArrowDrawable } from "../drawable/Drawable";
 import { AlreadyParsedTreeNode } from "./AlreadyParsedTreeNode";
 import type { Tree } from "./Tree";
@@ -50,7 +50,7 @@ export class ClassicDrawer {
   draw(x: number, y: number, key: number): React.ReactElement {
     if (this.tree.rootNode instanceof DataTreeNode) {
       const root = this.tree.rootNode;
-      const text = root.isEmpty ? "null" : formatLeaf(root.displayValue!, root.label!);
+      const text = formatRoot(root);
       const textConfig = {
         text: text,
         align: "center",

@@ -2047,6 +2047,27 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@sourceacademy/common-e-stepper@workspace:*, @sourceacademy/common-e-stepper@workspace:src/common/e-stepper":
+  version: 0.0.0-use.local
+  resolution: "@sourceacademy/common-e-stepper@workspace:src/common/e-stepper"
+  dependencies:
+    "@rollup/plugin-node-resolve": "npm:^16.0.3"
+    "@rollup/plugin-terser": "npm:^1.0.0"
+    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@sourceacademy/common-cse-machine": "workspace:*"
+    "@sourceacademy/common-stepper": "workspace:*"
+    "@types/jest": "npm:^30.0.0"
+    jest: "npm:^30.4.2"
+    rollup: "npm:^4.60.2"
+    ts-jest: "npm:^29.4.11"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^6.0.3"
+  peerDependencies:
+    "@sourceacademy/common-cse-machine": ">=0.3.1"
+    "@sourceacademy/common-stepper": ">=0.0.4"
+  languageName: unknown
+  linkType: soft
+
 "@sourceacademy/common-module-loader@workspace:*, @sourceacademy/common-module-loader@workspace:src/common/module-loader":
   version: 0.0.0-use.local
   resolution: "@sourceacademy/common-module-loader@workspace:src/common/module-loader"
@@ -2163,7 +2184,7 @@ __metadata:
     typescript: "npm:^6.0.3"
     vitest: "npm:^4.1.9"
   peerDependencies:
-    "@sourceacademy/common-cse-machine": ">=0.3.0"
+    "@sourceacademy/common-cse-machine": ">=0.3.1"
     "@sourceacademy/conductor": ^0.8.0
   languageName: unknown
   linkType: soft
@@ -2185,6 +2206,31 @@ __metadata:
     typescript: "npm:^6.0.3"
   peerDependencies:
     "@sourceacademy/conductor": ^0.8.0
+  languageName: unknown
+  linkType: soft
+
+"@sourceacademy/runner-e-stepper@workspace:src/runner/e-stepper":
+  version: 0.0.0-use.local
+  resolution: "@sourceacademy/runner-e-stepper@workspace:src/runner/e-stepper"
+  dependencies:
+    "@rollup/plugin-node-resolve": "npm:^16.0.3"
+    "@rollup/plugin-terser": "npm:^1.0.0"
+    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@sourceacademy/common-e-stepper": "workspace:*"
+    "@sourceacademy/common-stepper": "workspace:*"
+    "@sourceacademy/conductor": "npm:^0.8.0"
+    "@sourceacademy/runner-stepper": "workspace:*"
+    "@types/jest": "npm:^30.0.0"
+    jest: "npm:^30.4.2"
+    rollup: "npm:^4.60.2"
+    ts-jest: "npm:^29.4.11"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^6.0.3"
+  peerDependencies:
+    "@sourceacademy/common-e-stepper": ">=0.0.0"
+    "@sourceacademy/common-stepper": ">=0.0.4"
+    "@sourceacademy/conductor": ^0.8.0
+    "@sourceacademy/runner-stepper": ">=0.0.1"
   languageName: unknown
   linkType: soft
 
@@ -2228,7 +2274,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@sourceacademy/runner-stepper@workspace:src/runner/stepper":
+"@sourceacademy/runner-stepper@workspace:*, @sourceacademy/runner-stepper@workspace:src/runner/stepper":
   version: 0.0.0-use.local
   resolution: "@sourceacademy/runner-stepper@workspace:src/runner/stepper"
   dependencies:
@@ -2310,7 +2356,7 @@ __metadata:
     typescript: "npm:^6.0.3"
     vitest: "npm:^4.1.9"
   peerDependencies:
-    "@sourceacademy/common-cse-machine": ">=0.3.0"
+    "@sourceacademy/common-cse-machine": ">=0.3.1"
     "@sourceacademy/conductor": ^0.8.0
   languageName: unknown
   linkType: soft
@@ -2331,6 +2377,42 @@ __metadata:
     "@sourceacademy/conductor": "npm:^0.8.0"
     "@types/react": "npm:^19.0.0"
     "@types/react-test-renderer": "npm:^19.0.0"
+    konva: "npm:^9.3.0"
+    react: "npm:^19.0.0"
+    react-dom: "npm:^19.0.0"
+    react-konva: "npm:^19.0.0"
+    react-test-renderer: "npm:^19.0.0"
+    rollup: "npm:^4.60.2"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^6.0.3"
+  peerDependencies:
+    "@blueprintjs/core": ">=5"
+    konva: ">=9"
+    react: ">=18"
+    react-dom: ">=18"
+    react-konva: ">=18"
+  languageName: unknown
+  linkType: soft
+
+"@sourceacademy/web-e-stepper@workspace:src/web/e-stepper":
+  version: 0.0.0-use.local
+  resolution: "@sourceacademy/web-e-stepper@workspace:src/web/e-stepper"
+  dependencies:
+    "@blueprintjs/core": "npm:^6.0.0"
+    "@blueprintjs/icons": "npm:^6.0.0"
+    "@rollup/plugin-commonjs": "npm:^28.0.0"
+    "@rollup/plugin-node-resolve": "npm:^16.0.3"
+    "@rollup/plugin-replace": "npm:^6.0.3"
+    "@rollup/plugin-terser": "npm:^1.0.0"
+    "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@sourceacademy/common-cse-machine": "workspace:*"
+    "@sourceacademy/common-e-stepper": "workspace:*"
+    "@sourceacademy/common-stepper": "workspace:*"
+    "@sourceacademy/common-tabs": "workspace:^"
+    "@sourceacademy/conductor": "npm:^0.8.0"
+    "@types/react": "npm:^19.0.0"
+    "@types/react-test-renderer": "npm:^19.0.0"
+    classnames: "npm:^2.3.2"
     konva: "npm:^9.3.0"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
@@ -2383,9 +2465,11 @@ __metadata:
     "@sourceacademy/common-tabs": "workspace:^"
     "@sourceacademy/conductor": "npm:^0.8.0"
     "@types/react": "npm:^19.0.0"
+    "@types/react-test-renderer": "npm:^19.0.0"
     classnames: "npm:^2.3.2"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
+    react-test-renderer: "npm:^19.0.0"
     rollup: "npm:^4.60.2"
     tslib: "npm:^2.8.1"
     typescript: "npm:^6.0.3"
@@ -3289,12 +3373,12 @@ __metadata:
   linkType: hard
 
 "brace-expansion@npm:^1.1.7":
-  version: 1.1.16
-  resolution: "brace-expansion@npm:1.1.16"
+  version: 1.1.21
+  resolution: "brace-expansion@npm:1.1.21"
   dependencies:
     balanced-match: "npm:^1.0.0"
     concat-map: "npm:0.0.1"
-  checksum: 10c0/b2a915bbedbf4e45840d1fb9a4d391bbf26a79475bd134714d3cee34f1f0edb0ce982738028843be5fbaf8039429f71fa487df8c915b6065ced542c83e58fae6
+  checksum: 10c0/8f0a68a720f9cb28c2ecaea5cdaf15fafd686d6b6e4e722a81c9d4bd2f68c1fd0619731cac05875d842221eaf4d97d564d329a12eb3c4c22137502fb3c65be8b
   languageName: node
   linkType: hard
 
@@ -4428,10 +4512,10 @@ __metadata:
   linkType: hard
 
 "handlebars@npm:^4.7.9":
-  version: 4.7.9
-  resolution: "handlebars@npm:4.7.9"
+  version: 4.7.10
+  resolution: "handlebars@npm:4.7.10"
   dependencies:
-    minimist: "npm:^1.2.5"
+    minimist: "npm:^1.2.8"
     neo-async: "npm:^2.6.2"
     source-map: "npm:^0.6.1"
     uglify-js: "npm:^3.1.4"
@@ -4441,7 +4525,7 @@ __metadata:
       optional: true
   bin:
     handlebars: bin/handlebars
-  checksum: 10c0/22f8105a7e68e81aff2662bb434edf05f757d21d850731d71cec886d69c10cd33d3c43e34b2892968ec62de8241611851d3d0674c8ef324ea3e01dc66262faa9
+  checksum: 10c0/9b5573584ae5836172ae3f1502d9819568ba1b92ee83b81b18223beeb4c07486595e7b0fa633102beabc66ed06fe6e7da1dd9a9ea8c7072b9550b9a88809165c
   languageName: node
   linkType: hard
 
@@ -5634,7 +5718,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"minimist@npm:^1.2.5":
+"minimist@npm:^1.2.8":
   version: 1.2.8
   resolution: "minimist@npm:1.2.8"
   checksum: 10c0/19d3fcdca050087b84c2029841a093691a91259a47def2f18222f41e7645a0b7c44ef4b40e88a1e58a40c84d2ef0ee6047c55594d298146d0eb3f6b737c20ce6
@@ -6700,9 +6784,9 @@ __metadata:
   linkType: hard
 
 "source-map-js@npm:^1.2.1":
-  version: 1.2.1
-  resolution: "source-map-js@npm:1.2.1"
-  checksum: 10c0/7bda1fc4c197e3c6ff17de1b8b2c20e60af81b63a52cb32ec5a5d67a20a7d42651e2cb34ebe93833c5a2a084377e17455854fee3e21e7925c64a51b6a52b0faf
+  version: 1.2.2
+  resolution: "source-map-js@npm:1.2.2"
+  checksum: 10c0/d5d6dec62266834f83dd4f8a2606a196fb1a006ca5d53b0ef80ee513b7eba2f4e2ae241f4bc129ae7e9b80dea24f6e3d92b446b7e6e96be7653cab8888168a94
   languageName: node
   linkType: hard
 
@@ -7055,8 +7139,8 @@ __metadata:
   linkType: hard
 
 "tsx@npm:^4.22.3":
-  version: 4.23.13
-  resolution: "tsx@npm:4.23.13"
+  version: 4.23.15
+  resolution: "tsx@npm:4.23.15"
   dependencies:
     esbuild: "npm:~0.28.0"
     fsevents: "npm:~2.3.3"
@@ -7065,7 +7149,7 @@ __metadata:
       optional: true
   bin:
     tsx: dist/cli.mjs
-  checksum: 10c0/dc99c8988b42ec2443963a0b9051f42d068bc7e2a44e82f3b94b40539a991c5c01ea3ee049cf317d1040b2245711dd4c64ace9ac875f3b07edee29f610702e3c
+  checksum: 10c0/3c5fc53e578da87d3a63565286b1ecbb0e01b9bb646daec1957294ef890d14f22cc67bb4b09b5daffab0e7ce0217b1e7645393feb0f524b1ddf26ae9595d7e75
   languageName: node
   linkType: hard
 
@@ -7165,9 +7249,9 @@ __metadata:
   linkType: hard
 
 "undici@npm:^6.25.0":
-  version: 6.28.0
-  resolution: "undici@npm:6.28.0"
-  checksum: 10c0/3029a70df06b38b5b2f30732932a1e92544c753cd82c8abdf0d35afad48e0ba91612e79fe3a442dbbb9434d6a9eba2b714d5ea28984c903dda2b5d5444f38354
+  version: 6.29.0
+  resolution: "undici@npm:6.29.0"
+  checksum: 10c0/3fb2117985be977ba8b6bd6a242fec915e1b1d0f9681f5adb3f508fb1717352452d65bcfd3bed09e7c776cfda403a4e8edb24a318492f8b2d793439af2b8699b
   languageName: node
   linkType: hard
 
