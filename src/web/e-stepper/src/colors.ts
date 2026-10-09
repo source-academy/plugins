@@ -30,6 +30,7 @@ export const DiagramColors = {
   garbageOpacity: 0.3,
   lookup: "rgba(255, 213, 79, 0.35)",
   hover: "#ffd54f",
-  frameHover: "rgba(255, 213, 79, 0.15)",
+  /** A hovered frame's background: darker, as in the host's CSE diagram. */
+  frameHover: "#000000",
   background: "#1a2530",
 } as const;

@@ -267,11 +267,15 @@ describe("EStepperView", () => {
       const props = () => cseDiagram.createView.mock.calls.at(-1)![0];
       const first = withCse[1];
       expect(Object.keys(props().frameColors ?? {})).toEqual(first.frames.map(f => f.id));
-      // The program's frame labels report hovering...
+      // The program's environment blocks report hovering...
       const label = view.root.findAll(n => hasClass(n, "estepper-envblock-label"))[0];
-      act(() => label.props.onMouseEnter());
+      const block = view.root.findAll(n => hasClass(n, "estepper-envblock"))[0];
+      const stopPropagation = vi.fn();
+      act(() => block.props.onMouseOver({ stopPropagation }));
       expect(props().hoveredFrame).toBe(text(label));
-      act(() => label.props.onMouseLeave());
+      // (the innermost block under the mouse: the event goes no further)
+      expect(stopPropagation).toHaveBeenCalled();
+      act(() => block.props.onMouseLeave());
       expect(props().hoveredFrame).toBeNull();
       // ...and a frame hovered in the diagram is highlighted in the program.
       act(() => props().onHoverFrame!(text(label)));

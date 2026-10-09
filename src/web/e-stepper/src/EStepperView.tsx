@@ -46,7 +46,7 @@ function DefaultText() {
       marked with the frame it is evaluated in (a coloured bracket labelled E1, E2, ...), and lists
       and function objects are shown as references (#1, #2, ...) to the objects drawn in the
       environment diagram below the program. Hover over a reference to find its object, and over a
-      frame label to find its frame.
+      bracketed body to find its frame.
       <br />
       <br />
       Keyboard shortcuts (click on the explanation first): f / b for the next / previous step, a / e
@@ -137,16 +137,18 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
       const color = colorOf(envId);
       const body = node.body as StepperNode | StepperNode[];
       return (
+        // The whole block is hoverable; in nested blocks, the innermost one under the mouse wins
+        // (`mouseover` bubbles from it, and stops there).
         <span
           className={classNames("estepper-envblock", { hovered: hoveredFrame === envId })}
           style={{ borderColor: color, ["--estepper-frame-color" as string]: color }}
+          onMouseOver={event => {
+            event.stopPropagation();
+            setHoveredFrame(envId);
+          }}
+          onMouseLeave={() => setHoveredFrame(null)}
         >
-          <span
-            className="estepper-envblock-label"
-            style={{ background: color }}
-            onMouseEnter={() => setHoveredFrame(envId)}
-            onMouseLeave={() => setHoveredFrame(null)}
-          >
+          <span className="estepper-envblock-label" style={{ background: color }}>
             {envId}
           </span>
           {Array.isArray(body)
