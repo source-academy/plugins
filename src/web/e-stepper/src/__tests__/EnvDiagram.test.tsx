@@ -91,13 +91,33 @@ describe("EnvDiagram", () => {
       .findAllByType(konva("konva-group"))
       .filter(g => g.props.opacity === DiagramColors.garbageOpacity);
     expect(dimmed.length).toBeGreaterThan(0);
+    // Frames report hovering through onHoverFrame (not given here), objects through onHover.
     const object = root
       .findAllByType(konva("konva-group"))
-      .find(g => typeof g.props.onMouseEnter === "function")!;
-    act(() => object.props.onMouseEnter());
+      .filter(g => typeof g.props.onMouseEnter === "function")
+      .find(g => {
+        act(() => g.props.onMouseEnter());
+        return onHover.mock.calls.length > 0;
+      })!;
     expect(onHover).toHaveBeenLastCalledWith(expect.stringMatching(/^#\d+$/));
     act(() => object.props.onMouseLeave());
     expect(onHover).toHaveBeenLastCalledWith(null);
+  });
+
+  test("reports hovering over a frame, and draws a hovered frame highlighted", () => {
+    const onHoverFrame = vi.fn();
+    const { root } = draw({ onHoverFrame, hoveredFrame: "E2" });
+    const frameGroups = root
+      .findAllByType(konva("konva-group"))
+      .filter(g => typeof g.props.onMouseEnter === "function" && "opacity" in g.props);
+    act(() => frameGroups[0].props.onMouseEnter());
+    expect(onHoverFrame).toHaveBeenLastCalledWith(step.frames[0].id);
+    act(() => frameGroups[0].props.onMouseLeave());
+    expect(onHoverFrame).toHaveBeenLastCalledWith(null);
+    const highlighted = root
+      .findAllByType(konva("konva-rect"))
+      .filter(r => r.props.fill === DiagramColors.frameHover);
+    expect(highlighted).toHaveLength(1);
   });
 
   test("a hovered object is drawn highlighted", () => {

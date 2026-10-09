@@ -221,6 +221,26 @@ describe("EStepperView", () => {
       expect(view.root.findAllByType(konva("konva-stage"))).toHaveLength(1);
     });
 
+    test("gives it the frame colours, and shares the hovered frame with it", () => {
+      const cseDiagram = service();
+      // From the step inside the call of withdraw, which shows an environment bracket.
+      const view = render({ steps: withCse.slice(1), profile, cseDiagram });
+      const props = () => cseDiagram.createView.mock.calls.at(-1)![0];
+      const first = withCse[1];
+      expect(Object.keys(props().frameColors ?? {})).toEqual(first.frames.map(f => f.id));
+      // The program's frame labels report hovering...
+      const label = view.root.findAll(n => hasClass(n, "estepper-envblock-label"))[0];
+      act(() => label.props.onMouseEnter());
+      expect(props().hoveredFrame).toBe(text(label));
+      act(() => label.props.onMouseLeave());
+      expect(props().hoveredFrame).toBeNull();
+      // ...and a frame hovered in the diagram is highlighted in the program.
+      act(() => props().onHoverFrame!(text(label)));
+      expect(
+        view.root.findAll(n => hasClass(n, "estepper-envblock") && hasClass(n, "hovered")),
+      ).not.toHaveLength(0);
+    });
+
     test("shares the hovered object with it", () => {
       const cseDiagram = service();
       const view = render({ steps: withCse, profile, cseDiagram });

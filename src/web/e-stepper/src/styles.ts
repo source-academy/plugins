@@ -33,6 +33,11 @@ const E_STEPPER_CSS = `
   position: absolute; top: -1px; left: -3px; padding: 0 4px; border-radius: 3px 0 3px 0;
   font-size: 10px; line-height: 12px; color: #10161a; font-weight: bold;
 }
+.sa-e-stepper .estepper-envblock-label { cursor: default; }
+.sa-e-stepper .estepper-envblock.hovered {
+  border-left-width: 5px; background: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 0 0 1px var(--estepper-frame-color);
+}
 .sa-e-stepper .estepper-ref { cursor: default; border-radius: 3px; }
 .sa-e-stepper .estepper-ref-badge {
   display: inline-block; padding: 0 3px; border-radius: 3px; font-size: 12px;
