@@ -49,18 +49,6 @@ type Props = {
   cseDiagram?: ICseDiagramService;
 };
 
-/**
- * The indices of the steps to show. A step that only looks a name up (it has `lookups`) is left
- * out unless lookups are shown; the first and last steps always stay.
- */
-export function visibleStepIndices(steps: EStepperStep[], showLookups: boolean): number[] {
-  const indices: number[] = [];
-  steps.forEach((step, i) => {
-    if (showLookups || i === 0 || i === steps.length - 1 || !step.lookups?.length) indices.push(i);
-  });
-  return indices;
-}
-
 function DefaultText() {
   return (
     <div className={Classes.RUNNING_TEXT}>
@@ -160,7 +148,6 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
   const [outputOpen, setOutputOpen] = useState(true);
   // Display options. Arrows from the program into the diagram are off until the user asks.
   const [showArrows, setShowArrows] = useState(false);
-  const [showLookups, setShowLookups] = useState(true);
   const [collapseDead, setCollapseDead] = useState(false);
   const [anchors, setAnchors] = useState<{ resolve: CseDiagramAnchorResolver | null }>({
     resolve: null,
@@ -187,18 +174,10 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
   }, []);
   useEffect(() => setStepValue(1), [steps]);
 
-  const visible = useMemo(() => visibleStepIndices(steps, showLookups), [steps, showLookups]);
-  const lastStep = visible.length;
+  const lastStep = steps.length;
   const hasRun = lastStep > 0;
-  const stepIndex = hasRun ? visible[Math.min(stepValue, lastStep) - 1] : 0;
+  const stepIndex = hasRun ? Math.min(stepValue, lastStep) - 1 : 0;
   const step = hasRun ? steps[stepIndex] : undefined;
-  // Hiding lookups keeps the step in view, or moves to the next one that stays.
-  const changeShowLookups = (show: boolean) => {
-    const next = visibleStepIndices(steps, show);
-    const position = next.findIndex(i => i >= stepIndex);
-    setStepValue(position < 0 ? Math.max(1, next.length) : position + 1);
-    setShowLookups(show);
-  };
   const wide = containerSize.width >= WIDE_LAYOUT_MIN_WIDTH;
 
   const stepFirst = () => setStepValue(1);
@@ -373,11 +352,6 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
                 checked={showArrows}
                 disabled={anchors.resolve === null}
                 onChange={e => setShowArrows(e.currentTarget.checked)}
-              />
-              <Switch
-                label="Each name lookup is a step"
-                checked={showLookups}
-                onChange={e => changeShowLookups(e.currentTarget.checked)}
               />
               <Switch
                 label="Collapse finished frames"

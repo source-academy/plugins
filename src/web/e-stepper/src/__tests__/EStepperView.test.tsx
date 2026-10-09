@@ -21,7 +21,7 @@ vi.mock("@blueprintjs/core", async (importOriginal: () => Promise<object>) => ({
   Popover: (props: Record<string, unknown>) => createElement("popover-stub", props),
 }));
 
-import EStepperView, { visibleStepIndices } from "../EStepperView";
+import EStepperView from "../EStepperView";
 import ProgramArrows from "../ProgramArrows";
 import steps from "./makeWithdrawSteps.json";
 
@@ -269,12 +269,6 @@ describe("EStepperView", () => {
       const sw = options(view)[label];
       act(() => sw.props.onChange({ currentTarget: { checked } }));
     }
-    const lookup = (i: number): EStepperStep => ({
-      ...fixture[1],
-      lookups: [{ frameId: "E1", name: `x${i}` }],
-    });
-    const run = [fixture[0], lookup(1), lookup(2), fixture[2]];
-
     test("arrows are off by default", () => {
       const view = render({ steps: fixture, profile });
       expect(view.root.findAllByType(ProgramArrows)).toHaveLength(0);
@@ -290,26 +284,6 @@ describe("EStepperView", () => {
       expect(arrows.props.disabled).toBe(false);
       act(() => arrows.props.onChange({ currentTarget: { checked: true } }));
       expect(view.root.findAllByType(ProgramArrows)).toHaveLength(1);
-    });
-
-    test("steps that only look a name up can be left out", () => {
-      expect(visibleStepIndices(run, true)).toEqual([0, 1, 2, 3]);
-      expect(visibleStepIndices(run, false)).toEqual([0, 3]);
-    });
-
-    test("leaving lookups out shortens the run, and keeps the step in view", () => {
-      const view = render({ steps: run, profile });
-      const explanation = () =>
-        text(view.root.findAll(n => n.props.className === "result-output")[0]);
-      const slider = () => view.root.find(n => n.props.labelStepSize !== undefined);
-      expect(slider().props.max).toBe(4);
-      act(() => slider().props.onChange(2));
-      toggle(view, "Each name lookup is a step", false);
-      expect(slider().props.max).toBe(2);
-      // Step 2 was a lookup: the view moves on to the next step that stays.
-      expect(explanation()).toBe("Evaluation complete");
-      toggle(view, "Each name lookup is a step", true);
-      expect(slider().props.max).toBe(4);
     });
 
     test("collapsing finished frames goes to the diagram", () => {
