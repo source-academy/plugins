@@ -34,8 +34,8 @@ interface Props {
   onHoverFrame?: (frameId: string | null) => void;
   width: number;
   height: number;
-  /** Draw dead frames as their label alone, and leave out dead objects. */
-  collapseDead?: boolean;
+  /** Leave out the dead frames and objects. */
+  clearDead?: boolean;
   /**
    * Called with a function that finds where an object or frame is drawn now (in this component's
    * coordinates, with the user's pan and zoom), whenever that changes; with `null` on unmount.
@@ -49,8 +49,8 @@ interface Props {
  */
 export default function EnvDiagram(props: Props) {
   const layout = useMemo(
-    () => layoutDiagram(props.frames, props.heap, { collapseDead: props.collapseDead }),
-    [props.frames, props.heap, props.collapseDead],
+    () => layoutDiagram(props.frames, props.heap, { clearDead: props.clearDead }),
+    [props.frames, props.heap, props.clearDead],
   );
   const fitScale = Math.min(1, props.width / layout.width, props.height / layout.height);
   const [view, setView] = useState({ scale: fitScale, x: 0, y: 0 });
@@ -141,7 +141,10 @@ function FrameDrawing(props: {
   lookedUp: Set<string>;
 }) {
   const { box } = props;
-  const color = frameColor(box.index);
+  // What is dead is grey: the frame, its bindings and the arrows from it.
+  const dead = box.frame.isGarbage;
+  const color = dead ? DiagramColors.garbage : frameColor(box.index);
+  const textColor = dead ? DiagramColors.garbage : DiagramColors.text;
   const boxTop = box.y + C.headerHeight;
   return (
     <Group
@@ -152,10 +155,7 @@ function FrameDrawing(props: {
       <Text
         x={box.x}
         y={box.y + 2}
-        text={
-          (box.frame.name === "global" ? box.frame.id : `${box.frame.id}  ${box.frame.name}`) +
-          (box.collapsed ? "  …" : "")
-        }
+        text={box.frame.name === "global" ? box.frame.id : `${box.frame.id}  ${box.frame.name}`}
         fontFamily={FONT}
         fontSize={FONT_SIZE}
         fontStyle="bold"
@@ -193,14 +193,14 @@ function FrameDrawing(props: {
             text={`${row.name}:`}
             fontFamily={FONT}
             fontSize={FONT_SIZE}
-            fill={DiagramColors.text}
+            fill={textColor}
           />
           {row.value.kind === "ref" ? (
             <Circle
               x={row.valueX + C.dotRadius}
               y={row.y}
               radius={C.dotRadius}
-              fill={DiagramColors.stroke}
+              fill={dead ? DiagramColors.garbage : DiagramColors.stroke}
             />
           ) : (
             <Text
@@ -227,7 +227,9 @@ function ObjectDrawing(props: {
   const { box } = props;
   const object = box.object;
   // A hovered object keeps its outline and gets a darker background (its circles, its boxes).
-  const stroke = DiagramColors.stroke;
+  const dead = object.isGarbage;
+  const stroke = dead ? DiagramColors.garbage : DiagramColors.stroke;
+  const textColor = dead ? DiagramColors.garbage : DiagramColors.text;
   const strokeWidth = 2;
   const fill = props.hovered ? DiagramColors.hoverBackground : undefined;
   const label =
@@ -244,7 +246,7 @@ function ObjectDrawing(props: {
         text={label}
         fontFamily={FONT}
         fontSize={FONT_SIZE - 1}
-        fill={props.hovered ? DiagramColors.text : DiagramColors.dimText}
+        fill={props.hovered ? textColor : DiagramColors.dimText}
       />
       {object.kind === "function" ? (
         <>
@@ -335,7 +337,7 @@ function ObjectDrawing(props: {
                 text={valueLabel(element)}
                 fontFamily={FONT}
                 fontSize={FONT_SIZE}
-                fill={DiagramColors.text}
+                fill={textColor}
                 wrap="none"
                 ellipsis
               />
@@ -357,11 +359,12 @@ function isNone(value: EStepperValue): boolean {
 
 function ArrowDrawing(props: { arrow: ArrowSpec }) {
   const { arrow } = props;
+  const color = arrow.garbage ? DiagramColors.garbage : DiagramColors.stroke;
   return (
     <Arrow
       points={[arrow.from.x, arrow.from.y, arrow.to.x, arrow.to.y]}
-      stroke={DiagramColors.stroke}
-      fill={DiagramColors.stroke}
+      stroke={color}
+      fill={color}
       strokeWidth={1.5}
       pointerLength={7}
       pointerWidth={6}

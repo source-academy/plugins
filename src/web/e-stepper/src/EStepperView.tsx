@@ -148,7 +148,8 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
   const [outputOpen, setOutputOpen] = useState(true);
   // Display options. Program references (arrows from the program into the diagram) are off until the user asks.
   const [showArrows, setShowArrows] = useState(false);
-  const [collapseDead, setCollapseDead] = useState(false);
+  // "Clear dead frames" lasts until the step changes, as in the CSE machine.
+  const [clearDead, setClearDead] = useState(false);
   const [anchors, setAnchors] = useState<{ resolve: CseDiagramAnchorResolver | null }>({
     resolve: null,
   });
@@ -173,6 +174,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
     injectEStepperStyles();
   }, []);
   useEffect(() => setStepValue(1), [steps]);
+  useEffect(() => setClearDead(false), [steps, stepValue]);
 
   const lastStep = steps.length;
   const hasRun = lastStep > 0;
@@ -345,26 +347,30 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
         </ButtonGroup>
         {usingHostDiagram ? null : (
           // The host's diagram has its own toolbar for these (its arrow filters, "Clear Dead
-          // Frames"); this menu is for the plugin's own diagram.
-          <Popover
-            placement="bottom-end"
-            content={
-              <div className="estepper-options">
-                <Switch
-                  label="Program references"
-                  checked={showArrows}
-                  onChange={e => setShowArrows(e.currentTarget.checked)}
-                />
-                <Switch
-                  label="Collapse finished frames"
-                  checked={collapseDead}
-                  onChange={e => setCollapseDead(e.currentTarget.checked)}
-                />
-              </div>
-            }
-          >
-            <Button icon="settings" style={{ marginLeft: 8 }} aria-label="Display options" />
-          </Popover>
+          // Frames"); these are for the plugin's own diagram.
+          <>
+            <Popover
+              placement="bottom-end"
+              content={
+                <div className="estepper-options">
+                  <Switch
+                    label="Program references"
+                    checked={showArrows}
+                    onChange={e => setShowArrows(e.currentTarget.checked)}
+                  />
+                </div>
+              }
+            >
+              <Button icon="settings" style={{ marginLeft: 8 }} aria-label="Display options" />
+            </Popover>
+            <Button
+              icon="eraser"
+              style={{ marginLeft: 8 }}
+              text="Clear dead frames"
+              disabled={!hasRun || clearDead || !step?.frames.some(f => f.isGarbage)}
+              onClick={() => setClearDead(true)}
+            />
+          </>
         )}
       </div>
       {error ? (
@@ -427,7 +433,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
                   onHoverFrame={setHoveredFrame}
                   width={diagramSize.width}
                   height={diagramSize.height}
-                  collapseDead={collapseDead}
+                  clearDead={clearDead}
                   onAnchors={onAnchors}
                 />
               ) : null}

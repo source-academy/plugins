@@ -265,10 +265,6 @@ describe("EStepperView", () => {
         menu.root.findAllByType(Switch).map(sw => [sw.props.label as string, sw]),
       );
     }
-    function toggle(view: TestRenderer.ReactTestRenderer, label: string, checked: boolean) {
-      const sw = options(view)[label];
-      act(() => sw.props.onChange({ currentTarget: { checked } }));
-    }
     test("arrows are off by default", () => {
       const view = render({ steps: fixture, profile });
       expect(view.root.findAllByType(ProgramArrows)).toHaveLength(0);
@@ -285,12 +281,29 @@ describe("EStepperView", () => {
       expect(view.root.findAllByType(ProgramArrows)).toHaveLength(1);
     });
 
-    test("collapsing finished frames goes to the diagram", () => {
+    test("Clear dead frames clears them from the diagram until the step changes", () => {
       const view = render({ steps: fixture, profile });
       const diagram = () => view.root.find(n => n.props.onAnchors && n.props.frames);
-      expect(diagram().props.collapseDead).toBe(false);
-      toggle(view, "Collapse finished frames", true);
-      expect(diagram().props.collapseDead).toBe(true);
+      const clear = () =>
+        view.root.findAllByType(Button).find(b => b.props.text === "Clear dead frames")!;
+      // Only the last step has dead frames (E2).
+      expect(clear().props.disabled).toBe(true);
+      act(() =>
+        view.root
+          .find(n => hasClass(n, "sa-e-stepper"))
+          .props.onKeyDown({ key: "e", preventDefault: () => {} }),
+      );
+      expect(diagram().props.clearDead).toBe(false);
+      expect(clear().props.disabled).toBe(false);
+      act(() => clear().props.onClick());
+      expect(diagram().props.clearDead).toBe(true);
+      expect(clear().props.disabled).toBe(true);
+      act(() =>
+        view.root
+          .find(n => hasClass(n, "sa-e-stepper"))
+          .props.onKeyDown({ key: "b", preventDefault: () => {} }),
+      );
+      expect(diagram().props.clearDead).toBe(false);
     });
   });
 

@@ -27,7 +27,9 @@ export const DiagramColors = {
   text: "#ffffff",
   dimText: "#8a9ba8",
   stroke: "#ffffff",
-  garbageOpacity: 0.3,
+  /** What is dead (frames and objects nothing refers to any more, and their arrows and data). */
+  garbage: "#7f8b96",
+  garbageOpacity: 0.75,
   lookup: "rgba(255, 213, 79, 0.35)",
   /**
    * A hovered frame's or object's background: darker, as in the host's CSE diagram. Not a colour

@@ -104,6 +104,22 @@ describe("EnvDiagram", () => {
     expect(onHover).toHaveBeenLastCalledWith(null);
   });
 
+  test("draws dead frames, their data and their arrows grey, and live ones in their colours", () => {
+    const last = (steps as unknown as EStepperStep[])[2];
+    const { root } = draw({ frames: last.frames, heap: last.heap, activeFrameId: "Global" });
+    const outlines = root
+      .findAllByType(konva("konva-rect"))
+      .filter(r => r.props.cornerRadius === 6)
+      .map(r => r.props.stroke);
+    expect(outlines.filter(c => c === DiagramColors.garbage)).toHaveLength(
+      last.frames.filter(f => f.isGarbage).length,
+    );
+    expect(new Set(outlines).size).toBeGreaterThan(1);
+    const arrows = root.findAllByType(konva("konva-arrow")).map(a => a.props.stroke);
+    expect(arrows).toContain(DiagramColors.garbage);
+    expect(arrows).toContain(DiagramColors.stroke);
+  });
+
   test("reports hovering over a frame, and draws a hovered frame highlighted", () => {
     const onHoverFrame = vi.fn();
     const { root } = draw({ onHoverFrame, hoveredFrame: "E2" });

@@ -126,35 +126,30 @@ test("the global frame is neutral, other frames get distinct colours", () => {
   expect(new Set(colors).size).toBe(4);
 });
 
-describe("layoutDiagram with dead frames collapsed", () => {
+describe("layoutDiagram with dead frames cleared", () => {
   const full = layoutDiagram(last.frames, last.heap);
-  const collapsed = layoutDiagram(last.frames, last.heap, { collapseDead: true });
+  const cleared = layoutDiagram(last.frames, last.heap, { clearDead: true });
+  const deadObjects = last.heap.filter(o => o.isGarbage).map(o => o.id);
 
-  test("a garbage frame keeps its label but loses its bindings", () => {
-    const dead = last.frames.filter(f => f.isGarbage);
+  test("garbage frames and objects are left out, and the rest stays", () => {
+    const dead = last.frames.filter(f => f.isGarbage).map(f => f.id);
     expect(dead.length).toBeGreaterThan(0);
-    for (const f of dead) {
-      const box = collapsed.frames.find(b => b.frame.id === f.id)!;
-      expect(box.collapsed).toBe(true);
-      expect(box.rows).toEqual([]);
-      expect(box.height).toBeLessThanOrEqual(full.frames.find(b => b.frame.id === f.id)!.height);
-    }
+    expect(cleared.frames.map(b => b.frame.id)).toEqual(
+      full.frames.map(b => b.frame.id).filter(id => !dead.includes(id)),
+    );
+    expect(cleared.objects.map(o => o.object.id)).toEqual(
+      full.objects.map(o => o.object.id).filter(id => !deadObjects.includes(id)),
+    );
   });
 
-  test("live frames are untouched, and garbage objects are left out", () => {
-    for (const b of collapsed.frames.filter(b => !b.frame.isGarbage)) {
-      expect(b.collapsed).toBe(false);
-      expect(b.rows.length).toBe(full.frames.find(f => f.frame.id === b.frame.id)!.rows.length);
-    }
-    const garbage = last.heap.filter(o => o.isGarbage).map(o => o.id);
-    expect(collapsed.objects.map(o => o.object.id)).toEqual(
-      full.objects.map(o => o.object.id).filter(id => !garbage.includes(id)),
-    );
+  test("no arrow starts or ends at something that is gone", () => {
+    expect(cleared.arrows.length).toBeLessThan(full.arrows.length);
+    expect(cleared.arrows.every(a => !a.garbage)).toBe(true);
   });
 
   test("nothing changes when nothing is dead", () => {
     const live = last.frames.map(f => ({ ...f, isGarbage: false }));
     const heap = last.heap.map(o => ({ ...o, isGarbage: false }));
-    expect(layoutDiagram(live, heap, { collapseDead: true })).toEqual(layoutDiagram(live, heap));
+    expect(layoutDiagram(live, heap, { clearDead: true })).toEqual(layoutDiagram(live, heap));
   });
 });
