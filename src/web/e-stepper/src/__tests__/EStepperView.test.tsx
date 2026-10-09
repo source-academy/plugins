@@ -1,3 +1,4 @@
+import type { CseDiagramViewProps } from "@sourceacademy/common-cse-machine";
 import type { EStepperStep, SyntaxProfile } from "@sourceacademy/common-e-stepper";
 import { act, createElement } from "react";
 import { Button } from "@blueprintjs/core";
@@ -16,6 +17,9 @@ vi.mock("react-konva", () => {
 
 import EStepperView from "../EStepperView";
 import steps from "./makeWithdrawSteps.json";
+
+/** A stubbed Konva shape's host element type (see the react-konva mock above). */
+const konva = (type: string) => type as unknown as React.ElementType;
 import pythonProfile from "./pythonProfile.json";
 
 // Both produced by py-slang's e-stepper: three steps of make_withdraw, and its Python profile.
@@ -118,7 +122,7 @@ describe("EStepperView", () => {
 
   test("draws the environment diagram for the current step", () => {
     const view = render({ steps: [fixture[1]], profile });
-    expect(view.root.findAllByType("konva-stage")).toHaveLength(1);
+    expect(view.root.findAllByType(konva("konva-stage"))).toHaveLength(1);
   });
 
   test("stacks the panes in a narrow tab, with a divider that resizes the program pane", () => {
@@ -179,5 +183,53 @@ describe("EStepperView", () => {
     const toggle = view.root.find(n => hasClass(n, "estepper-output-toggle"));
     act(() => toggle.props.onClick());
     expect(view.root.findAll(n => hasClass(n, "estepper-output"))).toHaveLength(0);
+  });
+
+  describe("with the host's CSE machine diagram", () => {
+    const withCse = fixture.map((step, i) => ({
+      ...step,
+      cse: { stepIndex: i, control: [], stash: [], environments: [] },
+    }));
+    const service = () => {
+      const createView = vi.fn((props: CseDiagramViewProps) =>
+        createElement("host-cse-view", { "data-step": props.step }),
+      );
+      return { createView };
+    };
+
+    test("draws the environments with it, at the current step", () => {
+      const cseDiagram = service();
+      const view = render({ steps: withCse, profile, cseDiagram });
+      expect(view.root.findAllByType(konva("konva-stage"))).toHaveLength(0);
+      expect(view.root.findByType(konva("host-cse-view")).props["data-step"]).toBe(0);
+      const call = cseDiagram.createView.mock.calls.at(-1)![0];
+      expect(call.snapshots).toHaveLength(withCse.length);
+      act(() =>
+        view.root
+          .find(n => hasClass(n, "sa-e-stepper"))
+          .props.onKeyDown({ key: "e", preventDefault: () => {} }),
+      );
+      expect(view.root.findByType(konva("host-cse-view")).props["data-step"]).toBe(
+        withCse.length - 1,
+      );
+    });
+
+    test("falls back to its own diagram when the steps carry no CSE snapshots", () => {
+      const cseDiagram = service();
+      const view = render({ steps: fixture, profile, cseDiagram });
+      expect(cseDiagram.createView).not.toHaveBeenCalled();
+      expect(view.root.findAllByType(konva("konva-stage"))).toHaveLength(1);
+    });
+
+    test("shares the hovered object with it", () => {
+      const cseDiagram = service();
+      const view = render({ steps: withCse, profile, cseDiagram });
+      const { onHover } = cseDiagram.createView.mock.calls.at(-1)![0];
+      act(() => onHover!("#1"));
+      expect(cseDiagram.createView.mock.calls.at(-1)![0].hovered).toBe("#1");
+      act(() => onHover!(null));
+      expect(cseDiagram.createView.mock.calls.at(-1)![0].hovered).toBeNull();
+      expect(view.root.findAllByType(konva("konva-stage"))).toHaveLength(0);
+    });
   });
 });

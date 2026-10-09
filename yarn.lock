@@ -2013,6 +2013,7 @@ __metadata:
     "@rollup/plugin-node-resolve": "npm:^16.0.3"
     "@rollup/plugin-terser": "npm:^1.0.0"
     "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@sourceacademy/common-cse-machine": "workspace:*"
     "@sourceacademy/common-stepper": "workspace:*"
     "@types/jest": "npm:^30.0.0"
     jest: "npm:^30.4.2"
@@ -2021,6 +2022,7 @@ __metadata:
     tslib: "npm:^2.8.1"
     typescript: "npm:^6.0.3"
   peerDependencies:
+    "@sourceacademy/common-cse-machine": ">=0.3.0"
     "@sourceacademy/common-stepper": ">=0.0.4"
   languageName: unknown
   linkType: soft
@@ -2362,6 +2364,7 @@ __metadata:
     "@rollup/plugin-replace": "npm:^6.0.3"
     "@rollup/plugin-terser": "npm:^1.0.0"
     "@rollup/plugin-typescript": "npm:^12.3.0"
+    "@sourceacademy/common-cse-machine": "workspace:*"
     "@sourceacademy/common-e-stepper": "workspace:*"
     "@sourceacademy/common-stepper": "workspace:*"
     "@sourceacademy/common-tabs": "workspace:^"

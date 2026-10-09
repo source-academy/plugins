@@ -22,18 +22,21 @@ afterEach(() => vi.unstubAllGlobals());
 test.each([
   ["e-stepper", injectEStepperStyles, ".sa-e-stepper"],
   ["stepper", injectStepperStyles, ".sa-substituter"],
-])("the %s styles are injected once and kept up to date", (_name, inject, selector) => {
-  const doc = fakeDocument();
-  vi.stubGlobal("document", doc);
-  inject();
-  inject();
-  expect(doc.appended).toHaveLength(1);
-  expect(doc.appended[0].textContent).toContain(selector);
-  // A stale copy (e.g. from an earlier load of the plugin) is replaced.
-  doc.appended[0].textContent = "stale";
-  inject();
-  expect(doc.appended[0].textContent).toContain(selector);
-});
+])(
+  "the %s styles are injected once and kept up to date",
+  (_name: string, inject: () => void, selector: string) => {
+    const doc = fakeDocument();
+    vi.stubGlobal("document", doc);
+    inject();
+    inject();
+    expect(doc.appended).toHaveLength(1);
+    expect(doc.appended[0].textContent).toContain(selector);
+    // A stale copy (e.g. from an earlier load of the plugin) is replaced.
+    doc.appended[0].textContent = "stale";
+    inject();
+    expect(doc.appended[0].textContent).toContain(selector);
+  },
+);
 
 test("injecting without a document does nothing", () => {
   expect(() => injectEStepperStyles()).not.toThrow();

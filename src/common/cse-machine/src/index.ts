@@ -50,6 +50,12 @@ export interface CseSerializedValue {
   tag?: string;
   /** Language-specific extra data (closure frame id, element refs, etc.). */
   metadata?: unknown;
+  /**
+   * For a value that refers to a heap object (a list, a closure): a stable id of that object,
+   * unique within a run, if the evaluator names its objects. A plugin that draws the snapshot
+   * through {@link ICseDiagramService} uses it to refer to the object, e.g. to highlight it.
+   */
+  objectId?: string;
 }
 
 /**
@@ -145,4 +151,46 @@ export interface CseSnapshotMessage {
    * runners that predate this field remain valid `CseSnapshotMessage`s.
    */
   breakpointSteps?: number[];
+}
+
+/* -------------------------------------------------------------------------- */
+/*                         Host services for web plugins                      */
+/* -------------------------------------------------------------------------- */
+
+/** What {@link ICseDiagramService.createView} draws. */
+export interface CseDiagramViewProps {
+  /** A run's snapshots; frames from earlier snapshots are shown as dead frames. */
+  snapshots: CseSnapshot[];
+  /** The 0-based index of the snapshot to draw. */
+  step: number;
+  /** The {@link CseSerializedValue.objectId} of the heap object to highlight, if any. */
+  hovered?: string | null;
+  /**
+   * Called with a heap object's {@link CseSerializedValue.objectId} when the mouse enters the
+   * object in the diagram, and with `null` when it leaves.
+   */
+  onHover?: (objectId: string | null) => void;
+}
+
+/**
+ * A host's CSE machine visualization, lent to web plugins that want to draw environments the way
+ * the CSE Machine tab does (arrow routing and filtering, alignment, printable mode, clearing dead
+ * frames, saving, zoom) instead of drawing them themselves — e.g. the environment stepper.
+ */
+export interface ICseDiagramService {
+  /**
+   * Returns an element of the host's UI framework (a React element in the Source Academy frontend,
+   * which also provides React to the plugin) that draws the environments of `snapshots[step]` —
+   * environment only, without control and stash — together with the host's diagram toolbar.
+   */
+  createView(props: CseDiagramViewProps): unknown;
+}
+
+/**
+ * Optional services a host passes to the web plugins it loads, after the tab service:
+ * `registerPlugin(PluginClass, tabService, hostServices)`. Every member is optional, and a plugin
+ * that does not expect the argument simply ignores it.
+ */
+export interface IHostServices {
+  cseDiagram?: ICseDiagramService;
 }
