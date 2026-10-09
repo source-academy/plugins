@@ -55,6 +55,41 @@ function DefaultText() {
   );
 }
 
+/** The least height of the tab, and the gap it leaves below itself in the browser window. */
+const MIN_TAB_HEIGHT = 400;
+const BOTTOM_GAP = 16;
+
+/**
+ * The height that takes `element` from where it starts down to the bottom of the browser window
+ * (as the CSE Machine tab does): the side-content area the tab is in does not give it a height of
+ * its own to fill. Worked out again when the window is resized, when the element comes into view
+ * (a tab that is not selected is not laid out), and at every render (cheap; it changes only when
+ * the result does).
+ */
+function useFillHeight(element: HTMLElement | null): number | undefined {
+  const [height, setHeight] = useState<number | undefined>(undefined);
+  const fit = useCallback(() => {
+    if (!element || typeof window === "undefined") return;
+    const top = element.getBoundingClientRect().top;
+    if (!Number.isFinite(top)) return;
+    setHeight(Math.max(MIN_TAB_HEIGHT, Math.floor(window.innerHeight - top - BOTTOM_GAP)));
+  }, [element]);
+  useEffect(() => {
+    if (!element || typeof window === "undefined") return;
+    fit();
+    window.addEventListener("resize", fit);
+    const observer =
+      typeof IntersectionObserver === "undefined" ? undefined : new IntersectionObserver(fit);
+    observer?.observe(element);
+    return () => {
+      window.removeEventListener("resize", fit);
+      observer?.disconnect();
+    };
+  }, [element, fit]);
+  useEffect(fit);
+  return height;
+}
+
 /** Tracks an element's size; attach the returned callback as the element's `ref`. */
 function useSize(): [(element: HTMLElement | null) => void, { width: number; height: number }] {
   const [element, setElement] = useState<HTMLElement | null>(null);
@@ -89,6 +124,15 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
   const [programShare, setProgramShare] = useState(DEFAULT_PROGRAM_SHARE);
   const [outputOpen, setOutputOpen] = useState(true);
   const [containerRef, containerSize] = useSize();
+  const [root, setRoot] = useState<HTMLElement | null>(null);
+  const fillHeight = useFillHeight(root);
+  const rootRef = useCallback(
+    (element: HTMLElement | null) => {
+      containerRef(element);
+      setRoot(element);
+    },
+    [containerRef],
+  );
   const [diagramRef, diagramSize] = useSize();
 
   useEffect(() => {
@@ -238,7 +282,8 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
 
   return (
     <div
-      ref={containerRef}
+      ref={rootRef}
+      style={fillHeight === undefined ? undefined : { height: fillHeight }}
       className={classNames("sa-substituter", "sa-e-stepper", Classes.DARK)}
       onKeyDown={onKeyDown}
       tabIndex={-1}
