@@ -247,6 +247,38 @@ describe("EStepperView", () => {
     vi.unstubAllGlobals();
   });
 
+  test("leaves room for the margins and paddings of the containers around it", () => {
+    // As in the Source Academy frontend: a margin on the tab, and margins and paddings on the
+    // panels around it, each of which would make a panel scroll if the tab went down to the
+    // bottom of the window regardless.
+    const margins = [15, 6.4, 0, 6.4, 9.6];
+    const chain = margins.map(m => ({ m }));
+    chain.forEach((link, i) => Object.assign(link, { parentElement: chain[i + 1] ?? null }));
+    const element = {
+      getBoundingClientRect: () => ({ top: 164, width: 600, height: 600 }),
+      ...chain[0],
+    };
+    let renderer!: TestRenderer.ReactTestRenderer;
+    act(() => {
+      renderer = TestRenderer.create(<EStepperView steps={[fixture[1]]} profile={profile} />, {
+        createNodeMock: () => element,
+      });
+    });
+    vi.stubGlobal("window", { innerHeight: 676, addEventListener() {}, removeEventListener() {} });
+    vi.stubGlobal("document", { body: {} });
+    vi.stubGlobal("getComputedStyle", (e: { m: number }) => ({
+      marginBottom: `${e.m}px`,
+      paddingBottom: "0px",
+      borderBottomWidth: "0px",
+    }));
+    act(() => renderer.update(<EStepperView steps={[fixture[1]]} profile={profile} />));
+    // 676 - 164 - ceil(15 + 6.4 + 6.4 + 9.6)
+    expect(renderer.root.find(n => hasClass(n, "sa-e-stepper")).props.style).toEqual({
+      height: 676 - 164 - 38,
+    });
+    vi.unstubAllGlobals();
+  });
+
   test("the explanation takes the height of its text, whatever the host's styles", () => {
     const view = render({ steps: [fixture[1]], profile });
     const card = view.root.findAll(n => hasClass(n, "bp6-card") || hasClass(n, "bp5-card"))[0];

@@ -85,6 +85,26 @@ const MIN_TAB_HEIGHT = 400;
 const BOTTOM_GAP = 16;
 
 /**
+ * What lies between the bottom of `element` and the bottom of the browser window, however the host
+ * lays it out: the bottom margin, padding and border of the element and of every container around
+ * it. A tab that ends short of that by less than this overflows its container, which then shows a
+ * scroll bar (and so does the container around that: the host's panels nest). Without styles to
+ * ask (no DOM), the fixed gap.
+ */
+function bottomInset(element: HTMLElement): number {
+  if (typeof getComputedStyle !== "function") return BOTTOM_GAP;
+  let inset = 0;
+  for (let e: HTMLElement | null = element; e && e !== document.body; e = e.parentElement) {
+    const style = getComputedStyle(e);
+    inset +=
+      (parseFloat(style.marginBottom) || 0) +
+      (parseFloat(style.paddingBottom) || 0) +
+      (parseFloat(style.borderBottomWidth) || 0);
+  }
+  return Math.max(BOTTOM_GAP, Math.ceil(inset));
+}
+
+/**
  * The height that takes `element` from where it starts down to the bottom of the browser window
  * (as the CSE Machine tab does): the side-content area the tab is in does not give it a height of
  * its own to fill. Worked out again when the window is resized, when the element comes into view
@@ -97,7 +117,9 @@ function useFillHeight(element: HTMLElement | null): number | undefined {
     if (!element || typeof window === "undefined") return;
     const top = element.getBoundingClientRect().top;
     if (!Number.isFinite(top)) return;
-    setHeight(Math.max(MIN_TAB_HEIGHT, Math.floor(window.innerHeight - top - BOTTOM_GAP)));
+    setHeight(
+      Math.max(MIN_TAB_HEIGHT, Math.floor(window.innerHeight - top - bottomInset(element))),
+    );
   }, [element]);
   useEffect(() => {
     if (!element || typeof window === "undefined") return;
