@@ -15,7 +15,9 @@ vi.mock("react-konva", () => {
 import { EStepperHostPlugin } from "../EStepperHostPlugin";
 import steps from "./makeWithdrawSteps.json";
 
-function setUp(hostServices?: ConstructorParameters<typeof EStepperHostPlugin>[3]) {
+type PluginArgs = ConstructorParameters<typeof EStepperHostPlugin>;
+
+function setUp(hostServices?: PluginArgs[3]) {
   let deliver!: (message: EStepperMessage) => void;
   const sent: EStepperMessage[] = [];
   const channel = {
@@ -27,12 +29,10 @@ function setUp(hostServices?: ConstructorParameters<typeof EStepperHostPlugin>[3
   };
   let tab!: { id: string; label: string; iconName: string; body: React.ReactNode };
   const tabService = { registerTab: (t: typeof tab) => (tab = t), revealTab: vi.fn() };
-  const plugin = new EStepperHostPlugin(
-    {} as never,
-    [channel as never],
-    tabService as never,
-    hostServices,
-  );
+  // Stubs with only what the plugin uses.
+  const conduit = {} as PluginArgs[0];
+  const tabServiceStub = tabService as unknown as PluginArgs[2];
+  const plugin = new EStepperHostPlugin(conduit, [channel as never], tabServiceStub, hostServices);
   return { plugin, deliver: (m: EStepperMessage) => act(() => deliver(m)), sent, tab, tabService };
 }
 
