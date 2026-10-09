@@ -22,6 +22,7 @@ import classNames from "classnames";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { CustomASTRenderer, type NodeRenderers, type StepperNode } from "../../stepper/src/render";
+import { sliderLabels } from "../../stepper/src/sliderLabels";
 import { injectStepperStyles } from "../../stepper/src/styles";
 import { frameColor } from "./colors";
 import EnvDiagram from "./EnvDiagram";
@@ -50,20 +51,6 @@ type Props = {
   /** The host's CSE machine visualization, if it lends one (see `ICseDiagramService`). */
   cseDiagram?: ICseDiagramService;
 };
-
-/**
- * The values the step slider labels: 0, a round step apart, and always the last one (Blueprint's
- * own `labelStepSize` labels 0, s, 2s, ... and so can stop short of the end). A label that would
- * crowd the last one is left out.
- */
-export function sliderLabels(last: number): number[] {
-  const step = Math.max(1, Math.ceil(last / 10));
-  const labels: number[] = [];
-  for (let value = 0; value < last; value += step) labels.push(value);
-  if (labels.length > 1 && last - labels[labels.length - 1] < step / 2) labels.pop();
-  if (last > 0) labels.push(last);
-  return labels.length > 0 ? labels : [0];
-}
 
 /** Whether the step is a stop for breakpoint navigation: it evaluates a `breakpoint()` statement. */
 const isBreakpoint = (step: EStepperStep): boolean =>
@@ -196,6 +183,8 @@ function useSize(): [(element: HTMLElement | null) => void, { width: number; hei
  * strip under it) and the environment diagram — one above the other in a narrow tab, side by side
  * in a wide one. A heap object or frame under the mouse is highlighted in both panes.
  */
+export { sliderLabels };
+
 export default function EStepperView({ steps, profile, error, cseDiagram }: Props) {
   const [stepValue, setStepValue] = useState(1);
   const [hovered, setHovered] = useState<string | null>(null);

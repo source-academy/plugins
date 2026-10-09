@@ -5,6 +5,7 @@ import classNames from "classnames";
 import { useCallback, useEffect, useState } from "react";
 
 import { CustomASTRenderer } from "./render";
+import { sliderLabels } from "./sliderLabels";
 import { injectStepperStyles } from "./styles";
 
 function SubstDefaultText() {
@@ -19,9 +20,10 @@ function SubstDefaultText() {
         dragging the slider above to see its evaluation.
         <br />
         <br />
-        On even-numbered steps, the part of the program that will be evaluated next is highlighted
-        in yellow. On odd-numbered steps, the result of the evaluation is highlighted in green. You
-        can change the maximum steps limit (500-5000, default 1000) in the control bar.
+        On odd-numbered steps, the part of the program that will be evaluated next is highlighted in
+        yellow. On even-numbered steps, the result of the evaluation is highlighted in green (step 0
+        is the start). You can change the maximum steps limit (500-5000, default 1000) in the
+        control bar.
         <br />
         <br />
         <Divider />
@@ -180,12 +182,15 @@ export default function StepperView(props: StepperViewProps) {
       onKeyDown={hotkeyHandler}
       tabIndex={-1} // tab index necessary to fire keydown events on div element
     >
+      {/* The slider counts the steps taken: 0 is the start, the last is the total number. A run of
+          one step has nothing to slide between: a valid range, disabled. */}
       <Slider
-        disabled={!hasRunCode}
-        min={1}
-        max={lastStepValue}
-        onChange={setStepValue}
-        value={stepValue <= lastStepValue ? stepValue : 1}
+        disabled={lastStepValue < 2}
+        min={0}
+        max={Math.max(1, lastStepValue - 1)}
+        labelValues={sliderLabels(Math.max(1, lastStepValue - 1))}
+        onChange={value => setStepValue(value + 1)}
+        value={(stepValue <= lastStepValue ? stepValue : 1) - 1}
       />
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
         <ButtonGroup>
