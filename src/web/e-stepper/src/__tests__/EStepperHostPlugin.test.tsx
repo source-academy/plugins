@@ -12,6 +12,12 @@ vi.mock("react-konva", () => {
   );
 });
 
+// Blueprint's overlays need a DOM to unmount (the options menu goes when the host draws the diagram).
+vi.mock("@blueprintjs/core", async (importOriginal: () => Promise<object>) => ({
+  ...(await importOriginal()),
+  Popover: (props: Record<string, unknown>) => createElement("popover-stub", props),
+}));
+
 import { EStepperHostPlugin } from "../EStepperHostPlugin";
 import steps from "./makeWithdrawSteps.json";
 

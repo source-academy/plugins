@@ -146,7 +146,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
   const [programHeight, setProgramHeight] = useState(DEFAULT_PROGRAM_HEIGHT);
   const [programShare, setProgramShare] = useState(DEFAULT_PROGRAM_SHARE);
   const [outputOpen, setOutputOpen] = useState(true);
-  // Display options. Arrows from the program into the diagram are off until the user asks.
+  // Display options. Program references (arrows from the program into the diagram) are off until the user asks.
   const [showArrows, setShowArrows] = useState(false);
   const [collapseDead, setCollapseDead] = useState(false);
   const [anchors, setAnchors] = useState<{ resolve: CseDiagramAnchorResolver | null }>({
@@ -343,27 +343,29 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
           <Button disabled={!hasRun} icon="chevron-right" onClick={stepNext} />
           <Button disabled={!hasRun} icon="double-chevron-right" onClick={stepLast} />
         </ButtonGroup>
-        <Popover
-          placement="bottom-end"
-          content={
-            <div className="estepper-options">
-              <Switch
-                label="Arrows from the program into the diagram"
-                checked={showArrows}
-                disabled={anchors.resolve === null}
-                onChange={e => setShowArrows(e.currentTarget.checked)}
-              />
-              <Switch
-                label="Collapse finished frames"
-                checked={collapseDead}
-                disabled={usingHostDiagram}
-                onChange={e => setCollapseDead(e.currentTarget.checked)}
-              />
-            </div>
-          }
-        >
-          <Button icon="settings" style={{ marginLeft: 8 }} aria-label="Display options" />
-        </Popover>
+        {usingHostDiagram ? null : (
+          // The host's diagram has its own toolbar for these (its arrow filters, "Clear Dead
+          // Frames"); this menu is for the plugin's own diagram.
+          <Popover
+            placement="bottom-end"
+            content={
+              <div className="estepper-options">
+                <Switch
+                  label="Program references"
+                  checked={showArrows}
+                  onChange={e => setShowArrows(e.currentTarget.checked)}
+                />
+                <Switch
+                  label="Collapse finished frames"
+                  checked={collapseDead}
+                  onChange={e => setCollapseDead(e.currentTarget.checked)}
+                />
+              </div>
+            }
+          >
+            <Button icon="settings" style={{ marginLeft: 8 }} aria-label="Display options" />
+          </Popover>
+        )}
       </div>
       {error ? (
         <Card style={{ ...CARD_STYLE, marginTop: 8 }}>
@@ -430,7 +432,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
                 />
               ) : null}
             </div>
-            {showArrows ? (
+            {(usingHostDiagram ? anchors.resolve !== null : showArrows) ? (
               <ProgramArrows
                 resolve={anchors.resolve}
                 hovered={hovered}

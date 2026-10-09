@@ -272,16 +272,15 @@ describe("EStepperView", () => {
     test("arrows are off by default", () => {
       const view = render({ steps: fixture, profile });
       expect(view.root.findAllByType(ProgramArrows)).toHaveLength(0);
-      expect(options(view)["Arrows from the program into the diagram"].props.checked).toBe(false);
+      expect(options(view)["Program references"].props.checked).toBe(false);
     });
 
     test("arrows are drawn once the user turns them on and the diagram reports anchors", () => {
       const view = render({ steps: fixture, profile });
       const diagram = view.root.find(n => n.props.onAnchors && n.props.frames);
       act(() => diagram.props.onAnchors(() => ({ x: 1, y: 2 })));
-      const arrows = options(view)["Arrows from the program into the diagram"];
+      const arrows = options(view)["Program references"];
       expect(arrows.props.checked).toBe(false);
-      expect(arrows.props.disabled).toBe(false);
       act(() => arrows.props.onChange({ currentTarget: { checked: true } }));
       expect(view.root.findAllByType(ProgramArrows)).toHaveLength(1);
     });
@@ -313,6 +312,19 @@ describe("EStepperView", () => {
       );
       return { createView };
     };
+
+    test("leaves the arrows to the host's arrow menu, and draws them while it reports anchors", () => {
+      const cseDiagram = service();
+      const view = render({ steps: withCse, profile, cseDiagram });
+      // The host has its own toolbar; the plugin's options menu is for its own diagram.
+      expect(view.root.findAllByType(Popover)).toHaveLength(0);
+      expect(view.root.findAllByType(ProgramArrows)).toHaveLength(0);
+      const { onAnchors } = cseDiagram.createView.mock.calls.at(-1)![0];
+      act(() => onAnchors!(() => ({ x: 1, y: 2 })));
+      expect(view.root.findAllByType(ProgramArrows)).toHaveLength(1);
+      act(() => onAnchors!(null));
+      expect(view.root.findAllByType(ProgramArrows)).toHaveLength(0);
+    });
 
     test("draws the environments with it, at the current step", () => {
       const cseDiagram = service();
