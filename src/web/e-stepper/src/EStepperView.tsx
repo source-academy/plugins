@@ -383,10 +383,12 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
       {hasRun ? (
         <>
           {/* The slider counts the steps taken: 0 is the start, the last is the total number. */}
+          {/* A run of one step has nothing to slide between: a valid range, disabled. */}
           <Slider
+            disabled={lastStep < 2}
             min={0}
-            max={lastStep - 1}
-            labelValues={sliderLabels(lastStep - 1)}
+            max={Math.max(1, lastStep - 1)}
+            labelValues={sliderLabels(Math.max(1, lastStep - 1))}
             onChange={value => setStepValue(value + 1)}
             value={Math.min(stepValue, lastStep) - 1}
           />
