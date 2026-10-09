@@ -17,6 +17,7 @@ vi.mock("react-konva", () => {
 
 import { DiagramColors } from "../colors";
 import EnvDiagram from "../EnvDiagram";
+import { layoutDiagram } from "../layout";
 import steps from "./makeWithdrawSteps.json";
 
 /** A stubbed Konva shape's host element type (see the react-konva mock above). */
@@ -154,6 +155,20 @@ describe("EnvDiagram", () => {
       expect(object).toEqual({ x: expect.any(Number), y: expect.any(Number) });
       expect(resolve({ kind: "frame", id: "nope" })).toBeNull();
       expect(resolve({ kind: "object", id: "nope" })).toBeNull();
+    });
+
+    test("end at the horizontal centre of the top of an object, and the left edge of a frame", () => {
+      const { latest } = anchored();
+      const layout = layoutDiagram(step.frames, step.heap);
+      const view = { scale: Math.min(1, 800 / layout.width, 600 / layout.height) };
+      for (const box of layout.objects) {
+        const at = latest()({ kind: "object", id: box.object.id });
+        expect(at.x).toBeCloseTo((box.x + box.width / 2) * view.scale);
+        expect(at.y).toBeCloseTo(box.y * view.scale);
+      }
+      const frame = layout.frames[1];
+      const at = latest()({ kind: "frame", id: frame.frame.id });
+      expect(at.x).toBeCloseTo(frame.x * view.scale);
     });
 
     test("follow the user's pan and zoom, and go away with the diagram", () => {

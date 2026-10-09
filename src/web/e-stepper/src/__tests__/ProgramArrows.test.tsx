@@ -36,6 +36,12 @@ describe("arrowGeometry", () => {
     expect(path).toBe("M 10 0 C 10 100, 0 100, 0 200");
   });
 
+  test("comes down onto the top of an object, whatever the layout", () => {
+    // Side by side (further across than down): it still arrives vertically, from above.
+    const { path } = arrowGeometry({ x: 0, y: 0 }, { x: 200, y: 40 }, true);
+    expect(path).toBe("M 0 0 C 100 0, 200 20, 200 40");
+  });
+
   test("bends back correctly when the target is to the left", () => {
     expect(arrowGeometry({ x: 100, y: 0 }, { x: 0, y: 0 }).path).toBe("M 100 0 C 50 0, 50 0, 0 0");
   });
@@ -53,8 +59,8 @@ describe("computeProgramArrows", () => {
     const env = fake(rect(120, 200, 20, 12), { [ENV_ATTRIBUTE]: "E1" });
     const arrows = computeProgramArrows(container, program([ref, env]), diagram, resolve);
     expect(arrows.map(a => [a.kind, a.id, a.from, a.to])).toEqual([
-      ["object", "#1", { x: 70, y: 55 }, { x: 410, y: 20 }],
-      ["frame", "E1", { x: 40, y: 156 }, { x: 430, y: 40 }],
+      ["object", "#1", { x: 60, y: 55 }, { x: 410, y: 20 }],
+      ["frame", "E1", { x: 30, y: 156 }, { x: 430, y: 40 }],
     ]);
   });
 

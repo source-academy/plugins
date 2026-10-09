@@ -64,7 +64,8 @@ export default function EnvDiagram(props: Props) {
   const { onAnchors } = props;
   useEffect(() => {
     onAnchors?.(({ kind, id }) => {
-      // Arrows end at the left edge of an object, and at the left edge of a frame's box.
+      // Arrows end at the top, horizontally centred, of an object (a function's circles, a
+      // list's boxes), and at the left edge of a frame's box.
       const at =
         kind === "object"
           ? layout.objects.find(b => b.object.id === id)
@@ -72,7 +73,7 @@ export default function EnvDiagram(props: Props) {
       if (!at) return null;
       const point =
         "object" in at
-          ? { x: at.x, y: at.y + at.height / 2 }
+          ? { x: at.x + at.width / 2, y: at.y }
           : { x: at.x, y: at.y + C.headerHeight + at.height / 2 };
       return { x: view.x + point.x * view.scale, y: view.y + point.y * view.scale };
     });
