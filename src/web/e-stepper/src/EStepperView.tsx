@@ -51,6 +51,20 @@ type Props = {
   cseDiagram?: ICseDiagramService;
 };
 
+/**
+ * The values the step slider labels: 0, a round step apart, and always the last one (Blueprint's
+ * own `labelStepSize` labels 0, s, 2s, ... and so can stop short of the end). A label that would
+ * crowd the last one is left out.
+ */
+export function sliderLabels(last: number): number[] {
+  const step = Math.max(1, Math.ceil(last / 10));
+  const labels: number[] = [];
+  for (let value = 0; value < last; value += step) labels.push(value);
+  if (labels.length > 1 && last - labels[labels.length - 1] < step / 2) labels.pop();
+  if (last > 0) labels.push(last);
+  return labels.length > 0 ? labels : [0];
+}
+
 function DefaultText() {
   return (
     <div className={Classes.RUNNING_TEXT}>
@@ -368,12 +382,13 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
       {/* The step controls are for a run: before one there is nothing to step through. */}
       {hasRun ? (
         <>
+          {/* The slider counts the steps taken: 0 is the start, the last is the total number. */}
           <Slider
-            min={1}
-            max={Math.max(1, lastStep)}
-            labelStepSize={Math.max(1, Math.ceil(lastStep / 10))}
-            onChange={setStepValue}
-            value={Math.min(stepValue, Math.max(1, lastStep))}
+            min={0}
+            max={lastStep - 1}
+            labelValues={sliderLabels(lastStep - 1)}
+            onChange={value => setStepValue(value + 1)}
+            value={Math.min(stepValue, lastStep) - 1}
           />
           <div style={{ display: "flex", justifyContent: "center" }}>
             <ButtonGroup>

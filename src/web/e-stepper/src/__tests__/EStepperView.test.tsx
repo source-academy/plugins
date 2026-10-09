@@ -21,7 +21,7 @@ vi.mock("@blueprintjs/core", async (importOriginal: () => Promise<object>) => ({
   Popover: (props: Record<string, unknown>) => createElement("popover-stub", props),
 }));
 
-import EStepperView from "../EStepperView";
+import EStepperView, { sliderLabels } from "../EStepperView";
 import ProgramArrows from "../ProgramArrows";
 import steps from "./makeWithdrawSteps.json";
 
@@ -84,6 +84,40 @@ describe("EStepperView", () => {
   test("shows the welcome text before anything has run", () => {
     const view = render({ steps: [] });
     expect(text(view.root)).toContain("Welcome to the environment stepper");
+  });
+
+  test("the slider counts the steps taken: 0 on the left, the total on the right", () => {
+    const run = Array.from({ length: 174 }, (_, i) => ({ ...fixture[0], key: i }));
+    const view = render({ steps: run, profile });
+    const slider = () => view.root.findByType(Slider);
+    expect(slider().props.min).toBe(0);
+    expect(slider().props.max).toBe(173);
+    expect(slider().props.value).toBe(0);
+    const labels = slider().props.labelValues as number[];
+    expect(labels[0]).toBe(0);
+    expect(labels.at(-1)).toBe(173);
+    // The slider's value is the number of steps taken; the first step is number 0.
+    act(() => slider().props.onChange(173));
+    expect(slider().props.value).toBe(173);
+    act(() =>
+      view.root
+        .find(n => hasClass(n, "sa-e-stepper"))
+        .props.onKeyDown({ key: "a", preventDefault: () => {} }),
+    );
+    expect(slider().props.value).toBe(0);
+  });
+
+  test("labels the ends of the slider and a round step in between, never crowding the end", () => {
+    expect(sliderLabels(0)).toEqual([0]);
+    expect(sliderLabels(1)).toEqual([0, 1]);
+    expect(sliderLabels(10)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    // 173 in steps of 18: 162 would be 11 away from the end, which stays.
+    expect(sliderLabels(173).slice(0, 3)).toEqual([0, 18, 36]);
+    expect(sliderLabels(173).at(-1)).toBe(173);
+    // 20 in steps of 2 ends on 20 itself, not 18 and 20.
+    expect(sliderLabels(20).slice(-2)).toEqual([18, 20]);
+    // A multiple that falls just short of the end gives way to it.
+    expect(sliderLabels(37)).toEqual([0, 4, 8, 12, 16, 20, 24, 28, 32, 37]);
   });
 
   test("has no step controls before anything has run, and has them once there are steps", () => {
