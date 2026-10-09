@@ -19,6 +19,9 @@ import { DiagramColors } from "../colors";
 import EnvDiagram from "../EnvDiagram";
 import steps from "./makeWithdrawSteps.json";
 
+/** A stubbed Konva shape's host element type (see the react-konva mock above). */
+const konva = (type: string) => type as unknown as React.ElementType;
+
 /** make_withdraw, inside the call of withdraw (E2 active; see makeWithdrawSteps.json). */
 const step = (steps as unknown as EStepperStep[])[1];
 
@@ -44,7 +47,7 @@ function draw(overrides: Partial<Parameters<typeof EnvDiagram>[0]> = {}) {
 }
 
 const texts = (root: TestRenderer.ReactTestInstance) =>
-  root.findAllByType("konva-text").map(t => String(t.props.text));
+  root.findAllByType(konva("konva-text")).map(t => String(t.props.text));
 
 describe("EnvDiagram", () => {
   test("draws every frame with its label and bindings", () => {
@@ -55,7 +58,7 @@ describe("EnvDiagram", () => {
 
   test("outlines the active frame", () => {
     const frameRects = draw()
-      .root.findAllByType("konva-rect")
+      .root.findAllByType(konva("konva-rect"))
       .filter(r => r.props.cornerRadius === 6);
     const widths = frameRects.map(r => r.props.strokeWidth);
     expect(widths.filter(w => w === 4)).toHaveLength(1);
@@ -66,13 +69,13 @@ describe("EnvDiagram", () => {
     const all = texts(root);
     expect(all).toEqual(expect.arrayContaining(["#1 make_withdraw", "#2 withdraw", "#4", "#3"]));
     expect(all).toEqual(expect.arrayContaining(["1", "2"]));
-    expect(root.findAllByType("konva-arrow").length).toBeGreaterThan(5);
+    expect(root.findAllByType(konva("konva-arrow")).length).toBeGreaterThan(5);
   });
 
   test("highlights the bindings a step reads", () => {
     const { root } = draw({ lookups: [{ frameId: "E1", name: "balance" }] });
     const highlights = root
-      .findAllByType("konva-rect")
+      .findAllByType(konva("konva-rect"))
       .filter(r => r.props.fill === DiagramColors.lookup);
     expect(highlights).toHaveLength(1);
   });
@@ -85,29 +88,97 @@ describe("EnvDiagram", () => {
       activeFrameId: "Global",
     });
     const dimmed = root
-      .findAllByType("konva-group")
+      .findAllByType(konva("konva-group"))
       .filter(g => g.props.opacity === DiagramColors.garbageOpacity);
     expect(dimmed.length).toBeGreaterThan(0);
+    // Frames report hovering through onHoverFrame (not given here), objects through onHover.
     const object = root
-      .findAllByType("konva-group")
-      .find(g => typeof g.props.onMouseEnter === "function")!;
-    act(() => object.props.onMouseEnter());
+      .findAllByType(konva("konva-group"))
+      .filter(g => typeof g.props.onMouseEnter === "function")
+      .find(g => {
+        act(() => g.props.onMouseEnter());
+        return onHover.mock.calls.length > 0;
+      })!;
     expect(onHover).toHaveBeenLastCalledWith(expect.stringMatching(/^#\d+$/));
     act(() => object.props.onMouseLeave());
     expect(onHover).toHaveBeenLastCalledWith(null);
   });
 
-  test("a hovered object is drawn highlighted", () => {
+  test("reports hovering over a frame, and draws a hovered frame highlighted", () => {
+    const onHoverFrame = vi.fn();
+    const { root } = draw({ onHoverFrame, hoveredFrame: "E2" });
+    const frameGroups = root
+      .findAllByType(konva("konva-group"))
+      .filter(g => typeof g.props.onMouseEnter === "function" && "opacity" in g.props);
+    act(() => frameGroups[0].props.onMouseEnter());
+    expect(onHoverFrame).toHaveBeenLastCalledWith(step.frames[0].id);
+    act(() => frameGroups[0].props.onMouseLeave());
+    expect(onHoverFrame).toHaveBeenLastCalledWith(null);
+    const highlighted = root
+      .findAllByType(konva("konva-rect"))
+      .filter(r => r.props.fill === DiagramColors.hoverBackground);
+    expect(highlighted).toHaveLength(1);
+    // Every frame box is filled, so its whole area takes the mouse.
+    const boxes = root.findAllByType(konva("konva-rect")).filter(r => r.props.cornerRadius === 6);
+    expect(boxes.length).toBe(step.frames.length);
+    for (const box of boxes) expect(box.props.fill).toBeTruthy();
+  });
+
+  test("draws None in a list's box as a slash, not as text", () => {
+    const { root } = draw({
+      frames: [
+        {
+          id: "Global",
+          name: "global",
+          parentId: null,
+          isGarbage: false,
+          bindings: [
+            { name: "xs", value: { kind: "ref", objectId: "#1" } },
+            { name: "y", value: { kind: "primitive", display: "None", label: "None" } },
+          ],
+        },
+      ],
+      heap: [
+        {
+          kind: "list",
+          id: "#1",
+          isGarbage: false,
+          elements: [
+            { kind: "primitive", display: "3", label: "int" },
+            // Whatever the type tag: py-slang sends "None", others may send "NoneType".
+            { kind: "primitive", display: "None", label: "None" },
+            { kind: "primitive", display: "None", label: "NoneType" },
+            // A string reading None is not None.
+            { kind: "primitive", display: "'None'", label: "str" },
+          ],
+        },
+      ] as never,
+      activeFrameId: "Global",
+    });
+    const texts = root.findAllByType(konva("konva-text")).map(t => t.props.text);
+    // The binding y shows None; the list's box does not.
+    expect(texts.filter(t => t === "None")).toHaveLength(1);
+    expect(texts).toContain("3");
+    expect(texts).toContain("'None'");
+    const slashes = root
+      .findAllByType(konva("konva-line"))
+      .filter(l => l.props.points[1] > l.props.points[3]);
+    expect(slashes).toHaveLength(2);
+  });
+
+  test("a hovered object gets a darker background, keeping its outline", () => {
     const { root } = draw({ hovered: "#2" });
-    const hoveredCircles = root
-      .findAllByType("konva-circle")
-      .filter(c => c.props.stroke === DiagramColors.hover);
-    expect(hoveredCircles).toHaveLength(2);
+    const darkened = root
+      .findAllByType(konva("konva-circle"))
+      .filter(c => c.props.fill === DiagramColors.hoverBackground);
+    // The function object's two circles, outlined as usual.
+    expect(darkened).toHaveLength(2);
+    for (const c of darkened) expect(c.props.stroke).toBe(DiagramColors.stroke);
   });
 
   test("zooms around the pointer with the mouse wheel and remembers a pan", () => {
     const { root } = draw();
-    const stage = root.findByType("konva-stage");
+    const stage = root.findByType(konva("konva-stage"));
     const wheel = (deltaY: number) =>
       act(() =>
         stage.props.onWheel({
@@ -115,14 +186,14 @@ describe("EnvDiagram", () => {
           target: { getStage: () => ({ getPointerPosition: () => ({ x: 100, y: 100 }) }) },
         }),
       );
-    const scale = () => root.findByType("konva-stage").props.scaleX as number;
+    const scale = () => root.findByType(konva("konva-stage")).props.scaleX as number;
     const before = scale();
     wheel(-1);
     expect(scale()).toBeCloseTo(before * 1.1);
     wheel(1);
     expect(scale()).toBeCloseTo(before);
     act(() => stage.props.onDragEnd({ target: { x: () => 30, y: () => 40 } }));
-    expect(root.findByType("konva-stage").props.x).toBe(30);
-    expect(root.findByType("konva-stage").props.y).toBe(40);
+    expect(root.findByType(konva("konva-stage")).props.x).toBe(30);
+    expect(root.findByType(konva("konva-stage")).props.y).toBe(40);
   });
 });

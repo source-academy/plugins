@@ -4,7 +4,7 @@
  * the host.
  */
 const E_STEPPER_CSS = `
-.sa-e-stepper { display: flex; flex-direction: column; height: 100%; min-height: 600px; outline: none; }
+.sa-e-stepper { display: flex; flex-direction: column; height: 100%; min-height: 400px; outline: none; }
 .sa-e-stepper .estepper-main { display: flex; flex: 1; min-height: 0; gap: 8px; }
 .sa-e-stepper .estepper-main.narrow { flex-direction: column; }
 .sa-e-stepper .estepper-left { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
@@ -13,6 +13,9 @@ const E_STEPPER_CSS = `
 }
 .sa-e-stepper .estepper-divider {
   height: 6px; margin: 2px 0; cursor: row-resize; border-radius: 3px; background: rgba(255, 255, 255, 0.15);
+}
+.sa-e-stepper .estepper-divider.vertical {
+  height: auto; width: 6px; margin: 0 -2px; align-self: stretch; cursor: col-resize; flex: 0 0 auto;
 }
 .sa-e-stepper .estepper-divider:hover { background: rgba(255, 255, 255, 0.35); }
 .sa-e-stepper .estepper-diagram {
@@ -33,13 +36,20 @@ const E_STEPPER_CSS = `
   position: absolute; top: -1px; left: -3px; padding: 0 4px; border-radius: 3px 0 3px 0;
   font-size: 10px; line-height: 12px; color: #10161a; font-weight: bold;
 }
+.sa-e-stepper .estepper-envblock-label { cursor: default; }
+.sa-e-stepper .estepper-envblock.hovered {
+  border-left-width: 5px; background: rgba(0, 0, 0, 0.45);
+  box-shadow: inset 0 0 0 1px var(--estepper-frame-color);
+}
 .sa-e-stepper .estepper-ref { cursor: default; border-radius: 3px; }
 .sa-e-stepper .estepper-ref-badge {
   display: inline-block; padding: 0 3px; border-radius: 3px; font-size: 12px;
   background: rgba(255, 255, 255, 0.12); color: #c5cbd3; vertical-align: 1px;
 }
 .sa-e-stepper .estepper-ref-name { font-weight: bold; margin-right: 2px; }
-.sa-e-stepper .estepper-ref.hovered .estepper-ref-badge { background: #ffd54f; color: #10161a; }
+.sa-e-stepper .estepper-ref.hovered .estepper-ref-badge {
+  background: #000000; color: #ffffff; box-shadow: 0 0 0 1px #c5cbd3;
+}
 `;
 
 const STYLE_ELEMENT_ID = "sa-e-stepper-styles";
