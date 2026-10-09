@@ -9,6 +9,7 @@
   "updateInternalDependencies": "patch",
   "ignore": [
     "@sourceacademy/web-stepper",
+    "@sourceacademy/web-e-stepper",
     "@sourceacademy/web-data-visualizer"
   ]
 }

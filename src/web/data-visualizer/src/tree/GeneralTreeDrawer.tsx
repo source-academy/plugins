@@ -2,7 +2,7 @@ import Konva from "konva";
 import { Layer, Stage, Text } from "react-konva";
 
 import { Config } from "../Config";
-import { formatLeaf } from "../format";
+import { formatRoot } from "../format";
 import type { ClassificationResult } from "../classify";
 import { ArrowDrawable, BackwardArrowDrawable } from "../drawable/Drawable";
 import { AlreadyParsedTreeNode } from "./AlreadyParsedTreeNode";
@@ -47,7 +47,7 @@ export class GeneralTreeDrawer extends ClassicDrawer {
 
     if (this.tree.rootNode instanceof DataTreeNode) {
       const root = this.tree.rootNode;
-      const text = root.isEmpty ? "null" : formatLeaf(root.displayValue!, root.label!);
+      const text = formatRoot(root);
       const textConfig = {
         text: text,
         align: "center",
@@ -158,7 +158,13 @@ export class GeneralTreeDrawer extends ClassicDrawer {
 
         if (index == 0) {
           myY = y + Config.DistanceY * 2;
-          myX = originX;
+          // A function data item goes in its own column on the level below (see computeLayout).
+          // originX only tracks where nested lists go, so using it here would stack every function
+          // in the tree at the same x.
+          myX =
+            childNode instanceof FunctionTreeNode
+              ? this.leftMargin + (Config.NWidth + Config.BoxWidth) * childNode.nodePos
+              : originX;
         } else {
           myY = y;
           myX = x + Config.NWidth + Config.BoxWidth;

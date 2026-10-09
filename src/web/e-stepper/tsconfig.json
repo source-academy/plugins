@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.json",
+  "exclude": ["./dist"],
+  "include": ["./src"],
+  "compilerOptions": {
+    "declaration": false,
+    "outDir": "./dist",
+    // The program pane reuses the stepper's renderer from ../stepper/src, so the root spans both.
+    "rootDir": "..",
+    "types": []
+  }
+}
