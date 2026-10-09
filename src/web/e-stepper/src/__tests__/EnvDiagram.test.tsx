@@ -118,6 +118,10 @@ describe("EnvDiagram", () => {
       .findAllByType(konva("konva-rect"))
       .filter(r => r.props.fill === DiagramColors.frameHover);
     expect(highlighted).toHaveLength(1);
+    // Every frame box is filled, so its whole area takes the mouse.
+    const boxes = root.findAllByType(konva("konva-rect")).filter(r => r.props.cornerRadius === 6);
+    expect(boxes.length).toBe(step.frames.length);
+    for (const box of boxes) expect(box.props.fill).toBeTruthy();
   });
 
   test("a hovered object is drawn highlighted", () => {

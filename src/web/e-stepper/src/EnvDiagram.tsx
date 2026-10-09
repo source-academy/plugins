@@ -134,7 +134,9 @@ function FrameDrawing(props: {
         height={box.height}
         stroke={color}
         strokeWidth={props.active ? 4 : 2}
-        fill={props.hovered ? DiagramColors.frameHover : undefined}
+        // Filled even when not hovered (transparently), so the whole box takes the mouse, not just
+        // its outline and contents.
+        fill={props.hovered ? DiagramColors.frameHover : "rgba(0, 0, 0, 0)"}
         cornerRadius={6}
         shadowColor={props.active ? color : undefined}
         shadowBlur={props.active ? 10 : 0}
