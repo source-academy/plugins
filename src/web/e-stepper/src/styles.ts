@@ -14,6 +14,9 @@ const E_STEPPER_CSS = `
 .sa-e-stepper .estepper-divider {
   height: 6px; margin: 2px 0; cursor: row-resize; border-radius: 3px; background: rgba(255, 255, 255, 0.15);
 }
+.sa-e-stepper .estepper-divider.vertical {
+  height: auto; width: 6px; margin: 0 -2px; align-self: stretch; cursor: col-resize; flex: 0 0 auto;
+}
 .sa-e-stepper .estepper-divider:hover { background: rgba(255, 255, 255, 0.35); }
 .sa-e-stepper .estepper-diagram {
   flex: 1; min-height: 240px; min-width: 0; border-radius: 4px; background: #1a2530; overflow: hidden;

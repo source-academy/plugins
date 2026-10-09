@@ -145,11 +145,32 @@ describe("EStepperView", () => {
     vi.unstubAllGlobals();
   });
 
-  test("puts the panes side by side in a wide tab", () => {
+  test("puts the panes side by side in a wide tab, with a divider that resizes the program pane", () => {
     const view = render({ steps: [fixture[1]], profile }, 1200);
     const main = view.root.find(n => hasClass(n, "estepper-main"));
     expect(hasClass(main, "narrow")).toBe(false);
-    expect(view.root.findAll(n => hasClass(n, "estepper-divider"))).toHaveLength(0);
+    const left = () => view.root.find(n => hasClass(n, "estepper-left"));
+    expect(left().props.style.flex).toBe("0 0 45.00%");
+    const listeners: Record<string, (e: { clientX: number }) => void> = {};
+    vi.stubGlobal("window", {
+      addEventListener: (type: string, fn: (e: { clientX: number }) => void) =>
+        (listeners[type] = fn),
+      removeEventListener: (type: string) => delete listeners[type],
+    });
+    const divider = view.root.find(n => hasClass(n, "estepper-divider"));
+    expect(hasClass(divider, "vertical")).toBe(true);
+    // 1200px wide: dragging 120px to the left gives the program 10% less of the width...
+    act(() => divider.props.onPointerDown({ clientX: 600, preventDefault: () => {} }));
+    act(() => listeners.pointermove({ clientX: 480 }));
+    expect(left().props.style.flex).toBe("0 0 35.00%");
+    // ...and either pane keeps at least 200px.
+    act(() => listeners.pointermove({ clientX: 0 }));
+    expect(left().props.style.flex).toBe(`0 0 ${((200 / 1200) * 100).toFixed(2)}%`);
+    act(() => listeners.pointermove({ clientX: 2000 }));
+    expect(left().props.style.flex).toBe(`0 0 ${((1000 / 1200) * 100).toFixed(2)}%`);
+    act(() => listeners.pointerup({ clientX: 2000 }));
+    expect(listeners.pointermove).toBeUndefined();
+    vi.unstubAllGlobals();
   });
 
   test("steps with the buttons and the keyboard", () => {

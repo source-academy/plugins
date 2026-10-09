@@ -18,6 +18,9 @@ import { injectEStepperStyles } from "./styles";
 const WIDE_LAYOUT_MIN_WIDTH = 900;
 const DEFAULT_PROGRAM_HEIGHT = 240;
 const MIN_PANE_HEIGHT = 80;
+/** In a wide tab, the program pane's share of the width, and the least width of either pane. */
+const DEFAULT_PROGRAM_SHARE = 0.45;
+const MIN_PANE_WIDTH = 200;
 
 type Props = {
   steps: EStepperStep[];
@@ -78,6 +81,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
   const [hovered, setHovered] = useState<string | null>(null);
   const [hoveredFrame, setHoveredFrame] = useState<string | null>(null);
   const [programHeight, setProgramHeight] = useState(DEFAULT_PROGRAM_HEIGHT);
+  const [programShare, setProgramShare] = useState(DEFAULT_PROGRAM_SHARE);
   const [outputOpen, setOutputOpen] = useState(true);
   const [containerRef, containerSize] = useSize();
   const [diagramRef, diagramSize] = useSize();
@@ -179,6 +183,30 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
     [programHeight],
   );
 
+  // In a wide tab, the divider between the panes sets the program pane's share of the width (a
+  // share, not pixels, so the split keeps its proportions when the tab is resized).
+  const startWidthResize = useCallback(
+    (event: React.PointerEvent) => {
+      event.preventDefault();
+      const startX = event.clientX;
+      const startShare = programShare;
+      const total = containerSize.width;
+      if (total <= 2 * MIN_PANE_WIDTH) return;
+      const onMove = (e: PointerEvent) => {
+        const share = startShare + (e.clientX - startX) / total;
+        const least = MIN_PANE_WIDTH / total;
+        setProgramShare(Math.min(1 - least, Math.max(least, share)));
+      };
+      const onUp = () => {
+        window.removeEventListener("pointermove", onMove);
+        window.removeEventListener("pointerup", onUp);
+      };
+      window.addEventListener("pointermove", onMove);
+      window.addEventListener("pointerup", onUp);
+    },
+    [programShare, containerSize.width],
+  );
+
   // The host draws the environments when it can, from the steps' CSE snapshots (all steps, so it
   // can show frames from earlier steps as dead frames); otherwise the plugin's own diagram does.
   // The snapshots' values carry the e-stepper's object ids (`#3`) as their `objectId`, so the
@@ -234,7 +262,11 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
           <div className={classNames("estepper-main", { narrow: !wide })}>
             <div
               className="estepper-left"
-              style={wide ? { flex: "0 0 45%" } : { flex: `0 0 ${programHeight}px` }}
+              style={
+                wide
+                  ? { flex: `0 0 ${(programShare * 100).toFixed(2)}%` }
+                  : { flex: `0 0 ${programHeight}px` }
+              }
             >
               <div className="estepper-program" style={{ flex: 1 }}>
                 <CustomASTRenderer {...step!} profile={profile} nodeRenderers={nodeRenderers} />
@@ -248,7 +280,11 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
                 </div>
               ) : null}
             </div>
-            {wide ? null : <div className="estepper-divider" onPointerDown={startResize} />}
+            {wide ? (
+              <div className="estepper-divider vertical" onPointerDown={startWidthResize} />
+            ) : (
+              <div className="estepper-divider" onPointerDown={startResize} />
+            )}
             <div className="estepper-diagram" ref={diagramRef}>
               {cseDiagram && cseSnapshots ? (
                 (cseDiagram.createView({
