@@ -76,6 +76,7 @@ describe("EStepperView", () => {
   test("shows the welcome text before anything has run", () => {
     const view = render({ steps: [] });
     expect(text(view.root)).toContain("Welcome to the environment stepper");
+    expect(text(view.root)).toContain("Hover over a reference to find its object");
   });
 
   test("shows a runner error", () => {
@@ -218,6 +219,12 @@ describe("EStepperView", () => {
       const view = render({ steps: fixture, profile, cseDiagram });
       expect(cseDiagram.createView).not.toHaveBeenCalled();
       expect(view.root.findAllByType(konva("konva-stage"))).toHaveLength(1);
+    });
+
+    test("does not promise hover linking with it, which it does not support yet", () => {
+      const view = render({ steps: [], cseDiagram: service() });
+      expect(text(view.root)).toContain("Welcome to the environment stepper");
+      expect(text(view.root)).not.toContain("Hover over a reference");
     });
   });
 });

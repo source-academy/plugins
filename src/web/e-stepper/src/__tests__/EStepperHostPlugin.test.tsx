@@ -27,7 +27,12 @@ function setUp(hostServices?: ConstructorParameters<typeof EStepperHostPlugin>[3
   };
   let tab!: { id: string; label: string; iconName: string; body: React.ReactNode };
   const tabService = { registerTab: (t: typeof tab) => (tab = t), revealTab: vi.fn() };
-  const plugin = new EStepperHostPlugin({}, [channel as never], tabService, hostServices);
+  const plugin = new EStepperHostPlugin(
+    {} as never,
+    [channel as never],
+    tabService as never,
+    hostServices,
+  );
   return { plugin, deliver: (m: EStepperMessage) => act(() => deliver(m)), sent, tab, tabService };
 }
 

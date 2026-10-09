@@ -27,7 +27,7 @@ type Props = {
   cseDiagram?: ICseDiagramService;
 };
 
-function DefaultText() {
+function DefaultText({ linkedDiagram }: { linkedDiagram: boolean }) {
   return (
     <div className={Classes.RUNNING_TEXT}>
       Welcome to the environment stepper!
@@ -37,7 +37,8 @@ function DefaultText() {
       program is rewritten one step at a time. In addition, a function body being evaluated is
       marked with the frame it is evaluated in (a coloured bracket labelled E1, E2, ...), and lists
       and function objects are shown as references (#1, #2, ...) to the objects drawn in the
-      environment diagram below the program. Hover over a reference to find its object.
+      environment diagram below the program.
+      {linkedDiagram ? " Hover over a reference to find its object." : null}
       <br />
       <br />
       Keyboard shortcuts (click on the explanation first): f / b for the next / previous step, a / e
@@ -169,6 +170,9 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
 
   // The host draws the environments when it can, from the steps' CSE snapshots (all steps, so it
   // can show frames from earlier steps as dead frames); otherwise the plugin's own diagram does.
+  // The host's diagram is not linked to the program pane yet (hovering a reference highlights it
+  // only in the program): that needs a highlight hook in the host and a mapping from the
+  // e-stepper's object ids to the snapshot's, tracked in plugins#132.
   const cseSnapshots = useMemo<CseSnapshot[] | null>(
     () =>
       cseDiagram && steps.length > 0 && steps.every(s => s.cse !== undefined)
@@ -210,7 +214,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
       ) : null}
       {!hasRun ? (
         error ? null : (
-          <DefaultText />
+          <DefaultText linkedDiagram={!cseDiagram} />
         )
       ) : (
         <>
