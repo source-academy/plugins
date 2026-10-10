@@ -212,13 +212,16 @@ describe("EStepperView", () => {
     expect(text(label)).toBe("E2");
   });
 
-  test("renders references as badges, named function objects with their name", () => {
+  test("renders references as badges only; a function object's name is in its tooltip", () => {
     const view = render({ steps: [withRefs], profile });
     expect(view.root.findAll(n => hasClass(n, "estepper-ref"))).toHaveLength(2);
     const badges = view.root.findAll(n => n.props.className === "estepper-ref-badge").map(text);
     expect(badges).toEqual(["#2", "#4"]);
-    const names = view.root.findAll(n => n.props.className === "estepper-ref-name").map(text);
-    expect(names).toEqual(["withdraw"]);
+    expect(view.root.findAll(n => n.props.className === "estepper-ref-name")).toHaveLength(0);
+    const titles = view.root
+      .findAll(n => hasClass(n, "estepper-ref"))
+      .map(n => n.props.title as string | undefined);
+    expect(titles[0]).toBe("function withdraw(amount)");
   });
 
   test("hovering a reference highlights it", () => {

@@ -293,15 +293,21 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
     Ref: (node: StepperNode) => {
       const id = String(node.objectId);
       const object = objectOf(id);
-      const name = object?.kind === "function" ? object.name : undefined;
+      // Only the number identifies the object: the name it was defined with says nothing about
+      // the value a variable holds now (two calls of `make_withdraw` give two `withdraw`s). The
+      // definition is in the tooltip.
+      const title =
+        object?.kind === "function"
+          ? `function ${object.name ?? "lambda"}(${object.params.join(", ")})`
+          : undefined;
       return (
         <span
           className={classNames("estepper-ref", { hovered: hovered === id })}
+          title={title}
           {...{ [REF_ATTRIBUTE]: id }}
           onMouseEnter={() => setHovered(id)}
           onMouseLeave={() => setHovered(null)}
         >
-          {name ? <span className="estepper-ref-name">{name}</span> : null}
           <span className="estepper-ref-badge">{id}</span>
         </span>
       );
