@@ -38,8 +38,25 @@ describe("arrowGeometry", () => {
 
   test("comes down onto the top of an object, whatever the layout", () => {
     // Side by side (further across than down): it still arrives vertically, from above.
-    const { path } = arrowGeometry({ x: 0, y: 0 }, { x: 200, y: 40 }, true);
+    const { path } = arrowGeometry({ x: 0, y: 0 }, { x: 200, y: 40 }, "above");
     expect(path).toBe("M 0 0 C 100 0, 200 20, 200 40");
+  });
+
+  test("arrives at a frame from the left, whatever the layout", () => {
+    // Side by side: a horizontal arrival, as before.
+    expect(arrowGeometry({ x: 0, y: 0 }, { x: 100, y: 20 }, "left").path).toBe(
+      "M 0 0 C 50 0, 50 20, 100 20",
+    );
+    // Stacked: it leaves downwards, but still comes into the left edge, pointing right.
+    const stacked = arrowGeometry({ x: 10, y: 0 }, { x: 80, y: 300 }, "left");
+    expect(stacked.path).toBe("M 10 0 C 10 120, 45 300, 80 300");
+    expect(stacked.head.startsWith("80 300 ")).toBe(true);
+  });
+
+  test("a frame to the left of the start is still entered from its left", () => {
+    expect(arrowGeometry({ x: 100, y: 0 }, { x: 0, y: 200 }, "left").path).toBe(
+      "M 100 0 C 100 100, -40 200, 0 200",
+    );
   });
 
   test("bends back correctly when the target is to the left", () => {
