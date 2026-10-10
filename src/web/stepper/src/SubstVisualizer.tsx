@@ -84,12 +84,34 @@ type StepperViewProps = {
 };
 
 /**
+ * Tracks an element's width; attach the returned callback as the element's `ref`. Blueprint's
+ * slider measures its track only when it mounts, and converts a click to a step with that width, so
+ * the slider is keyed by this width to measure again after a resize.
+ */
+function useWidth(): [(element: HTMLElement | null) => void, number] {
+  const [element, setElement] = useState<HTMLElement | null>(null);
+  const [width, setWidth] = useState(0);
+  useEffect(() => {
+    if (!element) return;
+    setWidth(Math.floor(element.getBoundingClientRect().width));
+    if (typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(entries =>
+      setWidth(Math.floor(entries[0].contentRect.width)),
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [element]);
+  return [setElement, width];
+}
+
+/**
  * The presentational stepper: a slider + breakpoint controls over a list of serialized steps, with
  * a custom AST renderer and an explanation panel. A faithful port of the frontend's legacy
  * `SideContentSubstVisualizer`, minus its redux/i18n/js-slang couplings.
  */
 export default function StepperView(props: StepperViewProps) {
   const [stepValue, setStepValue] = useState(1);
+  const [rootRef, width] = useWidth();
   const lastStepValue = props.content.length;
   const hasRunCode = lastStepValue !== 0;
 
@@ -178,6 +200,7 @@ export default function StepperView(props: StepperViewProps) {
 
   return (
     <div
+      ref={rootRef}
       className={classNames("sa-substituter", Classes.DARK)}
       onKeyDown={hotkeyHandler}
       tabIndex={-1} // tab index necessary to fire keydown events on div element
@@ -185,6 +208,7 @@ export default function StepperView(props: StepperViewProps) {
       {/* The slider counts the steps taken: 0 is the start, the last is the total number. A run of
           one step has nothing to slide between: a valid range, disabled. */}
       <Slider
+        key={width}
         disabled={lastStepValue < 2}
         min={0}
         max={Math.max(1, lastStepValue - 1)}

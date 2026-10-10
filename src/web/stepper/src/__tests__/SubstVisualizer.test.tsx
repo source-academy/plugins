@@ -172,3 +172,37 @@ describe("sliderLabels", () => {
     expect(sliderLabels(37)).toEqual([0, 4, 8, 12, 16, 20, 24, 28, 32, 37]);
   });
 });
+
+describe("the step slider's track", () => {
+  test("is measured again when the tab is resized (a click maps to the right step)", () => {
+    const observers: ((entries: { contentRect: { width: number } }[]) => void)[] = [];
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        constructor(callback: (typeof observers)[number]) {
+          observers.push(callback);
+        }
+        observe() {}
+        disconnect() {}
+      },
+    );
+    // A Blueprint slider takes its listeners off the document when it goes away.
+    vi.stubGlobal("document", {
+      addEventListener() {},
+      removeEventListener() {},
+      getElementById: () => ({ textContent: "" }),
+    });
+    let view!: TestRenderer.ReactTestRenderer;
+    act(() => {
+      view = TestRenderer.create(<StepperView content={run(5)} />, {
+        createNodeMock: () => ({ getBoundingClientRect: () => ({ width: 600 }) }),
+      });
+    });
+    const before = view.root.findByType(Slider);
+    act(() => observers.forEach(cb => cb([{ contentRect: { width: 600 } }])));
+    expect(view.root.findByType(Slider)).toBe(before);
+    act(() => observers.forEach(cb => cb([{ contentRect: { width: 900 } }])));
+    expect(view.root.findByType(Slider)).not.toBe(before);
+    vi.unstubAllGlobals();
+  });
+});
