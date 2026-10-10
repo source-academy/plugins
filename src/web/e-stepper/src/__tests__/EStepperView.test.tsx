@@ -3,7 +3,7 @@ import type { EStepperStep, SyntaxProfile } from "@sourceacademy/common-e-steppe
 import { act, createElement } from "react";
 import { Button, Popover, Slider, Switch } from "@blueprintjs/core";
 import TestRenderer from "react-test-renderer";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // As in the data visualizer's tests: avoid Konva's Node build (it requires the optional `canvas`).
 vi.mock("konva", () => ({ default: {} }));
@@ -81,6 +81,16 @@ const text = (node: TestRenderer.ReactTestInstance): string =>
   node.children.map(c => (typeof c === "string" ? c : text(c))).join("");
 
 describe("EStepperView", () => {
+  // The slider remounts when the tab's size is known (it measures its track then), and a Blueprint
+  // slider takes its listeners off the document when it goes away.
+  beforeEach(() => {
+    vi.stubGlobal("document", {
+      addEventListener() {},
+      removeEventListener() {},
+      getElementById: () => ({ textContent: "" }),
+    });
+  });
+
   test("shows the welcome text before anything has run", () => {
     const view = render({ steps: [] });
     expect(text(view.root)).toContain("Welcome to the environment stepper");
@@ -290,6 +300,28 @@ describe("EStepperView", () => {
     );
     act(() => listeners.pointermove({ clientY: -100000 }));
     expect(view.root.find(n => hasClass(n, "estepper-left")).props.style.flex).toBe("0 0 80px");
+    vi.unstubAllGlobals();
+  });
+
+  test("the slider measures its track again when the tab is resized (a click maps to the right step)", () => {
+    const observers: ((entries: { contentRect: { width: number; height: number } }[]) => void)[] =
+      [];
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        constructor(callback: (typeof observers)[number]) {
+          observers.push(callback);
+        }
+        observe() {}
+        disconnect() {}
+      },
+    );
+    const view = render({ steps: fixture, profile }, 600);
+    const before = view.root.findByType(Slider);
+    act(() => observers.forEach(cb => cb([{ contentRect: { width: 600, height: 600 } }])));
+    expect(view.root.findByType(Slider)).toBe(before);
+    act(() => observers.forEach(cb => cb([{ contentRect: { width: 900, height: 600 } }])));
+    expect(view.root.findByType(Slider)).not.toBe(before);
     vi.unstubAllGlobals();
   });
 
