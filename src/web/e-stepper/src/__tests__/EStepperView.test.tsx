@@ -368,7 +368,7 @@ describe("EStepperView", () => {
     // panels around it, each of which would make a panel scroll if the tab went down to the
     // bottom of the window regardless.
     const margins = [15, 6.4, 0, 6.4, 9.6];
-    const chain = margins.map(m => ({ m }));
+    const chain = margins.map(m => ({ m, querySelector: () => null }));
     chain.forEach((link, i) => Object.assign(link, { parentElement: chain[i + 1] ?? null }));
     const element = {
       getBoundingClientRect: () => ({ top: 164, width: 600, height: 600 }),
@@ -438,20 +438,15 @@ describe("EStepperView", () => {
         menu.root.findAllByType(Switch).map(sw => [sw.props.label as string, sw]),
       );
     }
-    test("arrows are off by default", () => {
-      const view = render({ steps: fixture, profile });
-      expect(view.root.findAllByType(ProgramArrows)).toHaveLength(0);
-      expect(options(view)["From program"].props.checked).toBe(false);
-    });
-
-    test("arrows are drawn once the user turns them on and the diagram reports anchors", () => {
+    test("arrows are on by default and can be turned off", () => {
       const view = render({ steps: fixture, profile });
       const diagram = view.root.find(n => n.props.onAnchors && n.props.frames);
       act(() => diagram.props.onAnchors(() => ({ x: 1, y: 2 })));
       const arrows = options(view)["From program"];
-      expect(arrows.props.checked).toBe(false);
-      act(() => arrows.props.onChange({ currentTarget: { checked: true } }));
+      expect(arrows.props.checked).toBe(true);
       expect(view.root.findAllByType(ProgramArrows)).toHaveLength(1);
+      act(() => arrows.props.onChange({ currentTarget: { checked: false } }));
+      expect(view.root.findAllByType(ProgramArrows)).toHaveLength(0);
     });
 
     test("Clear dead frames is also available when only a heap object is dead", () => {
