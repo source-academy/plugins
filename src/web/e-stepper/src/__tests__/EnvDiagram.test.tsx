@@ -151,8 +151,16 @@ describe("EnvDiagram", () => {
       const resolve = latest();
       const frame = resolve({ kind: "frame", id: "E1" });
       const object = resolve({ kind: "object", id: "#1" });
-      expect(frame).toEqual({ x: expect.any(Number), y: expect.any(Number) });
-      expect(object).toEqual({ x: expect.any(Number), y: expect.any(Number) });
+      expect(frame).toEqual({
+        x: expect.any(Number),
+        y: expect.any(Number),
+        scale: expect.any(Number),
+      });
+      expect(object).toEqual({
+        x: expect.any(Number),
+        y: expect.any(Number),
+        scale: expect.any(Number),
+      });
       expect(resolve({ kind: "frame", id: "nope" })).toBeNull();
       expect(resolve({ kind: "object", id: "nope" })).toBeNull();
     });
@@ -180,7 +188,7 @@ describe("EnvDiagram", () => {
           .props.onDragMove({ target: { x: () => 30, y: () => 40 } }),
       );
       const panned = latest()({ kind: "frame", id: "E1" });
-      expect(panned).toEqual({ x: before.x + 30, y: before.y + 40 });
+      expect(panned).toEqual({ x: before.x + 30, y: before.y + 40, scale: before.scale });
       act(() =>
         root
           .findByType(konva("konva-stage"))
@@ -192,7 +200,10 @@ describe("EnvDiagram", () => {
       };
       act(() => root.findByType(konva("konva-stage")).props.onWheel(wheel));
       expect(wheel.evt.preventDefault).toHaveBeenCalled();
-      expect(latest()({ kind: "frame", id: "E1" })).not.toEqual(panned);
+      const zoomed = latest()({ kind: "frame", id: "E1" });
+      expect(zoomed).not.toEqual(panned);
+      // The arrowheads follow the zoom.
+      expect(zoomed.scale).toBeGreaterThan(panned.scale);
       expect(onAnchors).not.toHaveBeenLastCalledWith(null);
     });
 

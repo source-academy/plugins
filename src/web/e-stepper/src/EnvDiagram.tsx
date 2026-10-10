@@ -75,7 +75,11 @@ export default function EnvDiagram(props: Props) {
         "object" in at
           ? { x: at.x + at.width / 2, y: at.y }
           : { x: at.x, y: at.y + C.headerHeight + at.height / 2 };
-      return { x: view.x + point.x * view.scale, y: view.y + point.y * view.scale };
+      return {
+        x: view.x + point.x * view.scale,
+        y: view.y + point.y * view.scale,
+        scale: view.scale,
+      };
     });
   }, [onAnchors, layout, view]);
   useEffect(() => () => onAnchors?.(null), [onAnchors]);
