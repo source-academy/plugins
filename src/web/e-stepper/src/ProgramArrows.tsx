@@ -10,6 +10,8 @@ export interface ProgramArrow {
   /** In the overlay's coordinates (pixels from the top-left of the panes' container). */
   from: CseDiagramPoint;
   to: CseDiagramPoint;
+  /** The diagram's zoom at the target: the arrowhead and line scale with it. */
+  scale: number;
 }
 
 /** The marks in the program pane that arrows start from. */
@@ -36,6 +38,7 @@ export function arrowGeometry(
   from: CseDiagramPoint,
   to: CseDiagramPoint,
   arrival: Arrival = "axis",
+  scale = 1,
 ): { path: string; head: string } {
   const dx = to.x - from.x;
   const dy = to.y - from.y;
@@ -55,9 +58,15 @@ export function arrowGeometry(
           : { x: to.x, y: to.y - reach };
   const angle = Math.atan2(to.y - c2.y, to.x - c2.x);
   const [cos, sin] = [Math.cos(angle), Math.sin(angle)];
-  const base = { x: to.x - HEAD_LENGTH * cos, y: to.y - HEAD_LENGTH * sin };
-  const left = { x: base.x - HEAD_HALF_WIDTH * sin, y: base.y + HEAD_HALF_WIDTH * cos };
-  const right = { x: base.x + HEAD_HALF_WIDTH * sin, y: base.y - HEAD_HALF_WIDTH * cos };
+  const base = { x: to.x - HEAD_LENGTH * scale * cos, y: to.y - HEAD_LENGTH * scale * sin };
+  const left = {
+    x: base.x - HEAD_HALF_WIDTH * scale * sin,
+    y: base.y + HEAD_HALF_WIDTH * scale * cos,
+  };
+  const right = {
+    x: base.x + HEAD_HALF_WIDTH * scale * sin,
+    y: base.y - HEAD_HALF_WIDTH * scale * cos,
+  };
   return {
     path: `M ${fmt(from)} C ${fmt(c1)}, ${fmt(c2)}, ${fmt(to)}`,
     head: `${fmt(to)} ${fmt(left)} ${fmt(right)}`,
@@ -103,6 +112,7 @@ export function computeProgramArrows(
         id,
         from: { x: start.x - origin.left, y: start.y - origin.top },
         to: { x: end.x - origin.left, y: end.y - origin.top },
+        scale: target.scale ?? 1,
       });
     });
   };
@@ -161,13 +171,19 @@ export default function ProgramArrows({ resolve, hovered, hoveredFrame, colorOfF
           arrow.from,
           arrow.to,
           arrow.kind === "object" ? "above" : "left",
+          arrow.scale,
         );
         const emphasized =
           arrow.kind === "object" ? hovered === arrow.id : hoveredFrame === arrow.id;
         const color = arrow.kind === "frame" ? colorOfFrame(arrow.id) : REF_COLOR;
         return (
           <g key={arrow.key} opacity={emphasized ? 1 : 0.55}>
-            <path d={path} fill="none" stroke={color} strokeWidth={emphasized ? 2.5 : 1.5} />
+            <path
+              d={path}
+              fill="none"
+              stroke={color}
+              strokeWidth={(emphasized ? 2.5 : 1.5) * arrow.scale}
+            />
             <polygon points={head} fill={color} />
           </g>
         );

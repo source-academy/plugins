@@ -169,6 +169,12 @@ export interface CseDiagramPoint {
   y: number;
 }
 
+/** Where an arrow should end in a diagram view, and how much the view is zoomed. */
+export interface CseDiagramAnchor extends CseDiagramPoint {
+  /** The view's zoom (1 when not zoomed): arrowheads and lines scale with it, like the diagram's. */
+  scale?: number;
+}
+
 /**
  * Finds where a heap object or a frame is in a diagram view, as it is drawn right now (with the
  * user's pan and zoom): the point an arrow pointing at it should end at. `null` if it is not
@@ -178,7 +184,7 @@ export type CseDiagramAnchorResolver = (target: {
   kind: "object" | "frame";
   /** A {@link CseSerializedValue.objectId} or a {@link CseSerializedEnvFrame.id}. */
   id: string;
-}) => CseDiagramPoint | null;
+}) => CseDiagramAnchor | null;
 
 /** What {@link ICseDiagramService.createView} draws. */
 export interface CseDiagramViewProps {

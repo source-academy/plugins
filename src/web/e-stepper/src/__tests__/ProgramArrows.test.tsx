@@ -64,6 +64,18 @@ describe("arrowGeometry", () => {
   });
 });
 
+describe("arrowGeometry scale", () => {
+  test("the arrowhead grows with the diagram's zoom", () => {
+    const size = (scale: number) => {
+      const { head } = arrowGeometry({ x: 0, y: 0 }, { x: 100, y: 0 }, "axis", scale);
+      return head.split(" ").map(Number);
+    };
+    // Tip at (100, 0); the base is HEAD_LENGTH * scale back from it.
+    expect(size(1)).toEqual([100, 0, 92, 4, 92, -4]);
+    expect(size(2)).toEqual([100, 0, 84, 8, 84, -8]);
+  });
+});
+
 describe("computeProgramArrows", () => {
   const container = fake(rect(100, 50, 800, 400));
   const program = (marks: unknown[]) => fake(rect(100, 50, 300, 400), {}, marks);
@@ -79,6 +91,15 @@ describe("computeProgramArrows", () => {
       ["object", "#1", { x: 60, y: 55 }, { x: 410, y: 20 }],
       ["frame", "E1", { x: 30, y: 156 }, { x: 430, y: 40 }],
     ]);
+  });
+
+  test("carries the zoom of the target, 1 when the host gives none", () => {
+    const ref = fake(rect(150, 100, 20, 10), { [REF_ATTRIBUTE]: "#1" });
+    const env = fake(rect(120, 200, 20, 12), { [ENV_ATTRIBUTE]: "E1" });
+    const zoomed = ({ kind }: { kind: string }) =>
+      kind === "object" ? { x: 10, y: 20, scale: 1.5 } : { x: 30, y: 40 };
+    const arrows = computeProgramArrows(container, program([ref, env]), diagram, zoomed);
+    expect(arrows.map(a => a.scale)).toEqual([1.5, 1]);
   });
 
   test("skips marks scrolled out of the program pane, and targets that are not drawn or not in view", () => {
