@@ -21,16 +21,21 @@ const HEAD_HALF_WIDTH = 4;
 const round = (n: number) => Math.round(n * 10) / 10;
 const fmt = (p: CseDiagramPoint) => `${round(p.x)} ${round(p.y)}`;
 
+/** How an arrow arrives at its target: along the axis it travelled, down onto the top of an
+ * object, or from the left into the left edge of a frame. */
+export type Arrival = "axis" | "above" | "left";
+
 /**
  * The curve from `from` to `to` and its arrowhead. The curve leaves along the axis the two points
  * are further apart on (horizontally when the panes are side by side, vertically when stacked), so
- * it bends smoothly instead of looping back. It arrives along that axis too, unless `fromAbove`:
- * then it comes down onto `to` (the top of an object) whatever the layout.
+ * it bends smoothly instead of looping back. How it arrives depends on `arrival`: along that axis,
+ * down onto `to` (the top of an object), or from the left (into the left edge of a frame). The last
+ * two hold whatever the layout, so an arrow never lands tangentially on its target.
  */
 export function arrowGeometry(
   from: CseDiagramPoint,
   to: CseDiagramPoint,
-  fromAbove = false,
+  arrival: Arrival = "axis",
 ): { path: string; head: string } {
   const dx = to.x - from.x;
   const dy = to.y - from.y;
@@ -38,12 +43,16 @@ export function arrowGeometry(
   const span = horizontal ? dx : dy;
   const reach = Math.max(20, Math.min(Math.abs(span) / 2, 120)) * (span < 0 ? -1 : 1);
   const drop = Math.max(20, Math.min(Math.abs(dy) / 2, 120));
+  const lead = dx > 0 ? Math.max(24, Math.min(dx / 2, 120)) : 40;
   const c1 = horizontal ? { x: from.x + reach, y: from.y } : { x: from.x, y: from.y + reach };
-  const c2 = fromAbove
-    ? { x: to.x, y: to.y - drop }
-    : horizontal
-      ? { x: to.x - reach, y: to.y }
-      : { x: to.x, y: to.y - reach };
+  const c2 =
+    arrival === "above"
+      ? { x: to.x, y: to.y - drop }
+      : arrival === "left"
+        ? { x: to.x - lead, y: to.y }
+        : horizontal
+          ? { x: to.x - reach, y: to.y }
+          : { x: to.x, y: to.y - reach };
   const angle = Math.atan2(to.y - c2.y, to.x - c2.x);
   const [cos, sin] = [Math.cos(angle), Math.sin(angle)];
   const base = { x: to.x - HEAD_LENGTH * cos, y: to.y - HEAD_LENGTH * sin };
@@ -148,7 +157,11 @@ export default function ProgramArrows({ resolve, hovered, hoveredFrame, colorOfF
   return (
     <svg ref={svgRef} className="estepper-program-arrows" data-testid="estepper-program-arrows">
       {arrows.map(arrow => {
-        const { path, head } = arrowGeometry(arrow.from, arrow.to, arrow.kind === "object");
+        const { path, head } = arrowGeometry(
+          arrow.from,
+          arrow.to,
+          arrow.kind === "object" ? "above" : "left",
+        );
         const emphasized =
           arrow.kind === "object" ? hovered === arrow.id : hoveredFrame === arrow.id;
         const color = arrow.kind === "frame" ? colorOfFrame(arrow.id) : REF_COLOR;
