@@ -193,7 +193,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
   const [programShare, setProgramShare] = useState(DEFAULT_PROGRAM_SHARE);
   const [outputOpen, setOutputOpen] = useState(true);
   // Display options. Program references (arrows from the program into the diagram) are off until the user asks.
-  const [showArrows, setShowArrows] = useState(false);
+  const [showArrows, setShowArrows] = useState(true);
   // "Clear dead frames" lasts until the step changes, as in the CSE machine.
   const [clearDead, setClearDead] = useState(false);
   const [anchors, setAnchors] = useState<{ resolve: CseDiagramAnchorResolver | null }>({
