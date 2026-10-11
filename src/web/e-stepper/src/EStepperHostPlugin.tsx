@@ -15,7 +15,7 @@ import {
 } from "@sourceacademy/conductor/conduit";
 import { createElement, useSyncExternalStore } from "react";
 
-import EStepperView from "./EStepperView";
+import EStepperView, { type PaneLayout } from "./EStepperView";
 
 /** The side-content tab id used by the host to show/hide the e-stepper tab. */
 const TAB_ID = "e-stepper";
@@ -65,6 +65,8 @@ export class EStepperHostPlugin implements IPlugin {
 
     const subscribe = (listener: () => void) => this.subscribe(listener);
     const getState = () => this.getState();
+    // Kept here, not in the view: a run may mount the view anew, and the user's divider stays.
+    const layout: PaneLayout = {};
     const cseDiagram: ICseDiagramService | undefined = hostServices?.cseDiagram;
     function EStepperTab() {
       const state = useSyncExternalStore(subscribe, getState);
@@ -73,6 +75,7 @@ export class EStepperHostPlugin implements IPlugin {
         profile: state.profile,
         error: state.error,
         cseDiagram,
+        layout,
       });
     }
 

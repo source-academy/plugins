@@ -30,11 +30,6 @@ import EnvDiagram from "./EnvDiagram";
 import ProgramArrows, { ENV_ATTRIBUTE, REF_ATTRIBUTE } from "./ProgramArrows";
 import { injectEStepperStyles } from "./styles";
 
-/**
- * Width (px) from which the program and the diagram start out side by side: the arrangement is
- * chosen by the tab's width once, when the tab is first measured, and the user's after that.
- */
-const WIDE_LAYOUT_MIN_WIDTH = 900;
 const DEFAULT_PROGRAM_HEIGHT = 240;
 /** The least height of the diagram below the program, and of the program: about one line of it. */
 const MIN_PANE_HEIGHT = 80;
@@ -58,7 +53,36 @@ type Props = {
   error?: string | null;
   /** The host's CSE machine visualization, if it lends one (see `ICseDiagramService`). */
   cseDiagram?: ICseDiagramService;
+  /**
+   * The user's choices about the arrangement of the panes. The host keeps this object across runs,
+   * which may mount the view anew, so that the divider stays where the user put it.
+   */
+  layout?: PaneLayout;
 };
+
+/** The arrangement of the panes that the user chose; a missing field is still the default. */
+export type PaneLayout = { vertical?: boolean; programHeight?: number; programShare?: number };
+
+/** Like `useState`, but the value is also written to (and starts from) the host's `layout`. */
+function useRemembered<K extends keyof PaneLayout>(
+  layout: PaneLayout | undefined,
+  key: K,
+  fallback: NonNullable<PaneLayout[K]>,
+) {
+  const [value, setValue] = useState<NonNullable<PaneLayout[K]>>(
+    (layout?.[key] as NonNullable<PaneLayout[K]> | undefined) ?? fallback,
+  );
+  const set = useCallback(
+    (update: React.SetStateAction<NonNullable<PaneLayout[K]>>) =>
+      setValue(old => {
+        const next = typeof update === "function" ? update(old) : update;
+        if (layout) layout[key] = next;
+        return next;
+      }),
+    [layout, key],
+  );
+  return [value, set] as const;
+}
 
 /** Whether the step is a stop for breakpoint navigation: it evaluates a `breakpoint()` statement. */
 const isBreakpoint = (step: EStepperStep): boolean =>
@@ -193,12 +217,20 @@ function useSize(): [(element: HTMLElement | null) => void, { width: number; hei
  */
 export { sliderLabels };
 
-export default function EStepperView({ steps, profile, error, cseDiagram }: Props) {
+export default function EStepperView({ steps, profile, error, cseDiagram, layout }: Props) {
   const [stepValue, setStepValue] = useState(1);
   const [hovered, setHovered] = useState<string | null>(null);
   const [hoveredFrame, setHoveredFrame] = useState<string | null>(null);
-  const [programHeight, setProgramHeight] = useState(DEFAULT_PROGRAM_HEIGHT);
-  const [programShare, setProgramShare] = useState(DEFAULT_PROGRAM_SHARE);
+  const [programHeight, setProgramHeight] = useRemembered(
+    layout,
+    "programHeight",
+    DEFAULT_PROGRAM_HEIGHT,
+  );
+  const [programShare, setProgramShare] = useRemembered(
+    layout,
+    "programShare",
+    DEFAULT_PROGRAM_SHARE,
+  );
   const [outputOpen, setOutputOpen] = useState(true);
   // Display options. Program references (arrows from the program into the diagram) are off until the user asks.
   const [showArrows, setShowArrows] = useState(true);
@@ -235,15 +267,10 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
   const hasRun = lastStep > 0;
   const stepIndex = hasRun ? Math.min(stepValue, lastStep) - 1 : 0;
   const step = hasRun ? steps[stepIndex] : undefined;
-  // The arrangement of the panes: side by side ("wide") or one above the other ("vertical"). It
-  // starts from the tab's width when that is first known, and is the user's choice from then on.
-  const [vertical, setVertical] = useState<boolean | null>(null);
-  useEffect(() => {
-    if (containerSize.width > 0) {
-      setVertical(v => v ?? containerSize.width < WIDE_LAYOUT_MIN_WIDTH);
-    }
-  }, [containerSize.width]);
-  const wide = vertical === null ? false : !vertical;
+  // The arrangement of the panes: side by side ("wide", the default) or one above the other
+  // ("vertical"), as the user chooses, whatever the tab's width.
+  const [vertical, setVertical] = useRemembered(layout, "vertical", false);
+  const wide = !vertical;
 
   // The double arrows (and `a` / `e`) jump to the previous / next breakpoint, or to the first / last
   // step when there is none, as in the stepper.
@@ -458,7 +485,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
               title="Program above the environment, instead of beside it"
               aria-label="Vertical"
               aria-pressed={!wide}
-              onClick={() => setVertical(v => !(v ?? false))}
+              onClick={() => setVertical(v => !v)}
             >
               <Checkbox
                 readOnly
