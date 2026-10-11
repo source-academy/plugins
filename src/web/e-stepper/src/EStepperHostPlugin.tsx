@@ -21,10 +21,13 @@ import EStepperView, { type PaneLayout } from "./EStepperView";
 const TAB_ID = "e-stepper";
 
 /**
- * The user's arrangement of the panes. Module-level, not per plugin: the host terminates the
- * conduit and makes a new plugin on every Run, and the divider is to stay where the user put it.
+ * The user's arrangement of the panes, kept on `globalThis` for the page. Neither the plugin nor this
+ * module will do: the host terminates the conduit and makes a new plugin on every Run, and the
+ * bundle is wrapped in a factory (see `wrap.mjs`) that the host calls again each time, so even a
+ * module-level variable is new on every Run. The divider is to stay where the user put it.
  */
-const layout: PaneLayout = {};
+const LAYOUT_KEY = Symbol.for("sourceacademy.e-stepper.layout");
+const layout: PaneLayout = ((globalThis as Record<symbol, unknown>)[LAYOUT_KEY] ??= {});
 
 interface State {
   steps: EStepperStep[];
