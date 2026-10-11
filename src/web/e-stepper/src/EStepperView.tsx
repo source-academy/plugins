@@ -364,9 +364,20 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
   // resized). The pane's width is worked out at every render, so either pane keeps its least
   // width at the tab's current size, however the share was set.
   const paneSpace = Math.max(0, containerSize.width - DIVIDER_SPACE);
+  // In a tab too narrow for both least widths the program keeps its own and the diagram gets what is
+  // left (the width is never negative, nor more than there is).
   const programWidthFor = (share: number) =>
     Math.round(
-      Math.min(paneSpace - MIN_PANE_WIDTH, Math.max(MIN_PROGRAM_WIDTH, share * paneSpace)),
+      Math.max(
+        0,
+        Math.min(
+          paneSpace,
+          Math.min(
+            Math.max(MIN_PROGRAM_WIDTH, paneSpace - MIN_PANE_WIDTH),
+            Math.max(MIN_PROGRAM_WIDTH, share * paneSpace),
+          ),
+        ),
+      ),
     );
   const programWidth = programWidthFor(programShare);
   const startWidthResize = useCallback(
@@ -446,10 +457,13 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
               style={{ marginLeft: 8 }}
               title="Program above the environment, instead of beside it"
               aria-label="Vertical"
+              aria-pressed={!wide}
               onClick={() => setVertical(v => !(v ?? false))}
             >
               <Checkbox
                 readOnly
+                tabIndex={-1}
+                aria-hidden
                 checked={!wide}
                 label="Vertical"
                 style={{ margin: 0, pointerEvents: "none" }}

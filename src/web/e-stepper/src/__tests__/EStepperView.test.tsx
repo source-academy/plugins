@@ -363,6 +363,33 @@ describe("EStepperView", () => {
     expect(narrow()).toBe(true);
     act(() => vertical().props.onClick());
     expect(narrow()).toBe(false);
+    // The button states its state; the checkbox in it is only a picture.
+    expect(vertical().props["aria-pressed"]).toBe(false);
+    act(() => vertical().props.onClick());
+    expect(vertical().props["aria-pressed"]).toBe(true);
+    expect(view.root.findByType(Checkbox).props.tabIndex).toBe(-1);
+    vi.unstubAllGlobals();
+  });
+
+  test("side by side in a tab too narrow for both panes: the program keeps its least width, never negative", () => {
+    const observers: ((entries: { contentRect: { width: number; height: number } }[]) => void)[] =
+      [];
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        constructor(callback: (typeof observers)[number]) {
+          observers.push(callback);
+        }
+        observe() {}
+        disconnect() {}
+      },
+    );
+    const view = render({ steps: [fixture[1]], profile }, 1200);
+    const left = () => view.root.find(n => hasClass(n, "estepper-left")).props.style.flex;
+    for (const width of [250, 150, 10]) {
+      act(() => observers.forEach(cb => cb([{ contentRect: { width, height: 600 } }])));
+      expect(left()).toBe(`0 0 ${Math.min(44, Math.max(0, width - 18))}px`);
+    }
     vi.unstubAllGlobals();
   });
 
