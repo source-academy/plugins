@@ -258,8 +258,14 @@ describe("EStepperView", () => {
     expect(view.root.findAllByType(konva("konva-stage"))).toHaveLength(1);
   });
 
-  test("stacks the panes in a narrow tab, with a divider that resizes the program pane", () => {
+  test("stacks the panes when Vertical is chosen, with a divider that resizes the program pane", () => {
     const view = render({ steps: [fixture[1]], profile });
+    act(() =>
+      view.root
+        .findAllByType(Button)
+        .find(b => b.props["aria-label"] === "Vertical")!
+        .props.onClick(),
+    );
     const main = view.root.find(n => hasClass(n, "estepper-main"));
     expect(hasClass(main, "narrow")).toBe(true);
     const listeners: Record<string, (e: { clientY: number }) => void> = {};
@@ -278,10 +284,31 @@ describe("EStepperView", () => {
     vi.unstubAllGlobals();
   });
 
+  test("a view mounted anew (after a run) starts from the host's remembered arrangement", () => {
+    const layout = {};
+    const first = render({ steps: [fixture[1]], profile, layout });
+    act(() =>
+      first.root
+        .findAllByType(Button)
+        .find(b => b.props["aria-label"] === "Vertical")!
+        .props.onClick(),
+    );
+    act(() => first.unmount());
+    const second = render({ steps: [fixture[1]], profile, layout });
+    const main = second.root.find(n => hasClass(n, "estepper-main"));
+    expect(hasClass(main, "narrow")).toBe(true);
+  });
+
   test("the divider can not be dragged out of view: the diagram below keeps its least height", () => {
     // The panes' container is 600px high (see `render`'s node mock): 80px stay for the diagram,
     // and 26px for the divider and its gaps.
     const view = render({ steps: [fixture[1]], profile });
+    act(() =>
+      view.root
+        .findAllByType(Button)
+        .find(b => b.props["aria-label"] === "Vertical")!
+        .props.onClick(),
+    );
     const listeners: Record<string, (e: { clientY: number }) => void> = {};
     vi.stubGlobal("window", {
       addEventListener: (type: string, fn: (e: { clientY: number }) => void) =>
