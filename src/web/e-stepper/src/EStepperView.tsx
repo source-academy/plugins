@@ -400,7 +400,11 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
         <>
           {/* The slider counts the steps taken: 0 is the start, the last is the total number. */}
           {/* A run of one step has nothing to slide between: a valid range, disabled. */}
+          {/* Blueprint measures the track only when it mounts, and a click is converted to a step
+              with that width: a new key at each tab width makes it measure again after a resize
+              (the tab's width at mount is often not the one it ends up with). */}
           <Slider
+            key={containerSize.width}
             disabled={lastStep < 2}
             min={0}
             max={Math.max(1, lastStep - 1)}
