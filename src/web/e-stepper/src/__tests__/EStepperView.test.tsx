@@ -1,7 +1,7 @@
 import type { CseDiagramViewProps } from "@sourceacademy/common-cse-machine";
 import type { EStepperStep, SyntaxProfile } from "@sourceacademy/common-e-stepper";
 import { act, createElement } from "react";
-import { Button, Popover, Slider, Switch } from "@blueprintjs/core";
+import { Button, Checkbox, Popover, Slider, Switch } from "@blueprintjs/core";
 import TestRenderer from "react-test-renderer";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -299,7 +299,8 @@ describe("EStepperView", () => {
       view.root.find(n => hasClass(n, "estepper-divider")).props.onPointerDown({ clientY: 0 }),
     );
     act(() => listeners.pointermove({ clientY: -100000 }));
-    expect(view.root.find(n => hasClass(n, "estepper-left")).props.style.flex).toBe("0 0 80px");
+    // The program may shrink to about one line.
+    expect(view.root.find(n => hasClass(n, "estepper-left")).props.style.flex).toBe("0 0 40px");
     vi.unstubAllGlobals();
   });
 
@@ -322,6 +323,73 @@ describe("EStepperView", () => {
     expect(view.root.findByType(Slider)).toBe(before);
     act(() => observers.forEach(cb => cb([{ contentRect: { width: 900, height: 600 } }])));
     expect(view.root.findByType(Slider)).not.toBe(before);
+    vi.unstubAllGlobals();
+  });
+
+  test("the panes' arrangement starts from the tab's width, then is the user's choice (Vertical)", () => {
+    const observers: ((entries: { contentRect: { width: number; height: number } }[]) => void)[] =
+      [];
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        constructor(callback: (typeof observers)[number]) {
+          observers.push(callback);
+        }
+        observe() {}
+        disconnect() {}
+      },
+    );
+    const view = render({ steps: [fixture[1]], profile }, 1200);
+    const narrow = () =>
+      hasClass(
+        view.root.find(n => hasClass(n, "estepper-main")),
+        "narrow",
+      );
+    const vertical = () =>
+      view.root.findAllByType(Button).find(b => b.props["aria-label"] === "Vertical")!;
+    const resize = (width: number) =>
+      act(() => observers.forEach(cb => cb([{ contentRect: { width, height: 600 } }])));
+    // Wide at first: side by side, the box not ticked.
+    expect(narrow()).toBe(false);
+    expect(view.root.findByType(Checkbox).props.checked).toBe(false);
+    // Making the tab narrow does not rearrange it.
+    resize(500);
+    expect(narrow()).toBe(false);
+    // The user asks for the vertical arrangement, and then for the other one again.
+    act(() => vertical().props.onClick());
+    expect(narrow()).toBe(true);
+    expect(view.root.findByType(Checkbox).props.checked).toBe(true);
+    resize(1400);
+    expect(narrow()).toBe(true);
+    act(() => vertical().props.onClick());
+    expect(narrow()).toBe(false);
+    // The button states its state; the checkbox in it is only a picture.
+    expect(vertical().props["aria-pressed"]).toBe(false);
+    act(() => vertical().props.onClick());
+    expect(vertical().props["aria-pressed"]).toBe(true);
+    expect(view.root.findByType(Checkbox).props.tabIndex).toBe(-1);
+    vi.unstubAllGlobals();
+  });
+
+  test("side by side in a tab too narrow for both panes: the program keeps its least width, never negative", () => {
+    const observers: ((entries: { contentRect: { width: number; height: number } }[]) => void)[] =
+      [];
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        constructor(callback: (typeof observers)[number]) {
+          observers.push(callback);
+        }
+        observe() {}
+        disconnect() {}
+      },
+    );
+    const view = render({ steps: [fixture[1]], profile }, 1200);
+    const left = () => view.root.find(n => hasClass(n, "estepper-left")).props.style.flex;
+    for (const width of [250, 150, 10]) {
+      act(() => observers.forEach(cb => cb([{ contentRect: { width, height: 600 } }])));
+      expect(left()).toBe(`0 0 ${Math.min(44, Math.max(0, width - 18))}px`);
+    }
     vi.unstubAllGlobals();
   });
 
@@ -358,9 +426,9 @@ describe("EStepperView", () => {
     act(() => divider.props.onPointerDown({ clientX: 600, preventDefault: () => {} }));
     act(() => listeners.pointermove({ clientX: 480 }));
     expect(left()).toBe(`0 0 ${Math.round(0.45 * 1182) - 120}px`);
-    // Either pane keeps at least 200px.
+    // The program keeps at least 44px (about three characters), the diagram 200px.
     act(() => listeners.pointermove({ clientX: 0 }));
-    expect(left()).toBe("0 0 200px");
+    expect(left()).toBe("0 0 44px");
     act(() => listeners.pointermove({ clientX: 2000 }));
     expect(left()).toBe(`0 0 ${1182 - 200}px`);
     act(() => listeners.pointerup({ clientX: 2000 }));

@@ -1,5 +1,4 @@
 ---
-"@sourceacademy/common-cse-machine": patch
 "@sourceacademy/web-e-stepper": patch
 ---
 
