@@ -1,5 +1,15 @@
 # @sourceacademy/common-cse-machine
 
+## 0.4.0
+
+### Minor Changes
+
+- 34091e7: Add `CseDiagramViewProps.onAnchors` (with `CseDiagramAnchorResolver` and `CseDiagramPoint`), so a host's CSE diagram can report where its objects and frames are drawn, and a plugin (the environment stepper) can draw arrows into it from its own panes.
+
+### Patch Changes
+
+- 43c5ded: The diagram anchor resolver may report the view's zoom (`scale`), so arrows into the diagram scale with it
+
 ## 0.3.1
 
 ### Patch Changes
