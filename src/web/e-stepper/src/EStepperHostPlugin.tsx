@@ -20,6 +20,12 @@ import EStepperView, { type PaneLayout } from "./EStepperView";
 /** The side-content tab id used by the host to show/hide the e-stepper tab. */
 const TAB_ID = "e-stepper";
 
+/**
+ * The user's arrangement of the panes. Module-level, not per plugin: the host terminates the
+ * conduit and makes a new plugin on every Run, and the divider is to stay where the user put it.
+ */
+const layout: PaneLayout = {};
+
 interface State {
   steps: EStepperStep[];
   profile?: SyntaxProfile;
@@ -65,8 +71,6 @@ export class EStepperHostPlugin implements IPlugin {
 
     const subscribe = (listener: () => void) => this.subscribe(listener);
     const getState = () => this.getState();
-    // Kept here, not in the view: a run may mount the view anew, and the user's divider stays.
-    const layout: PaneLayout = {};
     const cseDiagram: ICseDiagramService | undefined = hostServices?.cseDiagram;
     function EStepperTab() {
       const state = useSyncExternalStore(subscribe, getState);
