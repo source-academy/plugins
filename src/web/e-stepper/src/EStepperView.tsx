@@ -48,7 +48,8 @@ const STACKED_DIVIDER_SPACE = 2 * 8 + 6 + 2 * 2;
  */
 const DEFAULT_PROGRAM_SHARE = 0.45;
 const MIN_PANE_WIDTH = 200;
-const MIN_PROGRAM_WIDTH = 80;
+/** About three characters of the program, with the pane's 10px padding on both sides. */
+const MIN_PROGRAM_WIDTH = 44;
 const DIVIDER_SPACE = 2 * 8 + 2;
 
 type Props = {

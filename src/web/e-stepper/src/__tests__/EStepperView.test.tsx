@@ -399,9 +399,9 @@ describe("EStepperView", () => {
     act(() => divider.props.onPointerDown({ clientX: 600, preventDefault: () => {} }));
     act(() => listeners.pointermove({ clientX: 480 }));
     expect(left()).toBe(`0 0 ${Math.round(0.45 * 1182) - 120}px`);
-    // The program keeps at least 80px, the diagram 200px.
+    // The program keeps at least 44px (about three characters), the diagram 200px.
     act(() => listeners.pointermove({ clientX: 0 }));
-    expect(left()).toBe("0 0 80px");
+    expect(left()).toBe("0 0 44px");
     act(() => listeners.pointermove({ clientX: 2000 }));
     expect(left()).toBe(`0 0 ${1182 - 200}px`);
     act(() => listeners.pointerup({ clientX: 2000 }));
