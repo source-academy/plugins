@@ -2,6 +2,7 @@ import {
   Button,
   ButtonGroup,
   Card,
+  Checkbox,
   Classes,
   Popover,
   Pre,
@@ -29,19 +30,25 @@ import EnvDiagram from "./EnvDiagram";
 import ProgramArrows, { ENV_ATTRIBUTE, REF_ATTRIBUTE } from "./ProgramArrows";
 import { injectEStepperStyles } from "./styles";
 
-/** Width (px) from which the program and the diagram are shown side by side. */
+/**
+ * Width (px) from which the program and the diagram start out side by side: the arrangement is
+ * chosen by the tab's width once, when the tab is first measured, and the user's after that.
+ */
 const WIDE_LAYOUT_MIN_WIDTH = 900;
 const DEFAULT_PROGRAM_HEIGHT = 240;
+/** The least height of the diagram below the program, and of the program: about one line of it. */
 const MIN_PANE_HEIGHT = 80;
+const MIN_PROGRAM_HEIGHT = 40;
 /** In a stacked tab: the two 8px gaps around the divider, its 6px, and its two 2px margins. */
 const STACKED_DIVIDER_SPACE = 2 * 8 + 6 + 2 * 2;
 /**
- * In a wide tab, the program pane's share of the width left for the two panes, and the least width
- * of either pane. That width is the tab's less the two 8px gaps around the divider and the
+ * In a wide tab, the program pane's share of the width left for the two panes, and the least widths
+ * of the panes. That width is the tab's less the two 8px gaps around the divider and the
  * divider's own 2px (6px wide, with -2px margins; see styles.ts).
  */
 const DEFAULT_PROGRAM_SHARE = 0.45;
 const MIN_PANE_WIDTH = 200;
+const MIN_PROGRAM_WIDTH = 80;
 const DIVIDER_SPACE = 2 * 8 + 2;
 
 type Props = {
@@ -227,7 +234,15 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
   const hasRun = lastStep > 0;
   const stepIndex = hasRun ? Math.min(stepValue, lastStep) - 1 : 0;
   const step = hasRun ? steps[stepIndex] : undefined;
-  const wide = containerSize.width >= WIDE_LAYOUT_MIN_WIDTH;
+  // The arrangement of the panes: side by side ("wide") or one above the other ("vertical"). It
+  // starts from the tab's width when that is first known, and is the user's choice from then on.
+  const [vertical, setVertical] = useState<boolean | null>(null);
+  useEffect(() => {
+    if (containerSize.width > 0) {
+      setVertical(v => v ?? containerSize.width < WIDE_LAYOUT_MIN_WIDTH);
+    }
+  }, [containerSize.width]);
+  const wide = vertical === null ? false : !vertical;
 
   // The double arrows (and `a` / `e`) jump to the previous / next breakpoint, or to the first / last
   // step when there is none, as in the stepper.
@@ -319,7 +334,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
   // always in view, to be dragged back.
   const maxProgramHeight =
     mainSize.height > 0
-      ? Math.max(MIN_PANE_HEIGHT, mainSize.height - STACKED_DIVIDER_SPACE - MIN_PANE_HEIGHT)
+      ? Math.max(MIN_PROGRAM_HEIGHT, mainSize.height - STACKED_DIVIDER_SPACE - MIN_PANE_HEIGHT)
       : Infinity;
   const stackedProgramHeight = Math.min(programHeight, maxProgramHeight);
   const startResize = useCallback(
@@ -328,7 +343,10 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
       const startHeight = stackedProgramHeight;
       const onMove = (e: PointerEvent) =>
         setProgramHeight(
-          Math.min(maxProgramHeight, Math.max(MIN_PANE_HEIGHT, startHeight + e.clientY - startY)),
+          Math.min(
+            maxProgramHeight,
+            Math.max(MIN_PROGRAM_HEIGHT, startHeight + e.clientY - startY),
+          ),
         );
       const onUp = () => {
         window.removeEventListener("pointermove", onMove);
@@ -346,18 +364,20 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
   // width at the tab's current size, however the share was set.
   const paneSpace = Math.max(0, containerSize.width - DIVIDER_SPACE);
   const programWidthFor = (share: number) =>
-    Math.round(Math.min(paneSpace - MIN_PANE_WIDTH, Math.max(MIN_PANE_WIDTH, share * paneSpace)));
+    Math.round(
+      Math.min(paneSpace - MIN_PANE_WIDTH, Math.max(MIN_PROGRAM_WIDTH, share * paneSpace)),
+    );
   const programWidth = programWidthFor(programShare);
   const startWidthResize = useCallback(
     (event: React.PointerEvent) => {
       event.preventDefault();
-      if (paneSpace <= 2 * MIN_PANE_WIDTH) return;
+      if (paneSpace <= MIN_PROGRAM_WIDTH + MIN_PANE_WIDTH) return;
       const startX = event.clientX;
       const startWidth = programWidth;
       const onMove = (e: PointerEvent) => {
         const width = Math.min(
           paneSpace - MIN_PANE_WIDTH,
-          Math.max(MIN_PANE_WIDTH, startWidth + e.clientX - startX),
+          Math.max(MIN_PROGRAM_WIDTH, startWidth + e.clientX - startX),
         );
         setProgramShare(width / paneSpace);
       };
@@ -419,6 +439,21 @@ export default function EStepperView({ steps, profile, error, cseDiagram }: Prop
               <Button icon="chevron-right" onClick={stepNext} />
               <Button icon="double-chevron-right" onClick={stepNextBreakpoint} />
             </ButtonGroup>
+            {/* The arrangement of the panes, a choice of the user (also with the host's diagram). */}
+            <Button
+              icon="vertical-distribution"
+              style={{ marginLeft: 8 }}
+              title="Program above the environment, instead of beside it"
+              aria-label="Vertical"
+              onClick={() => setVertical(v => !(v ?? false))}
+            >
+              <Checkbox
+                readOnly
+                checked={!wide}
+                label="Vertical"
+                style={{ margin: 0, pointerEvents: "none" }}
+              />
+            </Button>
             {usingHostDiagram ? null : (
               // The host's diagram has its own toolbar for these (its arrow filters, "Clear Dead
               // Frames"); these are for the plugin's own diagram.
