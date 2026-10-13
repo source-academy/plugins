@@ -126,17 +126,30 @@ interface Props {
   /** The object or frame under the mouse, whose arrows are drawn emphasized. */
   hovered: string | null;
   hoveredFrame: string | null;
+  /**
+   * Whether the arrows to objects are all drawn ("From program"). Otherwise an arrow to an object is
+   * drawn only while the object is hovered. An arrow to a frame is drawn only while the frame is
+   * hovered, whatever this is.
+   */
+  all: boolean;
   colorOfFrame: (frameId: string) => string;
 }
 
 const REF_COLOR = "#c5cbd3";
 
 /**
- * Draws the arrows from the program pane into the diagram, over both. It is placed last inside the
+ * Draws the arrows from the program pane into the diagram, over both: the arrows to objects all the
+ * time or only for the hovered object (see `all`), and the arrow to a frame only for the hovered frame. It is placed last inside the
  * container of the two panes (which is positioned), and finds the panes itself; it measures at
  * every render, and again when the program pane scrolls or the window is resized.
  */
-export default function ProgramArrows({ resolve, hovered, hoveredFrame, colorOfFrame }: Props) {
+export default function ProgramArrows({
+  resolve,
+  hovered,
+  hoveredFrame,
+  all,
+  colorOfFrame,
+}: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
   const [arrows, setArrows] = useState<ProgramArrow[]>([]);
   const [, setScrolled] = useState(0);
@@ -167,14 +180,15 @@ export default function ProgramArrows({ resolve, hovered, hoveredFrame, colorOfF
   return (
     <svg ref={svgRef} className="estepper-program-arrows" data-testid="estepper-program-arrows">
       {arrows.map(arrow => {
+        const emphasized =
+          arrow.kind === "object" ? hovered === arrow.id : hoveredFrame === arrow.id;
+        if (!emphasized && (arrow.kind === "frame" || !all)) return null;
         const { path, head } = arrowGeometry(
           arrow.from,
           arrow.to,
           arrow.kind === "object" ? "above" : "left",
           arrow.scale,
         );
-        const emphasized =
-          arrow.kind === "object" ? hovered === arrow.id : hoveredFrame === arrow.id;
         const color = arrow.kind === "frame" ? colorOfFrame(arrow.id) : REF_COLOR;
         return (
           <g key={arrow.key} opacity={emphasized ? 1 : 0.55}>

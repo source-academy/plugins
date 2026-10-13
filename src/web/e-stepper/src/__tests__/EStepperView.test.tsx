@@ -565,15 +565,17 @@ describe("EStepperView", () => {
         menu.root.findAllByType(Switch).map(sw => [sw.props.label as string, sw]),
       );
     }
-    test("arrows are on by default and can be turned off", () => {
+    test("arrows are on by default; turning them off leaves the arrows of what is hovered", () => {
       const view = render({ steps: fixture, profile });
       const diagram = view.root.find(n => n.props.onAnchors && n.props.frames);
       act(() => diagram.props.onAnchors(() => ({ x: 1, y: 2 })));
       const arrows = options(view)["From program"];
       expect(arrows.props.checked).toBe(true);
       expect(view.root.findAllByType(ProgramArrows)).toHaveLength(1);
+      expect(view.root.findByType(ProgramArrows).props.all).toBe(true);
       act(() => arrows.props.onChange({ currentTarget: { checked: false } }));
-      expect(view.root.findAllByType(ProgramArrows)).toHaveLength(0);
+      // Off draws no arrows on its own; the hovered object or frame still gets its arrow.
+      expect(view.root.findByType(ProgramArrows).props.all).toBe(false);
     });
 
     test("Clear dead frames is also available when only a heap object is dead", () => {
@@ -643,6 +645,10 @@ describe("EStepperView", () => {
       const { onAnchors } = cseDiagram.createView.mock.calls.at(-1)![0];
       act(() => onAnchors!(() => ({ x: 1, y: 2 })));
       expect(view.root.findAllByType(ProgramArrows)).toHaveLength(1);
+      expect(view.root.findByType(ProgramArrows).props.all).toBe(true);
+      // The host's "From program" is off: the anchors stay, for the arrows of what is hovered.
+      act(() => onAnchors!(() => ({ x: 1, y: 2 }), false));
+      expect(view.root.findByType(ProgramArrows).props.all).toBe(false);
       act(() => onAnchors!(null));
       expect(view.root.findAllByType(ProgramArrows)).toHaveLength(0);
     });

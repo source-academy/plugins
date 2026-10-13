@@ -40,7 +40,7 @@ interface Props {
    * Called with a function that finds where an object or frame is drawn now (in this component's
    * coordinates, with the user's pan and zoom), whenever that changes; with `null` on unmount.
    */
-  onAnchors?: (resolve: CseDiagramAnchorResolver | null) => void;
+  onAnchors?: (resolve: CseDiagramAnchorResolver | null, fromProgram?: boolean) => void;
 }
 
 /**
