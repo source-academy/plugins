@@ -213,10 +213,15 @@ export interface CseDiagramViewProps {
    * Asks the view to report where its objects and frames are, so the plugin can draw arrows into
    * the diagram from its own panes (the environment stepper's program pane). Called whenever the
    * drawing moves (a new step, pan, zoom, resize), and with `null` when the view no longer has
-   * anchors to give: when it unmounts, or when the host's arrow menu turns such arrows off.
-   * Optional: a host that does not support it never calls it, and the plugin draws no arrows.
+   * anchors to give: when it unmounts.
+   *
+   * `fromProgram` is whether the host's arrow menu asks for all arrows from the program to be
+   * drawn ("From program"). When it is `false`, the plugin draws such an arrow only while the
+   * object or frame it points to is hovered. Omitted, it is `true`: a host that predates this
+   * argument called `onAnchors` only while the menu asked for the arrows, and with `null` otherwise.
+   * Optional: a host that does not support `onAnchors` never calls it, and the plugin draws no arrows.
    */
-  onAnchors?: (resolve: CseDiagramAnchorResolver | null) => void;
+  onAnchors?: (resolve: CseDiagramAnchorResolver | null, fromProgram?: boolean) => void;
 }
 
 /**

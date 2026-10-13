@@ -142,6 +142,7 @@ describe("ProgramArrows", () => {
           resolve={({ kind }) => (kind === "object" ? { x: 10, y: 20 } : { x: 30, y: 40 })}
           hovered={null}
           hoveredFrame={null}
+          all
           colorOfFrame={() => "#ff0000"}
           {...props}
         />,
@@ -155,23 +156,27 @@ describe("ProgramArrows", () => {
       .findAllByType("path")
       .map(p => [p.props.stroke, p.props.strokeWidth, p.parent!.props.opacity]);
 
-  test("draws an arrow for each mark: grey for objects, in the frame's colour for frames", () => {
+  test("draws an arrow to each object, grey; one to a frame only while it is hovered", () => {
     const view = mount();
-    expect(view.root.findAllByType("polygon")).toHaveLength(2);
-    expect(strokes(view)).toEqual([
-      ["#c5cbd3", 1.5, 0.55],
-      ["#ff0000", 1.5, 0.55],
-    ]);
+    expect(view.root.findAllByType("polygon")).toHaveLength(1);
+    expect(strokes(view)).toEqual([["#c5cbd3", 1.5, 0.55]]);
     act(() => view.unmount());
     vi.unstubAllGlobals();
   });
 
-  test("emphasizes the arrows of the hovered object or frame", () => {
-    const object = mount({ hovered: "#1" });
-    expect(strokes(object)[0]).toEqual(["#c5cbd3", 2.5, 1]);
-    expect(strokes(object)[1][1]).toBe(1.5);
-    const frame = mount({ hoveredFrame: "E1" });
-    expect(strokes(frame)[1]).toEqual(["#ff0000", 2.5, 1]);
+  test('without "all", an arrow to an object is drawn only while the object is hovered', () => {
+    expect(strokes(mount({ all: false }))).toEqual([]);
+    expect(strokes(mount({ all: false, hovered: "#2" }))).toEqual([]);
+    expect(strokes(mount({ all: false, hovered: "#1" }))).toEqual([["#c5cbd3", 2.5, 1]]);
+    vi.unstubAllGlobals();
+  });
+
+  test('an arrow to a frame is drawn in the frame\'s colour while the frame is hovered, with or without "all"', () => {
+    for (const all of [true, false]) {
+      const view = mount({ all, hoveredFrame: "E1" });
+      expect(strokes(view).at(-1)).toEqual(["#ff0000", 2.5, 1]);
+      expect(view.root.findAllByType("path")).toHaveLength(all ? 2 : 1);
+    }
     vi.unstubAllGlobals();
   });
 
@@ -180,7 +185,7 @@ describe("ProgramArrows", () => {
     const view = mount();
     expect(listeners.has("scroll")).toBe(true);
     act(() => listeners.get("scroll")!());
-    expect(view.root.findAllByType("path")).toHaveLength(2);
+    expect(view.root.findAllByType("path")).toHaveLength(1);
     act(() => view.unmount());
     expect(listeners.has("scroll")).toBe(false);
     vi.unstubAllGlobals();

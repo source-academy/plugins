@@ -232,15 +232,17 @@ export default function EStepperView({ steps, profile, error, cseDiagram, layout
     DEFAULT_PROGRAM_SHARE,
   );
   const [outputOpen, setOutputOpen] = useState(true);
-  // Display options. Program references (arrows from the program into the diagram) are off until the user asks.
+  // Display options. "From program" (all the arrows from the program to objects in the diagram) is on until the user turns it off; hovering still draws an arrow to its object or frame.
   const [showArrows, setShowArrows] = useState(true);
   // "Clear dead frames" lasts until the step changes, as in the CSE machine.
   const [clearDead, setClearDead] = useState(false);
-  const [anchors, setAnchors] = useState<{ resolve: CseDiagramAnchorResolver | null }>({
-    resolve: null,
-  });
+  const [anchors, setAnchors] = useState<{
+    resolve: CseDiagramAnchorResolver | null;
+    fromProgram: boolean;
+  }>({ resolve: null, fromProgram: true });
   const onAnchors = useCallback(
-    (resolve: CseDiagramAnchorResolver | null) => setAnchors({ resolve }),
+    (resolve: CseDiagramAnchorResolver | null, fromProgram = true) =>
+      setAnchors({ resolve, fromProgram }),
     [],
   );
   const [containerRef, containerSize] = useSize();
@@ -596,9 +598,10 @@ export default function EStepperView({ steps, profile, error, cseDiagram, layout
                 />
               ) : null}
             </div>
-            {(usingHostDiagram ? anchors.resolve !== null : showArrows) ? (
+            {!usingHostDiagram || anchors.resolve !== null ? (
               <ProgramArrows
                 resolve={anchors.resolve}
+                all={usingHostDiagram ? anchors.fromProgram : showArrows}
                 hovered={hovered}
                 hoveredFrame={hoveredFrame}
                 colorOfFrame={colorOf}
