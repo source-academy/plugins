@@ -96,6 +96,13 @@ describe("EStepperView", () => {
     expect(text(view.root)).toContain("Welcome to the environment stepper");
   });
 
+  test("the welcome text links to the guide for students", () => {
+    const view = render({ steps: [] });
+    const link = view.root.findByType("a");
+    expect(link.props.href).toBe("https://docs.sourceacademy.org/python/e-stepper/");
+    expect(link.props.target).toBe("_blank");
+  });
+
   test("the slider counts the steps taken: 0 on the left, the total on the right", () => {
     const run = Array.from({ length: 174 }, (_, i) => ({ ...fixture[0], key: i }));
     const view = render({ steps: run, profile });
