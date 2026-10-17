@@ -102,6 +102,9 @@ export function previousBreakpoint(steps: EStepperStep[], value: number): number
   return 1;
 }
 
+/** The guide for students, built from `docs/md/README_ESTEPPER.md` of py-slang. */
+const GUIDE_URL = "https://docs.sourceacademy.org/python/e-stepper/";
+
 function DefaultText() {
   return (
     <div className={Classes.RUNNING_TEXT}>
@@ -114,6 +117,13 @@ function DefaultText() {
       and function objects are shown as references (#1, #2, ...) to the objects drawn in the
       environment diagram below the program. Hover over a reference to find its object, and over a
       bracketed body to find its frame.
+      <br />
+      <br />
+      What do the brackets, labels and badges mean? Read{" "}
+      <a href={GUIDE_URL} target="_blank" rel="noopener noreferrer">
+        the guide to the environment stepper
+      </a>
+      .
       <br />
       <br />
       Keyboard shortcuts (click on the explanation first): f / b for the next / previous step, a / e
