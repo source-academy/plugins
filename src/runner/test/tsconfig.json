@@ -5,6 +5,8 @@
   "compilerOptions": {
     "declaration": true,
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    // Some weird stuff is happening with py-slang
+    "skipLibCheck": true
   }
 }

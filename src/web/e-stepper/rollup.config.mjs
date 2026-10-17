@@ -1,8 +1,11 @@
+// @ts-check
+
 import commonjs from "@rollup/plugin-commonjs";
 import nodeResolve from "@rollup/plugin-node-resolve";
 import replace from "@rollup/plugin-replace";
 import terser from "@rollup/plugin-terser";
 import typescript from "@rollup/plugin-typescript";
+import { defineConfig } from "rollup";
 
 // React, Blueprint, and Konva/react-konva are provided by the host at load time through the
 // require-provider (see the frontend's `requireProvider`, which already exposes them for other
@@ -21,10 +24,7 @@ const external = [
   "react-konva",
 ];
 
-/**
- * @type {import('rollup').RollupOptions}
- */
-export default {
+export default defineConfig({
   input: "src/index.ts",
   output: {
     file: "dist/index.cjs",
@@ -38,7 +38,7 @@ export default {
     replace({ preventAssignment: true, "process.env.NODE_ENV": JSON.stringify("production") }),
     nodeResolve({ browser: true, preferBuiltins: false }),
     commonjs(),
-    typescript(),
+    typescript({ exclude: ['**/__tests__/**'] }),
     terser(),
   ],
-};
+});

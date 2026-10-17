@@ -25,9 +25,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { CustomASTRenderer, type NodeRenderers, type StepperNode } from "../../stepper/src/render";
 import { sliderLabels } from "../../stepper/src/sliderLabels";
 import { injectStepperStyles } from "../../stepper/src/styles";
-import { frameColor } from "./colors";
 import EnvDiagram from "./EnvDiagram";
 import ProgramArrows, { ENV_ATTRIBUTE, REF_ATTRIBUTE } from "./ProgramArrows";
+import { frameColor } from "./colors";
 import { injectEStepperStyles } from "./styles";
 
 const DEFAULT_PROGRAM_HEIGHT = 240;

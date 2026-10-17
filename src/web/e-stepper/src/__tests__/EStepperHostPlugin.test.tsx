@@ -3,8 +3,11 @@ import { act, createElement } from "react";
 import TestRenderer from "react-test-renderer";
 import { describe, expect, test, vi } from "vitest";
 
-vi.mock("konva", () => ({ default: {} }));
-vi.mock("react-konva", () => {
+import { EStepperHostPlugin } from "../EStepperHostPlugin";
+import steps from "./makeWithdrawSteps.json";
+
+vi.mock(import('konva'), () => ({ default: {} as any }));
+vi.mock(import('react-konva'), () => {
   const stub = (name: string) => (props: Record<string, unknown>) =>
     createElement(`konva-${name.toLowerCase()}`, props, props.children as never);
   return Object.fromEntries(
@@ -13,13 +16,10 @@ vi.mock("react-konva", () => {
 });
 
 // Blueprint's overlays need a DOM to unmount (the options menu goes when the host draws the diagram).
-vi.mock("@blueprintjs/core", async (importOriginal: () => Promise<object>) => ({
+vi.mock(import('@blueprintjs/core'), async importOriginal => ({
   ...(await importOriginal()),
-  Popover: (props: Record<string, unknown>) => createElement("popover-stub", props),
+  Popover: ((props: Record<string, unknown>) => createElement("popover-stub", props)) as any
 }));
-
-import { EStepperHostPlugin } from "../EStepperHostPlugin";
-import steps from "./makeWithdrawSteps.json";
 
 type PluginArgs = ConstructorParameters<typeof EStepperHostPlugin>;
 
@@ -38,11 +38,11 @@ function setUp(hostServices?: PluginArgs[3]) {
   // Stubs with only what the plugin uses.
   const conduit = {} as PluginArgs[0];
   const tabServiceStub = tabService as unknown as PluginArgs[2];
-  const plugin = new EStepperHostPlugin(conduit, [channel as never], tabServiceStub, hostServices);
+  const plugin = new EStepperHostPlugin(conduit, [channel], tabServiceStub, hostServices);
   return { plugin, deliver: (m: EStepperMessage) => act(() => deliver(m)), sent, tab, tabService };
 }
 
-describe("EStepperHostPlugin", () => {
+describe(EStepperHostPlugin, () => {
   test("registers and reveals the E-Stepper tab, and asks for the last run's steps", () => {
     const { tab, tabService, sent } = setUp();
     expect(tab).toMatchObject({ id: "e-stepper", label: "E-Stepper", iconName: "flow-review" });

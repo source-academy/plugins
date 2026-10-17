@@ -1,11 +1,11 @@
+// @ts-check
+
 import nodeResolve from "@rollup/plugin-node-resolve";
 import terser from "@rollup/plugin-terser";
 import typescript from "@rollup/plugin-typescript";
+import { defineConfig } from "rollup";
 
-/**
- * @type {import('rollup').RollupOptions}
- */
-export default {
+export default defineConfig({
   input: "src/index.ts",
   output: [
     {
@@ -17,5 +17,9 @@ export default {
       format: "esm",
     },
   ],
-  plugins: [nodeResolve(), typescript(), terser()],
-};
+  plugins: [
+    nodeResolve(), 
+    typescript({ exclude: ['**/__tests__/**'] }),
+    terser()
+  ],
+});

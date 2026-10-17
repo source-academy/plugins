@@ -3,22 +3,22 @@ import { act, createElement } from "react";
 import TestRenderer from "react-test-renderer";
 import { describe, expect, test, vi } from "vitest";
 
+import EnvDiagram from "../EnvDiagram";
+import { DiagramColors } from "../colors";
+import { layoutDiagram } from "../layout";
+import steps from "./makeWithdrawSteps.json";
+
 // Konva's Node build needs the optional `canvas` package, so the shapes are stubbed — as plain
 // host elements (`konva-rect`, ...) that keep their props and render their children, so the
 // drawing code runs and what it draws can be inspected.
-vi.mock("konva", () => ({ default: {} }));
-vi.mock("react-konva", () => {
+vi.mock(import('konva'), () => ({ default: {} as any }));
+vi.mock(import('react-konva'), () => {
   const stub = (name: string) => (props: Record<string, unknown>) =>
     createElement(`konva-${name.toLowerCase()}`, props, props.children as never);
   return Object.fromEntries(
     ["Stage", "Layer", "Text", "Group", "Line", "Rect", "Circle", "Arrow"].map(n => [n, stub(n)]),
   );
 });
-
-import { DiagramColors } from "../colors";
-import EnvDiagram from "../EnvDiagram";
-import { layoutDiagram } from "../layout";
-import steps from "./makeWithdrawSteps.json";
 
 /** A stubbed Konva shape's host element type (see the react-konva mock above). */
 const konva = (type: string) => type as unknown as React.ElementType;
@@ -50,7 +50,7 @@ function draw(overrides: Partial<Parameters<typeof EnvDiagram>[0]> = {}) {
 const texts = (root: TestRenderer.ReactTestInstance) =>
   root.findAllByType(konva("konva-text")).map(t => String(t.props.text));
 
-describe("EnvDiagram", () => {
+describe(EnvDiagram, () => {
   test("draws every frame with its label and bindings", () => {
     const all = texts(draw().root);
     expect(all).toEqual(expect.arrayContaining(["Global", "E1  make_withdraw", "E2  withdraw"]));

@@ -2,13 +2,14 @@ import type { SerializedDataVisualizerNode } from '@sourceacademy/common-data-vi
 import { Text } from 'react-konva';
 import { describe, expect, test, vi } from 'vitest';
 
+import { Config } from '../Config';
 import type { ClassificationResult } from '../classify';
 import { ArrowDrawable, BackwardArrowDrawable } from '../drawable/Drawable';
 import { AlreadyParsedTreeNode } from '../tree/AlreadyParsedTreeNode';
 import { BinaryTreeDrawer } from '../tree/BinaryTreeDrawer';
 import { GeneralTreeDrawer } from '../tree/GeneralTreeDrawer';
 import { Tree } from '../tree/Tree';
-import { ArrayTreeNode, FunctionTreeNode } from '../tree/TreeNode';
+import { ArrayTreeNode, DataTreeNode, FunctionTreeNode } from '../tree/TreeNode';
 
 // Same rationale as tree.test.ts: avoid Konva's Node-environment build requiring the optional
 // `canvas` package for what are, here, pure layout-arithmetic and warning-fallback checks.
@@ -47,22 +48,7 @@ vi.mock(import('react-konva'), () => {
   } as any;
 });
 
-<<<<<<< HEAD
-const empty = (): SerializedDataVisualizerNode => ({ type: 'empty' });
-=======
-import { Text } from "react-konva";
-
-import type { ClassificationResult } from "../classify";
-import { Config } from "../Config";
-import { ArrowDrawable, BackwardArrowDrawable } from "../drawable/Drawable";
-import { AlreadyParsedTreeNode } from "../tree/AlreadyParsedTreeNode";
-import { BinaryTreeDrawer } from "../tree/BinaryTreeDrawer";
-import { GeneralTreeDrawer } from "../tree/GeneralTreeDrawer";
-import { Tree } from "../tree/Tree";
-import { ArrayTreeNode, DataTreeNode, FunctionTreeNode } from "../tree/TreeNode";
-
 const empty = (): SerializedDataVisualizerNode => ({ type: "empty" });
->>>>>>> origin/main
 const leaf = (n: number): SerializedDataVisualizerNode => ({
   type: 'leaf',
   displayValue: String(n),
@@ -164,16 +150,12 @@ describe(BinaryTreeDrawer, () => {
     expect(deep.height).toBeGreaterThan(single.height);
   });
 
-<<<<<<< HEAD
-  test('the bare empty terminator is a trivial valid binary tree, drawn via the measured-text branch', () => {
-=======
   test("an empty value carries the language's spelling of it through to the root node", () => {
     const tree = Tree.fromSerializedNode({ type: "empty", displayValue: "None" });
     expect((tree.rootNode as DataTreeNode).displayValue).toBe("None");
   });
 
   test("the bare empty terminator is a trivial valid binary tree, drawn via the measured-text branch", () => {
->>>>>>> origin/main
     // Per isBinaryTreeNode: a binary tree is `null`, or a 3-element list — a bare *leaf* value is
     // neither, so (unlike this case) it fails classification and hits the warning box instead.
     const tree = Tree.fromSerializedNode(empty());
@@ -237,10 +219,6 @@ describe(BinaryTreeDrawer, () => {
   });
 });
 
-<<<<<<< HEAD
-describe(GeneralTreeDrawer, () => {
-  test('a non-general-tree structure draws the fixed-size warning box instead of a tree', () => {
-=======
 describe("BinaryTreeDrawer canvas (issue #84)", () => {
   // Python value -> wire node, the way py-slang serializes it (2-element list -> pair).
   type Py = null | number | string | Py[];
@@ -340,7 +318,7 @@ describe("BinaryTreeDrawer canvas margin", () => {
   );
 });
 
-describe("GeneralTreeDrawer", () => {
+describe(GeneralTreeDrawer, () => {
   test("draws a list of functions as a tree with three data items, not the warning box (issue #113)", () => {
     // draw_data(llist(lambda x : x, lambda y: y, lambda z: z))
     const fn = (): SerializedDataVisualizerNode => ({
@@ -427,7 +405,6 @@ describe("GeneralTreeDrawer", () => {
   );
 
   test("a non-general-tree structure draws the fixed-size warning box instead of a tree", () => {
->>>>>>> origin/main
     // An *improper* list (here, a bare 2-tuple whose second slot is a leaf rather than another pair
     // or the empty terminator) is the only shape General Tree View actually rejects — a binary-tree-
     // shaped input is itself a valid (proper-list) general tree, see classify.test.ts.

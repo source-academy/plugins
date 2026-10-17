@@ -8,13 +8,8 @@
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
   "ignore": [
-<<<<<<< HEAD
     "@sourceacademy/web-data-visualizer",
-    "@sourceacademy/web-stepper"
-=======
-    "@sourceacademy/web-stepper",
     "@sourceacademy/web-e-stepper",
-    "@sourceacademy/web-data-visualizer"
->>>>>>> origin/main
+    "@sourceacademy/web-stepper"
   ]
 }

@@ -1,13 +1,18 @@
+import { Button, Checkbox, Popover, Slider, Switch } from "@blueprintjs/core";
 import type { CseDiagramViewProps } from "@sourceacademy/common-cse-machine";
 import type { EStepperStep, SyntaxProfile } from "@sourceacademy/common-e-stepper";
 import { act, createElement } from "react";
-import { Button, Checkbox, Popover, Slider, Switch } from "@blueprintjs/core";
 import TestRenderer from "react-test-renderer";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import EStepperView, { nextBreakpoint, previousBreakpoint, sliderLabels } from "../EStepperView";
+import ProgramArrows from "../ProgramArrows";
+import steps from "./makeWithdrawSteps.json";
+import pythonProfile from "./pythonProfile.json";
+
 // As in the data visualizer's tests: avoid Konva's Node build (it requires the optional `canvas`).
-vi.mock("konva", () => ({ default: {} }));
-vi.mock("react-konva", () => {
+vi.mock(import('konva'), () => ({ default: {} as any }));
+vi.mock(import('react-konva'), () => {
   const stub = (name: string) => (props: Record<string, unknown>) =>
     createElement(`konva-${name.toLowerCase()}`, props, props.children as never);
   return Object.fromEntries(
@@ -16,18 +21,13 @@ vi.mock("react-konva", () => {
 });
 
 // Blueprint's overlays need a DOM; the tests read the options menu's content from the props.
-vi.mock("@blueprintjs/core", async (importOriginal: () => Promise<object>) => ({
+vi.mock(import('@blueprintjs/core'), async (importOriginal: () => Promise<object>) => ({
   ...(await importOriginal()),
-  Popover: (props: Record<string, unknown>) => createElement("popover-stub", props),
+  Popover: ((props: Record<string, unknown>) => createElement("popover-stub", props)) as any
 }));
-
-import EStepperView, { nextBreakpoint, previousBreakpoint, sliderLabels } from "../EStepperView";
-import ProgramArrows from "../ProgramArrows";
-import steps from "./makeWithdrawSteps.json";
 
 /** A stubbed Konva shape's host element type (see the react-konva mock above). */
 const konva = (type: string) => type as unknown as React.ElementType;
-import pythonProfile from "./pythonProfile.json";
 
 // Both produced by py-slang's e-stepper: three steps of make_withdraw, and its Python profile.
 const fixture = steps as unknown as EStepperStep[];
@@ -80,7 +80,7 @@ const hasClass = (node: TestRenderer.ReactTestInstance, name: string): boolean =
 const text = (node: TestRenderer.ReactTestInstance): string =>
   node.children.map(c => (typeof c === "string" ? c : text(c))).join("");
 
-describe("EStepperView", () => {
+describe(EStepperView, () => {
   // The slider remounts when the tab's size is known (it measures its track then), and a Blueprint
   // slider takes its listeners off the document when it goes away.
   beforeEach(() => {

@@ -8,15 +8,15 @@ import { act } from "react";
 import TestRenderer from "react-test-renderer";
 import { describe, expect, test, vi } from "vitest";
 
+import StepperView from "../SubstVisualizer";
+import { sliderLabels } from "../sliderLabels";
+
 // The hotkey library needs react-dom, which it does not declare (so it does not resolve here).
 // (Here it runs the binding for the key pressed, as the real one does.)
-vi.mock("@mantine/hooks", () => ({
+vi.mock(import('@mantine/hooks'), () => ({
   getHotkeyHandler: (bindings: [string, () => void][]) => (event: { key: string }) =>
     bindings.find(([key]) => key === event.key)?.[1](),
 }));
-
-import { sliderLabels } from "../sliderLabels";
-import StepperView from "../SubstVisualizer";
 
 const step = (explanation: string): SerializedStepperStep => ({
   ast: { type: "Program", nodeId: "p", body: [] },
@@ -162,7 +162,7 @@ describe("breakpoints and keys", () => {
   });
 });
 
-describe("sliderLabels", () => {
+describe(sliderLabels, () => {
   test("labels 0, a round step apart, and always the last, never crowding it", () => {
     expect(sliderLabels(0)).toEqual([0]);
     expect(sliderLabels(1)).toEqual([0, 1]);

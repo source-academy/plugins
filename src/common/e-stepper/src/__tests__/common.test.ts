@@ -1,10 +1,10 @@
+import { RUNNER_ID as STEPPER_RUNNER_ID, STEPPER_CHANNEL_ID } from "@sourceacademy/common-stepper";
 import { expect, test } from "vitest";
 
-import { RUNNER_ID as STEPPER_RUNNER_ID, STEPPER_CHANNEL_ID } from "@sourceacademy/common-stepper";
 import {
+  ENV_BLOCK_NODE_TYPE,
   E_STEPPER_CHANNEL_ID,
   E_STEPPER_DIRECTORY_ID,
-  ENV_BLOCK_NODE_TYPE,
   REF_NODE_TYPE,
   RUNNER_ID,
   WEB_ID,

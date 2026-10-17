@@ -1,3 +1,4 @@
+import type { ICseDiagramService, IHostServices } from "@sourceacademy/common-cse-machine";
 import {
   E_STEPPER_CHANNEL_ID,
   WEB_ID,
@@ -5,7 +6,6 @@ import {
   type EStepperStep,
   type SyntaxProfile,
 } from "@sourceacademy/common-e-stepper";
-import type { ICseDiagramService, IHostServices } from "@sourceacademy/common-cse-machine";
 import type { ITabService, Tab } from "@sourceacademy/common-tabs";
 import {
   checkIsPluginClass,

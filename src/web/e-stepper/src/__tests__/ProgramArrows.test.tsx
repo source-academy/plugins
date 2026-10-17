@@ -3,10 +3,10 @@ import TestRenderer from "react-test-renderer";
 import { describe, expect, test, vi } from "vitest";
 
 import ProgramArrows, {
-  arrowGeometry,
-  computeProgramArrows,
   ENV_ATTRIBUTE,
   REF_ATTRIBUTE,
+  arrowGeometry,
+  computeProgramArrows,
 } from "../ProgramArrows";
 
 const rect = (left: number, top: number, width: number, height: number) =>
@@ -24,7 +24,7 @@ function fake(box: DOMRect, attributes: Record<string, string> = {}, marks: unkn
   } as unknown as Element;
 }
 
-describe("arrowGeometry", () => {
+describe(arrowGeometry, () => {
   test("leaves and arrives horizontally when the target is further across than down", () => {
     const { path, head } = arrowGeometry({ x: 0, y: 0 }, { x: 100, y: 20 });
     expect(path).toBe("M 0 0 C 50 0, 50 20, 100 20");
@@ -76,7 +76,7 @@ describe("arrowGeometry scale", () => {
   });
 });
 
-describe("computeProgramArrows", () => {
+describe(computeProgramArrows, () => {
   const container = fake(rect(100, 50, 800, 400));
   const program = (marks: unknown[]) => fake(rect(100, 50, 300, 400), {}, marks);
   const diagram = fake(rect(500, 50, 400, 400));
@@ -114,7 +114,7 @@ describe("computeProgramArrows", () => {
   });
 });
 
-describe("ProgramArrows", () => {
+describe(ProgramArrows, () => {
   const ref = fake(rect(150, 100, 20, 10), { [REF_ATTRIBUTE]: "#1" });
   const env = fake(rect(120, 200, 20, 12), { [ENV_ATTRIBUTE]: "E1" });
   const listeners = new Map<string, () => void>();

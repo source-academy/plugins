@@ -1,4 +1,3 @@
-import { expect, test } from "vitest";
 
 import {
   E_STEPPER_CHANNEL_ID,
@@ -7,6 +6,7 @@ import {
 } from "@sourceacademy/common-e-stepper";
 import { STEPPER_CHANNEL_ID } from "@sourceacademy/common-stepper";
 import { BaseStepperRunnerPlugin } from "@sourceacademy/runner-stepper";
+import { expect, test } from "vitest";
 import { BaseEStepperRunnerPlugin } from "..";
 
 class FakeChannel {
@@ -43,7 +43,7 @@ class CountingEStepper extends BaseEStepperRunnerPlugin<number> {
 }
 
 const make = <T>(Cls: new (...args: never[]) => T, channel: FakeChannel): T =>
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   new (Cls as any)({} as any, [channel as any]);
 
 test("attaches to the e-stepper channel, not the stepper's", () => {

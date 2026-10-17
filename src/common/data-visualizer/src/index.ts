@@ -59,13 +59,6 @@ export type RefId = number;
  * distinguishes "pair" from "list" for classification purposes by `children.length`, not by tag.
  */
 export type SerializedDataVisualizerNode =
-<<<<<<< HEAD
-  | { type: 'array'; refId: RefId; children: SerializedDataVisualizerNode[] }
-  | { type: 'empty' }
-  | { type: 'leaf'; displayValue: string; label: string }
-  | { type: 'function'; refId: RefId; displayValue: string }
-  | { type: 'ref'; refId: RefId };
-=======
   | { type: "array"; refId: RefId; children: SerializedDataVisualizerNode[] }
   | {
       type: "empty";
@@ -79,7 +72,6 @@ export type SerializedDataVisualizerNode =
   | { type: "leaf"; displayValue: string; label: string }
   | { type: "function"; refId: RefId; displayValue: string }
   | { type: "ref"; refId: RefId };
->>>>>>> origin/main
 
 /** One row = the fully-serialized arguments of a single `draw_data(...)` call. */
 export type SerializedDataVisualizerRow = SerializedDataVisualizerNode[];

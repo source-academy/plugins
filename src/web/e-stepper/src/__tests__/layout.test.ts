@@ -6,8 +6,8 @@ import type {
 import { describe, expect, test } from "vitest";
 
 import { frameColor } from "../colors";
-import { layoutDiagram, LayoutConfig as C, type DiagramLayout } from "../layout";
-import steps from "./makeWithdrawSteps.json";
+import { LayoutConfig as C, layoutDiagram, type DiagramLayout } from "../layout";
+import steps from "./makeWithdrawSteps.json" with { type: 'json' };
 
 /** The last step of `make_withdraw` (produced by py-slang's e-stepper engine): frames Global, E1,
  * E2 (garbage), function objects #1 (in Global) and #2 (in E1), lists #4 = [W1, #3] and #3. */

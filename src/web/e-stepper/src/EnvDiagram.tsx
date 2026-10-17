@@ -10,12 +10,12 @@ import { Arrow, Circle, Group, Layer, Line, Rect, Stage, Text } from "react-konv
 
 import { DiagramColors, frameColor } from "./colors";
 import {
+  LayoutConfig as C,
+  layoutDiagram,
+  valueLabel,
   type ArrowSpec,
   type FrameBox,
-  layoutDiagram,
-  LayoutConfig as C,
   type ObjectBox,
-  valueLabel,
 } from "./layout";
 
 const FONT = "Inconsolata, Consolas, monospace";
