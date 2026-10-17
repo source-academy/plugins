@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import {
   Button,
   ButtonGroup,
@@ -29,6 +30,18 @@ import { injectStepperStyles } from './styles';
  */
 type StepperNode = SerializedStepperNode & Record<string, any>;
 
+=======
+import { Button, ButtonGroup, Card, Classes, Divider, Pre, Slider } from "@blueprintjs/core";
+import { getHotkeyHandler, type HotkeyItem } from "@mantine/hooks";
+import type { SerializedStepperStep, SyntaxProfile } from "@sourceacademy/common-stepper";
+import classNames from "classnames";
+import { useCallback, useEffect, useState } from "react";
+
+import { CustomASTRenderer } from "./render";
+import { sliderLabels } from "./sliderLabels";
+import { injectStepperStyles } from "./styles";
+
+>>>>>>> origin/main
 function SubstDefaultText() {
   return (
     <div>
@@ -41,9 +54,10 @@ function SubstDefaultText() {
         dragging the slider above to see its evaluation.
         <br />
         <br />
-        On even-numbered steps, the part of the program that will be evaluated next is highlighted
-        in yellow. On odd-numbered steps, the result of the evaluation is highlighted in green. You
-        can change the maximum steps limit (500-5000, default 1000) in the control bar.
+        On odd-numbered steps, the part of the program that will be evaluated next is highlighted in
+        yellow. On even-numbered steps, the result of the evaluation is highlighted in green (step 0
+        is the start). You can change the maximum steps limit (500-5000, default 1000) in the
+        control bar.
         <br />
         <br />
         <Divider />
@@ -104,12 +118,34 @@ type StepperViewProps = {
 };
 
 /**
+ * Tracks an element's width; attach the returned callback as the element's `ref`. Blueprint's
+ * slider measures its track only when it mounts, and converts a click to a step with that width, so
+ * the slider is keyed by this width to measure again after a resize.
+ */
+function useWidth(): [(element: HTMLElement | null) => void, number] {
+  const [element, setElement] = useState<HTMLElement | null>(null);
+  const [width, setWidth] = useState(0);
+  useEffect(() => {
+    if (!element) return;
+    setWidth(Math.floor(element.getBoundingClientRect().width));
+    if (typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(entries =>
+      setWidth(Math.floor(entries[0].contentRect.width)),
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [element]);
+  return [setElement, width];
+}
+
+/**
  * The presentational stepper: a slider + breakpoint controls over a list of serialized steps, with
  * a custom AST renderer and an explanation panel. A faithful port of the frontend's legacy
  * `SideContentSubstVisualizer`, minus its redux/i18n/js-slang couplings.
  */
 export default function StepperView(props: StepperViewProps) {
   const [stepValue, setStepValue] = useState(1);
+  const [rootRef, width] = useWidth();
   const lastStepValue = props.content.length;
   const hasRunCode = lastStepValue !== 0;
 
@@ -198,16 +234,25 @@ export default function StepperView(props: StepperViewProps) {
 
   return (
     <div
+<<<<<<< HEAD
       className={classNames('sa-substituter', Classes.DARK)}
+=======
+      ref={rootRef}
+      className={classNames("sa-substituter", Classes.DARK)}
+>>>>>>> origin/main
       onKeyDown={hotkeyHandler}
       tabIndex={-1} // tab index necessary to fire keydown events on div element
     >
+      {/* The slider counts the steps taken: 0 is the start, the last is the total number. A run of
+          one step has nothing to slide between: a valid range, disabled. */}
       <Slider
-        disabled={!hasRunCode}
-        min={1}
-        max={lastStepValue}
-        onChange={setStepValue}
-        value={stepValue <= lastStepValue ? stepValue : 1}
+        key={width}
+        disabled={lastStepValue < 2}
+        min={0}
+        max={Math.max(1, lastStepValue - 1)}
+        labelValues={sliderLabels(Math.max(1, lastStepValue - 1))}
+        onChange={value => setStepValue(value + 1)}
+        value={(stepValue <= lastStepValue ? stepValue : 1) - 1}
       />
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <ButtonGroup>
@@ -234,6 +279,7 @@ export default function StepperView(props: StepperViewProps) {
     </div>
   );
 }
+<<<<<<< HEAD
 
 /*
   Custom AST renderer for Stepper (Inspired by astring library)
@@ -1188,3 +1234,5 @@ const EXPRESSIONS_PRECEDENCE = {
   YieldExpression: 2,
   RestElement: 1,
 };
+=======
+>>>>>>> origin/main

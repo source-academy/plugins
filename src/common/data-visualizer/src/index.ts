@@ -59,11 +59,27 @@ export type RefId = number;
  * distinguishes "pair" from "list" for classification purposes by `children.length`, not by tag.
  */
 export type SerializedDataVisualizerNode =
+<<<<<<< HEAD
   | { type: 'array'; refId: RefId; children: SerializedDataVisualizerNode[] }
   | { type: 'empty' }
   | { type: 'leaf'; displayValue: string; label: string }
   | { type: 'function'; refId: RefId; displayValue: string }
   | { type: 'ref'; refId: RefId };
+=======
+  | { type: "array"; refId: RefId; children: SerializedDataVisualizerNode[] }
+  | {
+      type: "empty";
+      /**
+       * How the language writes its empty value (e.g. `"None"` for Python), shown when the empty value
+       * is drawn on its own. Inside a pair/array it is always drawn as a diagonal slash instead. Omit it
+       * to get `"null"` (Source).
+       */
+      displayValue?: string;
+    }
+  | { type: "leaf"; displayValue: string; label: string }
+  | { type: "function"; refId: RefId; displayValue: string }
+  | { type: "ref"; refId: RefId };
+>>>>>>> origin/main
 
 /** One row = the fully-serialized arguments of a single `draw_data(...)` call. */
 export type SerializedDataVisualizerRow = SerializedDataVisualizerNode[];

@@ -114,6 +114,9 @@ A single name → value binding within a frame.
 | `value` | `CseSerializedValue` | The bound value |
 | `isConst` | `boolean \| undefined` | Whether the binding is a constant (e.g. `const` in Source) |
 
+### Host services: `ICseDiagramService`
+A host can lend web plugins its CSE machine visualization, passed as the third constructor argument: `registerPlugin(PluginClass, tabService, hostServices)` with `hostServices: IHostServices`. `hostServices.cseDiagram.createView({ snapshots, step })` returns an element of the host's UI framework (a React element in the Source Academy frontend) that draws the environments of `snapshots[step]` the way the CSE Machine tab does: environment only, with frames from earlier snapshots shown as dead frames, and the host's diagram toolbar. The environment stepper (`@sourceacademy/web-e-stepper`) uses it when available.
+
 ## Further reading
 - To send snapshots from an evaluator, use [`@sourceacademy/runner-cse-machine`](https://github.com/source-academy/plugins/tree/main/src/runner/cse-machine)
 - To receive snapshots in a host app, use [`@sourceacademy/web-cse-machine`](https://github.com/source-academy/plugins/tree/main/src/web/cse-machine)

@@ -39,7 +39,7 @@
     "@rollup/plugin-typescript": "catalog:",
     "@sourceacademy/common-test": "workspace:*",
     "@sourceacademy/conductor": "catalog:",
-    "@vitest/coverage-istanbul": "^4.1.9",
+    "@vitest/coverage-istanbul": "catalog:",
     "rollup": "catalog:",
     "tslib": "catalog:",
     "typescript": "catalog:",

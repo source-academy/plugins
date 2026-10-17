@@ -1,7 +1,7 @@
 {
   "name": "@sourceacademy/runner-cse-machine",
   "version": "3.0.0",
-  "packageManager": "yarn@4.18.0",
+  "packageManager": "yarn@4.18.1",
   "description": "The runner-side CSE machine plugin: sends evaluation snapshots to the host",
   "repository": {
     "type": "git",
@@ -30,7 +30,7 @@
     }
   },
   "peerDependencies": {
-    "@sourceacademy/common-cse-machine": ">=0.3.0",
+    "@sourceacademy/common-cse-machine": ">=0.3.1",
     "@sourceacademy/conductor": "*"
   },
   "devDependencies": {
@@ -39,7 +39,7 @@
     "@rollup/plugin-typescript": "catalog:",
     "@sourceacademy/common-cse-machine": "workspace:*",
     "@sourceacademy/conductor": "catalog:",
-    "@vitest/coverage-istanbul": "^4.1.9",
+    "@vitest/coverage-istanbul": "catalog:",
     "rollup": "catalog:",
     "tslib": "catalog:",
     "typescript": "catalog:",

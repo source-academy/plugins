@@ -1,0 +1,584 @@
+[
+  {
+    "ast": {
+      "type": "Program",
+      "nodeId": "n47",
+      "body": [
+        {
+          "type": "FunctionDeclaration",
+          "nodeId": "n26",
+          "id": {
+            "type": "Identifier",
+            "nodeId": "n0",
+            "name": "make_withdraw"
+          },
+          "params": [
+            {
+              "type": "Identifier",
+              "nodeId": "n1",
+              "name": "balance"
+            }
+          ],
+          "body": {
+            "type": "BlockStatement",
+            "nodeId": "n25",
+            "body": [
+              {
+                "type": "FunctionDeclaration",
+                "nodeId": "n22",
+                "id": {
+                  "type": "Identifier",
+                  "nodeId": "n2",
+                  "name": "withdraw"
+                },
+                "params": [
+                  {
+                    "type": "Identifier",
+                    "nodeId": "n3",
+                    "name": "amount"
+                  }
+                ],
+                "body": {
+                  "type": "BlockStatement",
+                  "nodeId": "n21",
+                  "body": [
+                    {
+                      "type": "NonlocalStatement",
+                      "nodeId": "n4",
+                      "names": "balance"
+                    },
+                    {
+                      "type": "IfStatement",
+                      "nodeId": "n20",
+                      "test": {
+                        "type": "BinaryExpression",
+                        "nodeId": "n7",
+                        "operator": ">=",
+                        "left": {
+                          "type": "Identifier",
+                          "nodeId": "n5",
+                          "name": "balance"
+                        },
+                        "right": {
+                          "type": "Identifier",
+                          "nodeId": "n6",
+                          "name": "amount"
+                        }
+                      },
+                      "consequent": {
+                        "type": "BlockStatement",
+                        "nodeId": "n16",
+                        "body": [
+                          {
+                            "type": "VariableDeclaration",
+                            "nodeId": "n13",
+                            "kind": "",
+                            "declarations": [
+                              {
+                                "type": "VariableDeclarator",
+                                "nodeId": "n12",
+                                "id": {
+                                  "type": "Identifier",
+                                  "nodeId": "n8",
+                                  "name": "balance"
+                                },
+                                "init": {
+                                  "type": "BinaryExpression",
+                                  "nodeId": "n11",
+                                  "operator": "-",
+                                  "left": {
+                                    "type": "Identifier",
+                                    "nodeId": "n9",
+                                    "name": "balance"
+                                  },
+                                  "right": {
+                                    "type": "Identifier",
+                                    "nodeId": "n10",
+                                    "name": "amount"
+                                  }
+                                }
+                              }
+                            ]
+                          },
+                          {
+                            "type": "ReturnStatement",
+                            "nodeId": "n15",
+                            "argument": {
+                              "type": "Identifier",
+                              "nodeId": "n14",
+                              "name": "balance"
+                            }
+                          }
+                        ]
+                      },
+                      "alternate": {
+                        "type": "BlockStatement",
+                        "nodeId": "n19",
+                        "body": [
+                          {
+                            "type": "ReturnStatement",
+                            "nodeId": "n18",
+                            "argument": {
+                              "type": "Literal",
+                              "nodeId": "n17",
+                              "value": null,
+                              "raw": "'Insufficient funds'",
+                              "label": "str"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "ReturnStatement",
+                "nodeId": "n24",
+                "argument": {
+                  "type": "Identifier",
+                  "nodeId": "n23",
+                  "name": "withdraw"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "VariableDeclaration",
+          "nodeId": "n32",
+          "kind": "",
+          "declarations": [
+            {
+              "type": "VariableDeclarator",
+              "nodeId": "n31",
+              "id": {
+                "type": "Identifier",
+                "nodeId": "n27",
+                "name": "W1"
+              },
+              "init": {
+                "type": "CallExpression",
+                "nodeId": "n30",
+                "callee": {
+                  "type": "Identifier",
+                  "nodeId": "n28",
+                  "name": "make_withdraw"
+                },
+                "arguments": [
+                  {
+                    "type": "Literal",
+                    "nodeId": "n29",
+                    "value": null,
+                    "raw": "100",
+                    "label": "int"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "VariableDeclaration",
+          "nodeId": "n40",
+          "kind": "",
+          "declarations": [
+            {
+              "type": "VariableDeclarator",
+              "nodeId": "n39",
+              "id": {
+                "type": "Identifier",
+                "nodeId": "n33",
+                "name": "xs"
+              },
+              "init": {
+                "type": "ArrayExpression",
+                "nodeId": "n38",
+                "elements": [
+                  {
+                    "type": "Identifier",
+                    "nodeId": "n34",
+                    "name": "W1"
+                  },
+                  {
+                    "type": "ArrayExpression",
+                    "nodeId": "n37",
+                    "elements": [
+                      {
+                        "type": "Literal",
+                        "nodeId": "n35",
+                        "value": null,
+                        "raw": "1",
+                        "label": "int"
+                      },
+                      {
+                        "type": "Literal",
+                        "nodeId": "n36",
+                        "value": null,
+                        "raw": "2",
+                        "label": "int"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "ExpressionStatement",
+          "nodeId": "n46",
+          "expression": {
+            "type": "CallExpression",
+            "nodeId": "n45",
+            "callee": {
+              "type": "Identifier",
+              "nodeId": "n41",
+              "name": "print"
+            },
+            "arguments": [
+              {
+                "type": "CallExpression",
+                "nodeId": "n44",
+                "callee": {
+                  "type": "Identifier",
+                  "nodeId": "n42",
+                  "name": "W1"
+                },
+                "arguments": [
+                  {
+                    "type": "Literal",
+                    "nodeId": "n43",
+                    "value": null,
+                    "raw": "50",
+                    "label": "int"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "markers": [
+      {
+        "explanation": "Start of evaluation"
+      }
+    ],
+    "frames": [
+      {
+        "id": "Global",
+        "name": "global",
+        "parentId": null,
+        "bindings": [],
+        "isGarbage": false
+      }
+    ],
+    "heap": [],
+    "activeFrameId": "Global"
+  },
+  {
+    "ast": {
+      "type": "Program",
+      "nodeId": "n6",
+      "body": [
+        {
+          "type": "ExpressionStatement",
+          "nodeId": "n5",
+          "expression": {
+            "type": "CallExpression",
+            "nodeId": "n4",
+            "callee": {
+              "type": "Identifier",
+              "nodeId": "n0",
+              "name": "print"
+            },
+            "arguments": [
+              {
+                "type": "EnvBlock",
+                "nodeId": "n3",
+                "envId": "E2",
+                "body": [
+                  {
+                    "type": "ReturnStatement",
+                    "nodeId": "n2",
+                    "argument": {
+                      "type": "Identifier",
+                      "nodeId": "n1",
+                      "name": "balance"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "markers": [
+      {
+        "explanation": "Assigned balance = 50 in frame E1",
+        "redexType": "afterMarker"
+      }
+    ],
+    "frames": [
+      {
+        "id": "Global",
+        "name": "global",
+        "parentId": null,
+        "bindings": [
+          {
+            "name": "make_withdraw",
+            "value": {
+              "kind": "ref",
+              "objectId": "#1"
+            }
+          },
+          {
+            "name": "W1",
+            "value": {
+              "kind": "ref",
+              "objectId": "#2"
+            }
+          },
+          {
+            "name": "xs",
+            "value": {
+              "kind": "ref",
+              "objectId": "#4"
+            }
+          }
+        ],
+        "isGarbage": false
+      },
+      {
+        "id": "E1",
+        "name": "make_withdraw",
+        "parentId": "Global",
+        "bindings": [
+          {
+            "name": "balance",
+            "value": {
+              "kind": "primitive",
+              "display": "50",
+              "label": "int"
+            }
+          },
+          {
+            "name": "withdraw",
+            "value": {
+              "kind": "ref",
+              "objectId": "#2"
+            }
+          }
+        ],
+        "isGarbage": false
+      },
+      {
+        "id": "E2",
+        "name": "withdraw",
+        "parentId": "E1",
+        "bindings": [
+          {
+            "name": "amount",
+            "value": {
+              "kind": "primitive",
+              "display": "50",
+              "label": "int"
+            }
+          }
+        ],
+        "isGarbage": false
+      }
+    ],
+    "heap": [
+      {
+        "kind": "function",
+        "id": "#1",
+        "name": "make_withdraw",
+        "params": ["balance"],
+        "envId": "Global",
+        "source": "def make_withdraw(balance):\n    def withdraw(amount):\n        nonlocal balance\n        if balance >= amount:\n            balance = balance - amount\n            return balance\n        else:\n            return 'Insufficient funds'\n    return withdraw",
+        "isGarbage": false
+      },
+      {
+        "kind": "function",
+        "id": "#2",
+        "name": "withdraw",
+        "params": ["amount"],
+        "envId": "E1",
+        "source": "def withdraw(amount):\n        nonlocal balance\n        if balance >= amount:\n            balance = balance - amount\n            return balance\n        else:\n            return 'Insufficient funds'",
+        "isGarbage": false
+      },
+      {
+        "kind": "list",
+        "id": "#3",
+        "elements": [
+          {
+            "kind": "primitive",
+            "display": "1",
+            "label": "int"
+          },
+          {
+            "kind": "primitive",
+            "display": "2",
+            "label": "int"
+          }
+        ],
+        "isGarbage": false
+      },
+      {
+        "kind": "list",
+        "id": "#4",
+        "elements": [
+          {
+            "kind": "ref",
+            "objectId": "#2"
+          },
+          {
+            "kind": "ref",
+            "objectId": "#3"
+          }
+        ],
+        "isGarbage": false
+      }
+    ],
+    "activeFrameId": "E2"
+  },
+  {
+    "ast": {
+      "type": "Program",
+      "nodeId": "n0",
+      "body": []
+    },
+    "markers": [
+      {
+        "explanation": "Evaluation complete"
+      }
+    ],
+    "frames": [
+      {
+        "id": "Global",
+        "name": "global",
+        "parentId": null,
+        "bindings": [
+          {
+            "name": "make_withdraw",
+            "value": {
+              "kind": "ref",
+              "objectId": "#1"
+            }
+          },
+          {
+            "name": "W1",
+            "value": {
+              "kind": "ref",
+              "objectId": "#2"
+            }
+          },
+          {
+            "name": "xs",
+            "value": {
+              "kind": "ref",
+              "objectId": "#4"
+            }
+          }
+        ],
+        "isGarbage": false
+      },
+      {
+        "id": "E1",
+        "name": "make_withdraw",
+        "parentId": "Global",
+        "bindings": [
+          {
+            "name": "balance",
+            "value": {
+              "kind": "primitive",
+              "display": "50",
+              "label": "int"
+            }
+          },
+          {
+            "name": "withdraw",
+            "value": {
+              "kind": "ref",
+              "objectId": "#2"
+            }
+          }
+        ],
+        "isGarbage": false
+      },
+      {
+        "id": "E2",
+        "name": "withdraw",
+        "parentId": "E1",
+        "bindings": [
+          {
+            "name": "amount",
+            "value": {
+              "kind": "primitive",
+              "display": "50",
+              "label": "int"
+            }
+          }
+        ],
+        "isGarbage": true
+      }
+    ],
+    "heap": [
+      {
+        "kind": "function",
+        "id": "#1",
+        "name": "make_withdraw",
+        "params": ["balance"],
+        "envId": "Global",
+        "source": "def make_withdraw(balance):\n    def withdraw(amount):\n        nonlocal balance\n        if balance >= amount:\n            balance = balance - amount\n            return balance\n        else:\n            return 'Insufficient funds'\n    return withdraw",
+        "isGarbage": false
+      },
+      {
+        "kind": "function",
+        "id": "#2",
+        "name": "withdraw",
+        "params": ["amount"],
+        "envId": "E1",
+        "source": "def withdraw(amount):\n        nonlocal balance\n        if balance >= amount:\n            balance = balance - amount\n            return balance\n        else:\n            return 'Insufficient funds'",
+        "isGarbage": false
+      },
+      {
+        "kind": "list",
+        "id": "#3",
+        "elements": [
+          {
+            "kind": "primitive",
+            "display": "1",
+            "label": "int"
+          },
+          {
+            "kind": "primitive",
+            "display": "2",
+            "label": "int"
+          }
+        ],
+        "isGarbage": false
+      },
+      {
+        "kind": "list",
+        "id": "#4",
+        "elements": [
+          {
+            "kind": "ref",
+            "objectId": "#2"
+          },
+          {
+            "kind": "ref",
+            "objectId": "#3"
+          }
+        ],
+        "isGarbage": false
+      }
+    ],
+    "activeFrameId": "Global",
+    "output": "50\n"
+  }
+]

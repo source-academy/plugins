@@ -1,13 +1,13 @@
 import Konva from 'konva';
 import { Layer, Stage, Text } from 'react-konva';
 
-import { Config } from '../Config';
-import type { ClassificationResult } from '../classify';
-import { ArrowDrawable, BackwardArrowDrawable } from '../drawable/Drawable';
-import { formatLeaf } from '../format';
-import { AlreadyParsedTreeNode } from './AlreadyParsedTreeNode';
-import { ClassicDrawer } from './ClassicDrawer';
-import type { Tree } from './Tree';
+import { Config } from "../Config";
+import type { ClassificationResult } from "../classify";
+import { ArrowDrawable, BackwardArrowDrawable } from "../drawable/Drawable";
+import { formatRoot } from "../format";
+import { AlreadyParsedTreeNode } from "./AlreadyParsedTreeNode";
+import { ClassicDrawer } from "./ClassicDrawer";
+import type { Tree } from "./Tree";
 import {
   ArrayTreeNode,
   DataTreeNode,
@@ -47,7 +47,7 @@ export class BinaryTreeDrawer extends ClassicDrawer {
 
     if (this.tree.rootNode instanceof DataTreeNode) {
       const root = this.tree.rootNode;
-      const text = root.isEmpty ? 'null' : formatLeaf(root.displayValue!, root.label!);
+      const text = formatRoot(root);
       const textConfig = {
         text: text,
         align: 'center',
@@ -191,8 +191,18 @@ export class BinaryTreeDrawer extends ClassicDrawer {
           // NEW left branches that stretch towards the left
           this.leftCOUNTER++;
           this.runningX = myX;
-        } else if (x > this.runningX2 && index === 0 && y === parentY + Config.DistanceY) {
-          // NEW right branches that stretch towards the right
+        } else if (
+          x > this.runningX2 &&
+          index === 0 &&
+          y === parentY &&
+          node !== this.tree.rootNode
+        ) {
+          // NEW right branches that stretch towards the right. A right branch hangs off a node's
+          // third box, which sits level with its parent (y === parentY) - not one step down like the
+          // second box a left branch hangs off. Checking the left-branch condition here meant right
+          // branches were never counted, so the canvas was too narrow and they were clipped. The
+          // root's own first box is also level with its "parent" (draw() passes it its own x/y), but
+          // its index-0 child is the root's data, not a right branch.
           this.rightCOUNTER++;
           this.runningX2 = myX;
         }

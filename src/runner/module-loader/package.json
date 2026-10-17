@@ -1,7 +1,7 @@
 {
   "name": "@sourceacademy/runner-module-loader",
   "version": "0.1.0",
-  "packageManager": "yarn@4.18.0",
+  "packageManager": "yarn@4.18.1",
   "description": "The runner plugin for the module loader in Source Academy",
   "repository": {
     "type": "git",
@@ -36,7 +36,7 @@
     "@sourceacademy/common-module-loader": "workspace:*",
     "@sourceacademy/conductor": "catalog:",
     "@sourceacademy/runner-remote-execution": "workspace:*",
-    "@vitest/coverage-istanbul": "^4.1.9",
+    "@vitest/coverage-istanbul": "catalog:",
     "rollup": "catalog:",
     "tslib": "catalog:",
     "typescript": "catalog:",

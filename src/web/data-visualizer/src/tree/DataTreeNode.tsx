@@ -17,8 +17,9 @@ export class DataTreeNode extends TreeNode {
     super();
   }
 
-  static empty(): DataTreeNode {
-    return new DataTreeNode(true);
+  /** `displayValue` is the language's own spelling of its empty value, if it sent one. */
+  static empty(displayValue?: string): DataTreeNode {
+    return new DataTreeNode(true, displayValue);
   }
 
   static leaf(displayValue: string, label: string): DataTreeNode {

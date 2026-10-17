@@ -1,7 +1,7 @@
 {
   "name": "@sourceacademy/plugins-workspace",
   "private": true,
-  "packageManager": "yarn@4.18.0",
+  "packageManager": "yarn@4.18.1",
   "workspaces": [
     "src/common/*/",
     "src/runner/*/",
@@ -21,12 +21,12 @@
     "format:ci": "prettier --list-different \"**/*.{ts,tsx,json,js,cjs,mjs}\""
   },
   "devDependencies": {
-    "@changesets/cli": "^2.31.0",
+    "@changesets/cli": "^3.0.0",
     "@commander-js/extra-typings": "^15.0.0",
     "@sourceacademy/conductor": "catalog:",
     "@sourceacademy/plugin-directory": "source-academy/plugin-directory#main",
     "@types/node": "^25.9.1",
-    "@vitest/coverage-istanbul": "^4.1.9",
+    "@vitest/coverage-istanbul": "catalog:",
     "@vitest/eslint-plugin": "^1.6.26",
     "@yarnpkg/types": "^4.0.1",
     "commander": "^15.0.0",
@@ -36,6 +36,7 @@
     "prettier": "^3.8.1",
     "typescript": "catalog:",
     "typescript-eslint": "^8.57.1",
+    "vite": "^8.0.0",
     "vitest": "catalog:"
   },
   "repository": {
