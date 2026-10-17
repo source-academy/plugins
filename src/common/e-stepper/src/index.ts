@@ -24,38 +24,38 @@
  *  - {@link RefNode}: a reference to a heap object.
  */
 
-import type { CseSnapshot } from "@sourceacademy/common-cse-machine";
+import type { CseSnapshot } from '@sourceacademy/common-cse-machine';
 import type {
   SerializedMarker,
   SerializedStepperNode,
   SerializedStepperStep,
   SyntaxProfile,
-} from "@sourceacademy/common-stepper";
+} from '@sourceacademy/common-stepper';
 
 /** The channel the e-stepper runner and host plugins communicate over. */
-export const E_STEPPER_CHANNEL_ID = "__e_stepper";
+export const E_STEPPER_CHANNEL_ID = '__e_stepper';
 
 /** The id of the runner (worker-side) e-stepper plugin. */
-export const RUNNER_ID = "__runner_e_stepper";
+export const RUNNER_ID = '__runner_e_stepper';
 
 /** The id of the web/host (browser-side) e-stepper plugin. */
-export const WEB_ID = "__web_e_stepper";
+export const WEB_ID = '__web_e_stepper';
 
 /**
  * The id used to look the e-stepper up in the plugin directory (i.e. the argument to
  * `IRunnerPlugin.hostLoadPlugin`). The host resolves this to the web plugin's bundle URL.
  */
-export const E_STEPPER_DIRECTORY_ID = "e-stepper";
+export const E_STEPPER_DIRECTORY_ID = 'e-stepper';
 
 /* -------------------------------------------------------------------------- */
 /*                         Program nodes into the store                       */
 /* -------------------------------------------------------------------------- */
 
 /** The `type` of an {@link EnvBlockNode}. */
-export const ENV_BLOCK_NODE_TYPE = "EnvBlock";
+export const ENV_BLOCK_NODE_TYPE = 'EnvBlock';
 
 /** The `type` of a {@link RefNode}. */
-export const REF_NODE_TYPE = "Ref";
+export const REF_NODE_TYPE = 'Ref';
 
 /**
  * A function body under evaluation, together with the frame it is evaluated in. Created when a
@@ -97,13 +97,13 @@ export type EStepperValue =
    * A primitive value, shown inline. `display` is the already-rendered text (e.g. `"3.0"`,
    * `"'hello'"`, `"None"`); `label` is a coarse type tag (e.g. `"int"`, `"float"`, `"str"`).
    */
-  | { kind: "primitive"; display: string; label: string }
+  | { kind: 'primitive'; display: string; label: string }
   /** A reference to a heap object. */
-  | { kind: "ref"; objectId: string }
+  | { kind: 'ref'; objectId: string }
   /** A builtin function, shown by its name (builtins are not heap objects and not drawn). */
-  | { kind: "builtin"; name: string }
+  | { kind: 'builtin'; name: string }
   /** A binding that exists but has not been assigned yet (e.g. a function's local). */
-  | { kind: "unassigned" };
+  | { kind: 'unassigned' };
 
 /** A name → value binding in a frame. */
 export interface EStepperBinding {
@@ -130,7 +130,7 @@ export interface EStepperFrame {
 
 /** A function object: what a function definition or lambda expression evaluates to. */
 export interface EStepperFunctionObject {
-  kind: "function";
+  kind: 'function';
   /** Stable id for the whole run, unique among heap objects; also its label (e.g. `"#3"`). */
   id: string;
   /** The function's name, or absent for an anonymous function (e.g. a lambda). */
@@ -146,7 +146,7 @@ export interface EStepperFunctionObject {
 
 /** A mutable sequence, e.g. a Python list. A pair is a list of two elements. */
 export interface EStepperListObject {
-  kind: "list";
+  kind: 'list';
   /** Stable id for the whole run, unique among heap objects; also its label (e.g. `"#7"`). */
   id: string;
   elements: EStepperValue[];
@@ -195,7 +195,7 @@ export type { SerializedMarker, SerializedStepperNode, SyntaxProfile };
 
 /** Runner → host: the computed evaluation steps for the most recent run. */
 export interface EStepperStepsMessage {
-  type: "steps";
+  type: 'steps';
   steps: EStepperStep[];
   /**
    * The language's rendering rules for ordinary program nodes, as for the stepper. `EnvBlock` and
@@ -206,13 +206,13 @@ export interface EStepperStepsMessage {
 
 /** Runner → host: stepping failed (e.g. a parse error). */
 export interface EStepperErrorMessage {
-  type: "error";
+  type: 'error';
   error: string;
 }
 
 /** Host → runner: asks the runner to (re)send the steps it last computed. */
 export interface EStepperRequestMessage {
-  type: "request";
+  type: 'request';
 }
 
 /** Every message that may cross the {@link E_STEPPER_CHANNEL_ID} channel. */

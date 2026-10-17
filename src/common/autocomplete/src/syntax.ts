@@ -10,7 +10,9 @@ export interface SyntaxHighlightAck {
 }
 
 export type SyntaxHighlightMessage =
-  SyntaxHighlightRequest | SyntaxHighlightResponse | SyntaxHighlightAck;
+  | SyntaxHighlightRequest
+  | SyntaxHighlightResponse
+  | SyntaxHighlightAck;
 
 /**
  * References an implementation supplied by an existing Ace mode.

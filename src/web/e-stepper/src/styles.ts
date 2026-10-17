@@ -59,14 +59,14 @@ const E_STEPPER_CSS = `
 }
 `;
 
-const STYLE_ELEMENT_ID = "sa-e-stepper-styles";
+const STYLE_ELEMENT_ID = 'sa-e-stepper-styles';
 
 /** Injects (or refreshes) the e-stepper's stylesheet, like the stepper's own `injectStepperStyles`. */
 export function injectEStepperStyles(): void {
-  if (typeof document === "undefined") return;
+  if (typeof document === 'undefined') return;
   let style = document.getElementById(STYLE_ELEMENT_ID) as HTMLStyleElement | null;
   if (style === null) {
-    style = document.createElement("style");
+    style = document.createElement('style');
     style.id = STYLE_ELEMENT_ID;
     document.head.appendChild(style);
   }

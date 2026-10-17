@@ -24,7 +24,7 @@ import type { RefId, SerializedDataVisualizerNode } from '@sourceacademy/common-
 
 /** A node's "type" for homogeneity comparisons — the closest equivalent to the old code's `typeof`. */
 function typeLabel(node: SerializedDataVisualizerNode): string {
-  return node.type === "leaf" ? node.label : node.type;
+  return node.type === 'leaf' ? node.label : node.type;
 }
 
 /** True for a node that can be a pair-chain link: an `"array"` with exactly two children. A native
@@ -56,7 +56,7 @@ function detectCyclesAndSharing(root: SerializedDataVisualizerNode): {
 
   function visit(node: SerializedDataVisualizerNode): void {
     switch (node.type) {
-      case "ref":
+      case 'ref':
         if (functionRefIds.has(node.refId)) {
           return;
         }
@@ -72,11 +72,11 @@ function detectCyclesAndSharing(root: SerializedDataVisualizerNode): {
         }
         onPath.delete(node.refId);
         return;
-      case "function":
+      case 'function':
         functionRefIds.add(node.refId);
         return;
-      case "leaf":
-      case "empty":
+      case 'leaf':
+      case 'empty':
         return;
     }
   }
@@ -106,7 +106,7 @@ function isBinaryTreeNode(node: SerializedDataVisualizerNode, rootLabel: string 
   // Binary Tree View draws a node's data inside its box and hangs only the left/right subtrees
   // below it, so it has nowhere to put a compound (list) entry - it would be drawn as if it were a
   // branch. Such a tree is shown in General Tree View instead.
-  if (data.type === "array") {
+  if (data.type === 'array') {
     return false;
   }
   if (!isPairNode(rest)) {
@@ -241,7 +241,7 @@ function computeLayout(root: SerializedDataVisualizerNode): TreeLayout {
     // same counter as the pairs there, so it neither overlaps a nested list's boxes nor falls below
     // the canvas.
     const head = node.children[0];
-    if (head.type === "function") {
+    if (head.type === 'function') {
       const fnDepth = depth + 1;
       if (nodeCountByDepth[fnDepth] === undefined) {
         nodeCountByDepth[fnDepth] = 0;

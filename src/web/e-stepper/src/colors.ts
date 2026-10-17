@@ -5,17 +5,17 @@
  * background.
  */
 
-const GLOBAL_COLOR = "#c5cbd3";
+const GLOBAL_COLOR = '#c5cbd3';
 
 const PALETTE = [
-  "#4fc3f7", // light blue
-  "#ffb74d", // orange
-  "#81c784", // green
-  "#f06292", // pink
-  "#ba68c8", // purple
-  "#fff176", // yellow
-  "#4db6ac", // teal
-  "#e57373", // red
+  '#4fc3f7', // light blue
+  '#ffb74d', // orange
+  '#81c784', // green
+  '#f06292', // pink
+  '#ba68c8', // purple
+  '#fff176', // yellow
+  '#4db6ac', // teal
+  '#e57373', // red
 ];
 
 /** The colour of the frame at `index` in a step's frame list (index 0 is the global frame). */
@@ -24,17 +24,17 @@ export function frameColor(index: number): string {
 }
 
 export const DiagramColors = {
-  text: "#ffffff",
-  dimText: "#8a9ba8",
-  stroke: "#ffffff",
+  text: '#ffffff',
+  dimText: '#8a9ba8',
+  stroke: '#ffffff',
   /** What is dead (frames and objects nothing refers to any more, and their arrows and data). */
-  garbage: "#7f8b96",
+  garbage: '#7f8b96',
   garbageOpacity: 0.75,
-  lookup: "rgba(255, 213, 79, 0.35)",
+  lookup: 'rgba(255, 213, 79, 0.35)',
   /**
    * A hovered frame's or object's background: darker, as in the host's CSE diagram. Not a colour
    * of its own, since frames are colour-coded.
    */
-  hoverBackground: "#000000",
-  background: "#1a2530",
+  hoverBackground: '#000000',
+  background: '#1a2530',
 } as const;

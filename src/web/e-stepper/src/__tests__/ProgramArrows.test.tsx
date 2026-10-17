@@ -1,13 +1,13 @@
-import { act } from "react";
-import TestRenderer from "react-test-renderer";
-import { describe, expect, test, vi } from "vitest";
+import { act } from 'react';
+import TestRenderer from 'react-test-renderer';
+import { describe, expect, test, vi } from 'vitest';
 
 import ProgramArrows, {
   ENV_ATTRIBUTE,
   REF_ATTRIBUTE,
   arrowGeometry,
   computeProgramArrows,
-} from "../ProgramArrows";
+} from '../ProgramArrows';
 
 const rect = (left: number, top: number, width: number, height: number) =>
   ({ left, top, right: left + width, bottom: top + height, width, height }) as DOMRect;
@@ -25,50 +25,50 @@ function fake(box: DOMRect, attributes: Record<string, string> = {}, marks: unkn
 }
 
 describe(arrowGeometry, () => {
-  test("leaves and arrives horizontally when the target is further across than down", () => {
+  test('leaves and arrives horizontally when the target is further across than down', () => {
     const { path, head } = arrowGeometry({ x: 0, y: 0 }, { x: 100, y: 20 });
-    expect(path).toBe("M 0 0 C 50 0, 50 20, 100 20");
-    expect(head.startsWith("100 20 ")).toBe(true);
+    expect(path).toBe('M 0 0 C 50 0, 50 20, 100 20');
+    expect(head.startsWith('100 20 ')).toBe(true);
   });
 
-  test("goes vertically when the panes are stacked", () => {
+  test('goes vertically when the panes are stacked', () => {
     const { path } = arrowGeometry({ x: 10, y: 0 }, { x: 0, y: 200 });
-    expect(path).toBe("M 10 0 C 10 100, 0 100, 0 200");
+    expect(path).toBe('M 10 0 C 10 100, 0 100, 0 200');
   });
 
-  test("comes down onto the top of an object, whatever the layout", () => {
+  test('comes down onto the top of an object, whatever the layout', () => {
     // Side by side (further across than down): it still arrives vertically, from above.
-    const { path } = arrowGeometry({ x: 0, y: 0 }, { x: 200, y: 40 }, "above");
-    expect(path).toBe("M 0 0 C 100 0, 200 20, 200 40");
+    const { path } = arrowGeometry({ x: 0, y: 0 }, { x: 200, y: 40 }, 'above');
+    expect(path).toBe('M 0 0 C 100 0, 200 20, 200 40');
   });
 
-  test("arrives at a frame from the left, whatever the layout", () => {
+  test('arrives at a frame from the left, whatever the layout', () => {
     // Side by side: a horizontal arrival, as before.
-    expect(arrowGeometry({ x: 0, y: 0 }, { x: 100, y: 20 }, "left").path).toBe(
-      "M 0 0 C 50 0, 50 20, 100 20",
+    expect(arrowGeometry({ x: 0, y: 0 }, { x: 100, y: 20 }, 'left').path).toBe(
+      'M 0 0 C 50 0, 50 20, 100 20',
     );
     // Stacked: it leaves downwards, but still comes into the left edge, pointing right.
-    const stacked = arrowGeometry({ x: 10, y: 0 }, { x: 80, y: 300 }, "left");
-    expect(stacked.path).toBe("M 10 0 C 10 120, 45 300, 80 300");
-    expect(stacked.head.startsWith("80 300 ")).toBe(true);
+    const stacked = arrowGeometry({ x: 10, y: 0 }, { x: 80, y: 300 }, 'left');
+    expect(stacked.path).toBe('M 10 0 C 10 120, 45 300, 80 300');
+    expect(stacked.head.startsWith('80 300 ')).toBe(true);
   });
 
-  test("a frame to the left of the start is still entered from its left", () => {
-    expect(arrowGeometry({ x: 100, y: 0 }, { x: 0, y: 200 }, "left").path).toBe(
-      "M 100 0 C 100 100, -40 200, 0 200",
+  test('a frame to the left of the start is still entered from its left', () => {
+    expect(arrowGeometry({ x: 100, y: 0 }, { x: 0, y: 200 }, 'left').path).toBe(
+      'M 100 0 C 100 100, -40 200, 0 200',
     );
   });
 
-  test("bends back correctly when the target is to the left", () => {
-    expect(arrowGeometry({ x: 100, y: 0 }, { x: 0, y: 0 }).path).toBe("M 100 0 C 50 0, 50 0, 0 0");
+  test('bends back correctly when the target is to the left', () => {
+    expect(arrowGeometry({ x: 100, y: 0 }, { x: 0, y: 0 }).path).toBe('M 100 0 C 50 0, 50 0, 0 0');
   });
 });
 
-describe("arrowGeometry scale", () => {
+describe('arrowGeometry scale', () => {
   test("the arrowhead grows with the diagram's zoom", () => {
     const size = (scale: number) => {
-      const { head } = arrowGeometry({ x: 0, y: 0 }, { x: 100, y: 0 }, "axis", scale);
-      return head.split(" ").map(Number);
+      const { head } = arrowGeometry({ x: 0, y: 0 }, { x: 100, y: 0 }, 'axis', scale);
+      return head.split(' ').map(Number);
     };
     // Tip at (100, 0); the base is HEAD_LENGTH * scale back from it.
     expect(size(1)).toEqual([100, 0, 92, 4, 92, -4]);
@@ -81,33 +81,33 @@ describe(computeProgramArrows, () => {
   const program = (marks: unknown[]) => fake(rect(100, 50, 300, 400), {}, marks);
   const diagram = fake(rect(500, 50, 400, 400));
   const resolve = ({ kind, id }: { kind: string; id: string }) =>
-    id === "missing" ? null : kind === "object" ? { x: 10, y: 20 } : { x: 30, y: 40 };
+    id === 'missing' ? null : kind === 'object' ? { x: 10, y: 20 } : { x: 30, y: 40 };
 
-  test("draws an arrow from each badge and bracket label to its target, in container coordinates", () => {
-    const ref = fake(rect(150, 100, 20, 10), { [REF_ATTRIBUTE]: "#1" });
-    const env = fake(rect(120, 200, 20, 12), { [ENV_ATTRIBUTE]: "E1" });
+  test('draws an arrow from each badge and bracket label to its target, in container coordinates', () => {
+    const ref = fake(rect(150, 100, 20, 10), { [REF_ATTRIBUTE]: '#1' });
+    const env = fake(rect(120, 200, 20, 12), { [ENV_ATTRIBUTE]: 'E1' });
     const arrows = computeProgramArrows(container, program([ref, env]), diagram, resolve);
     expect(arrows.map(a => [a.kind, a.id, a.from, a.to])).toEqual([
-      ["object", "#1", { x: 60, y: 55 }, { x: 410, y: 20 }],
-      ["frame", "E1", { x: 30, y: 156 }, { x: 430, y: 40 }],
+      ['object', '#1', { x: 60, y: 55 }, { x: 410, y: 20 }],
+      ['frame', 'E1', { x: 30, y: 156 }, { x: 430, y: 40 }],
     ]);
   });
 
-  test("carries the zoom of the target, 1 when the host gives none", () => {
-    const ref = fake(rect(150, 100, 20, 10), { [REF_ATTRIBUTE]: "#1" });
-    const env = fake(rect(120, 200, 20, 12), { [ENV_ATTRIBUTE]: "E1" });
+  test('carries the zoom of the target, 1 when the host gives none', () => {
+    const ref = fake(rect(150, 100, 20, 10), { [REF_ATTRIBUTE]: '#1' });
+    const env = fake(rect(120, 200, 20, 12), { [ENV_ATTRIBUTE]: 'E1' });
     const zoomed = ({ kind }: { kind: string }) =>
-      kind === "object" ? { x: 10, y: 20, scale: 1.5 } : { x: 30, y: 40 };
+      kind === 'object' ? { x: 10, y: 20, scale: 1.5 } : { x: 30, y: 40 };
     const arrows = computeProgramArrows(container, program([ref, env]), diagram, zoomed);
     expect(arrows.map(a => a.scale)).toEqual([1.5, 1]);
   });
 
-  test("skips marks scrolled out of the program pane, and targets that are not drawn or not in view", () => {
-    const scrolledOut = fake(rect(150, 600, 20, 10), { [REF_ATTRIBUTE]: "#1" });
-    const notDrawn = fake(rect(150, 100, 20, 10), { [REF_ATTRIBUTE]: "missing" });
-    const outOfView = fake(rect(150, 100, 20, 10), { [REF_ATTRIBUTE]: "#3" });
+  test('skips marks scrolled out of the program pane, and targets that are not drawn or not in view', () => {
+    const scrolledOut = fake(rect(150, 600, 20, 10), { [REF_ATTRIBUTE]: '#1' });
+    const notDrawn = fake(rect(150, 100, 20, 10), { [REF_ATTRIBUTE]: 'missing' });
+    const outOfView = fake(rect(150, 100, 20, 10), { [REF_ATTRIBUTE]: '#3' });
     const far = ({ id }: { id: string }) =>
-      id === "#3" ? { x: 900, y: 20 } : id === "missing" ? null : { x: 1, y: 1 };
+      id === '#3' ? { x: 900, y: 20 } : id === 'missing' ? null : { x: 1, y: 1 };
     expect(
       computeProgramArrows(container, program([scrolledOut, notDrawn, outOfView]), diagram, far),
     ).toHaveLength(0);
@@ -115,8 +115,8 @@ describe(computeProgramArrows, () => {
 });
 
 describe(ProgramArrows, () => {
-  const ref = fake(rect(150, 100, 20, 10), { [REF_ATTRIBUTE]: "#1" });
-  const env = fake(rect(120, 200, 20, 12), { [ENV_ATTRIBUTE]: "E1" });
+  const ref = fake(rect(150, 100, 20, 10), { [REF_ATTRIBUTE]: '#1' });
+  const env = fake(rect(120, 200, 20, 12), { [ENV_ATTRIBUTE]: 'E1' });
   const listeners = new Map<string, () => void>();
   const programEl = Object.assign(fake(rect(100, 50, 300, 400), {}, [ref, env]), {
     addEventListener: (type: string, fn: () => void) => listeners.set(type, fn),
@@ -126,24 +126,24 @@ describe(ProgramArrows, () => {
   const containerEl = {
     getBoundingClientRect: () => rect(100, 50, 800, 400),
     querySelector: (selector: string) =>
-      selector === ".estepper-program"
+      selector === '.estepper-program'
         ? programEl
-        : selector === ".estepper-diagram"
+        : selector === '.estepper-diagram'
           ? diagramEl
           : null,
   };
 
   function mount(props: Partial<Parameters<typeof ProgramArrows>[0]> = {}) {
-    vi.stubGlobal("window", { addEventListener: vi.fn(), removeEventListener: vi.fn() });
+    vi.stubGlobal('window', { addEventListener: vi.fn(), removeEventListener: vi.fn() });
     let renderer!: TestRenderer.ReactTestRenderer;
     act(() => {
       renderer = TestRenderer.create(
         <ProgramArrows
-          resolve={({ kind }) => (kind === "object" ? { x: 10, y: 20 } : { x: 30, y: 40 })}
+          resolve={({ kind }) => (kind === 'object' ? { x: 10, y: 20 } : { x: 30, y: 40 })}
           hovered={null}
           hoveredFrame={null}
           all
-          colorOfFrame={() => "#ff0000"}
+          colorOfFrame={() => '#ff0000'}
           {...props}
         />,
         { createNodeMock: () => ({ parentElement: containerEl }) },
@@ -153,41 +153,41 @@ describe(ProgramArrows, () => {
   }
   const strokes = (r: TestRenderer.ReactTestRenderer) =>
     r.root
-      .findAllByType("path")
+      .findAllByType('path')
       .map(p => [p.props.stroke, p.props.strokeWidth, p.parent!.props.opacity]);
 
-  test("draws an arrow to each object, grey; one to a frame only while it is hovered", () => {
+  test('draws an arrow to each object, grey; one to a frame only while it is hovered', () => {
     const view = mount();
-    expect(view.root.findAllByType("polygon")).toHaveLength(1);
-    expect(strokes(view)).toEqual([["#c5cbd3", 1.5, 0.55]]);
+    expect(view.root.findAllByType('polygon')).toHaveLength(1);
+    expect(strokes(view)).toEqual([['#c5cbd3', 1.5, 0.55]]);
     act(() => view.unmount());
     vi.unstubAllGlobals();
   });
 
   test('without "all", an arrow to an object is drawn only while the object is hovered', () => {
     expect(strokes(mount({ all: false }))).toEqual([]);
-    expect(strokes(mount({ all: false, hovered: "#2" }))).toEqual([]);
-    expect(strokes(mount({ all: false, hovered: "#1" }))).toEqual([["#c5cbd3", 2.5, 1]]);
+    expect(strokes(mount({ all: false, hovered: '#2' }))).toEqual([]);
+    expect(strokes(mount({ all: false, hovered: '#1' }))).toEqual([['#c5cbd3', 2.5, 1]]);
     vi.unstubAllGlobals();
   });
 
   test('an arrow to a frame is drawn in the frame\'s colour while the frame is hovered, with or without "all"', () => {
     for (const all of [true, false]) {
-      const view = mount({ all, hoveredFrame: "E1" });
-      expect(strokes(view).at(-1)).toEqual(["#ff0000", 2.5, 1]);
-      expect(view.root.findAllByType("path")).toHaveLength(all ? 2 : 1);
+      const view = mount({ all, hoveredFrame: 'E1' });
+      expect(strokes(view).at(-1)).toEqual(['#ff0000', 2.5, 1]);
+      expect(view.root.findAllByType('path')).toHaveLength(all ? 2 : 1);
     }
     vi.unstubAllGlobals();
   });
 
-  test("draws none without anchors, and measures again when the program pane scrolls", () => {
+  test('draws none without anchors, and measures again when the program pane scrolls', () => {
     expect(strokes(mount({ resolve: null }))).toEqual([]);
     const view = mount();
-    expect(listeners.has("scroll")).toBe(true);
-    act(() => listeners.get("scroll")!());
-    expect(view.root.findAllByType("path")).toHaveLength(1);
+    expect(listeners.has('scroll')).toBe(true);
+    act(() => listeners.get('scroll')!());
+    expect(view.root.findAllByType('path')).toHaveLength(1);
     act(() => view.unmount());
-    expect(listeners.has("scroll")).toBe(false);
+    expect(listeners.has('scroll')).toBe(false);
     vi.unstubAllGlobals();
   });
 });

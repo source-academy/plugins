@@ -1,5 +1,5 @@
-import { Config } from "./Config";
-import type { DataTreeNode } from "./tree/DataTreeNode";
+import { Config } from './Config';
+import type { DataTreeNode } from './tree/DataTreeNode';
 
 /**
  * Formats a leaf's display value for showing inside a box: quotes and truncates strings (mirroring
@@ -21,5 +21,5 @@ export function formatLeaf(displayValue: string, label: string): string {
  * empty value if it sent one (e.g. `None` for Python), `null` otherwise, or the formatted leaf.
  */
 export function formatRoot(node: DataTreeNode): string {
-  return node.isEmpty ? (node.displayValue ?? "null") : formatLeaf(node.displayValue!, node.label!);
+  return node.isEmpty ? (node.displayValue ?? 'null') : formatLeaf(node.displayValue!, node.label!);
 }

@@ -6,8 +6,8 @@
   "scripts": {
     "build": "rollup -c",
     "prepack": "yarn build",
-    "test": "jest",
-    "test-coverage": "jest --coverage"
+    "test": "vitest",
+    "test-coverage": "vitest --coverage"
   },
   "license": "ISC",
   "files": [

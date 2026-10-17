@@ -181,7 +181,7 @@ export interface CseDiagramAnchor extends CseDiagramPoint {
  * drawn, e.g. when it is scrolled or collapsed out of the view.
  */
 export type CseDiagramAnchorResolver = (target: {
-  kind: "object" | "frame";
+  kind: 'object' | 'frame';
   /** A {@link CseSerializedValue.objectId} or a {@link CseSerializedEnvFrame.id}. */
   id: string;
 }) => CseDiagramAnchor | null;

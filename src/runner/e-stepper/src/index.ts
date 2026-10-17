@@ -2,8 +2,8 @@ import {
   E_STEPPER_CHANNEL_ID,
   RUNNER_ID,
   type EStepperStep,
-} from "@sourceacademy/common-e-stepper";
-import { BaseStepperRunnerPlugin } from "@sourceacademy/runner-stepper";
+} from '@sourceacademy/common-e-stepper';
+import { BaseStepperRunnerPlugin } from '@sourceacademy/runner-stepper';
 
 /**
  * The language-agnostic runner half of the e-stepper (environment stepper).

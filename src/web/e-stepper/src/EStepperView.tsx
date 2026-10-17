@@ -8,27 +8,27 @@ import {
   Pre,
   Slider,
   Switch,
-} from "@blueprintjs/core";
+} from '@blueprintjs/core';
 import type {
   CseDiagramAnchorResolver,
   CseSnapshot,
   ICseDiagramService,
-} from "@sourceacademy/common-cse-machine";
+} from '@sourceacademy/common-cse-machine';
 import type {
   EStepperHeapObject,
   EStepperStep,
   SyntaxProfile,
-} from "@sourceacademy/common-e-stepper";
-import classNames from "classnames";
-import { useCallback, useEffect, useMemo, useState } from "react";
+} from '@sourceacademy/common-e-stepper';
+import classNames from 'classnames';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { CustomASTRenderer, type NodeRenderers, type StepperNode } from "../../stepper/src/render";
-import { sliderLabels } from "../../stepper/src/sliderLabels";
-import { injectStepperStyles } from "../../stepper/src/styles";
-import EnvDiagram from "./EnvDiagram";
-import ProgramArrows, { ENV_ATTRIBUTE, REF_ATTRIBUTE } from "./ProgramArrows";
-import { frameColor } from "./colors";
-import { injectEStepperStyles } from "./styles";
+import { CustomASTRenderer, type NodeRenderers, type StepperNode } from '../../stepper/src/render';
+import { sliderLabels } from '../../stepper/src/sliderLabels';
+import { injectStepperStyles } from '../../stepper/src/styles';
+import EnvDiagram from './EnvDiagram';
+import ProgramArrows, { ENV_ATTRIBUTE, REF_ATTRIBUTE } from './ProgramArrows';
+import { frameColor } from './colors';
+import { injectEStepperStyles } from './styles';
 
 const DEFAULT_PROGRAM_HEIGHT = 240;
 /** The least height of the diagram below the program, and of the program: about one line of it. */
@@ -75,7 +75,7 @@ function useRemembered<K extends keyof PaneLayout>(
   const set = useCallback(
     (update: React.SetStateAction<NonNullable<PaneLayout[K]>>) =>
       setValue(old => {
-        const next = typeof update === "function" ? update(old) : update;
+        const next = typeof update === 'function' ? update(old) : update;
         if (layout) layout[key] = next;
         return next;
       }),
@@ -86,7 +86,7 @@ function useRemembered<K extends keyof PaneLayout>(
 
 /** Whether the step is a stop for breakpoint navigation: it evaluates a `breakpoint()` statement. */
 const isBreakpoint = (step: EStepperStep): boolean =>
-  step.markers?.some(m => m.redexNodeType === "DebuggerStatement") ?? false;
+  step.markers?.some(m => m.redexNodeType === 'DebuggerStatement') ?? false;
 
 /** The step value (1-based) of the next breakpoint after `value`, or of the last step. */
 export function nextBreakpoint(steps: EStepperStep[], value: number): number {
@@ -103,7 +103,7 @@ export function previousBreakpoint(steps: EStepperStep[], value: number): number
 }
 
 /** The guide for students, built from `docs/md/README_ESTEPPER.md` of py-slang. */
-const GUIDE_URL = "https://docs.sourceacademy.org/python/e-stepper/";
+const GUIDE_URL = 'https://docs.sourceacademy.org/python/e-stepper/';
 
 function DefaultText() {
   return (
@@ -119,7 +119,7 @@ function DefaultText() {
       bracketed body to find its frame.
       <br />
       <br />
-      What do the brackets, labels and badges mean? Read{" "}
+      What do the brackets, labels and badges mean? Read{' '}
       <a href={GUIDE_URL} target="_blank" rel="noopener noreferrer">
         the guide to the environment stepper
       </a>
@@ -140,7 +140,7 @@ function DefaultText() {
  * a height, that would make the explanation as tall as the tab. Inline, so it outranks any
  * stylesheet.
  */
-const CARD_STYLE: React.CSSProperties = { height: "auto", flex: "0 0 auto" };
+const CARD_STYLE: React.CSSProperties = { height: 'auto', flex: '0 0 auto' };
 
 /** The least height of the tab, and the gap it leaves below itself in the browser window. */
 const MIN_TAB_HEIGHT = 400;
@@ -154,7 +154,7 @@ const BOTTOM_GAP = 16;
  * ask (no DOM), the fixed gap.
  */
 function bottomInset(element: HTMLElement): number {
-  if (typeof getComputedStyle !== "function") return BOTTOM_GAP;
+  if (typeof getComputedStyle !== 'function') return BOTTOM_GAP;
   let inset = 0;
   for (let e: HTMLElement | null = element; e && e !== document.body; e = e.parentElement) {
     const style = getComputedStyle(e);
@@ -176,7 +176,7 @@ function bottomInset(element: HTMLElement): number {
 function useFillHeight(element: HTMLElement | null): number | undefined {
   const [height, setHeight] = useState<number | undefined>(undefined);
   const fit = useCallback(() => {
-    if (!element || typeof window === "undefined") return;
+    if (!element || typeof window === 'undefined') return;
     const top = element.getBoundingClientRect().top;
     if (!Number.isFinite(top)) return;
     setHeight(
@@ -184,14 +184,14 @@ function useFillHeight(element: HTMLElement | null): number | undefined {
     );
   }, [element]);
   useEffect(() => {
-    if (!element || typeof window === "undefined") return;
+    if (!element || typeof window === 'undefined') return;
     fit();
-    window.addEventListener("resize", fit);
+    window.addEventListener('resize', fit);
     const observer =
-      typeof IntersectionObserver === "undefined" ? undefined : new IntersectionObserver(fit);
+      typeof IntersectionObserver === 'undefined' ? undefined : new IntersectionObserver(fit);
     observer?.observe(element);
     return () => {
-      window.removeEventListener("resize", fit);
+      window.removeEventListener('resize', fit);
       observer?.disconnect();
     };
   }, [element, fit]);
@@ -209,7 +209,7 @@ function useSize(): [(element: HTMLElement | null) => void, { width: number; hei
     // (which a browser may delay, e.g. in a background tab).
     const initial = element.getBoundingClientRect();
     setSize({ width: Math.floor(initial.width), height: Math.floor(initial.height) });
-    if (typeof ResizeObserver === "undefined") return;
+    if (typeof ResizeObserver === 'undefined') return;
     const observer = new ResizeObserver(entries => {
       const rect = entries[0].contentRect;
       setSize({ width: Math.floor(rect.width), height: Math.floor(rect.height) });
@@ -233,12 +233,12 @@ export default function EStepperView({ steps, profile, error, cseDiagram, layout
   const [hoveredFrame, setHoveredFrame] = useState<string | null>(null);
   const [programHeight, setProgramHeight] = useRemembered(
     layout,
-    "programHeight",
+    'programHeight',
     DEFAULT_PROGRAM_HEIGHT,
   );
   const [programShare, setProgramShare] = useRemembered(
     layout,
-    "programShare",
+    'programShare',
     DEFAULT_PROGRAM_SHARE,
   );
   const [outputOpen, setOutputOpen] = useState(true);
@@ -281,7 +281,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram, layout
   const step = hasRun ? steps[stepIndex] : undefined;
   // The arrangement of the panes: side by side ("wide", the default) or one above the other
   // ("vertical"), as the user chooses, whatever the tab's width.
-  const [vertical, setVertical] = useRemembered(layout, "vertical", false);
+  const [vertical, setVertical] = useRemembered(layout, 'vertical', false);
   const wide = !vertical;
 
   // The double arrows (and `a` / `e`) jump to the previous / next breakpoint, or to the first / last
@@ -324,8 +324,8 @@ export default function EStepperView({ steps, profile, error, cseDiagram, layout
         // The whole block is hoverable; in nested blocks, the innermost one under the mouse wins
         // (`mouseover` bubbles from it, and stops there).
         <span
-          className={classNames("estepper-envblock", { hovered: hoveredFrame === envId })}
-          style={{ borderColor: color, ["--estepper-frame-color" as string]: color }}
+          className={classNames('estepper-envblock', { hovered: hoveredFrame === envId })}
+          style={{ borderColor: color, ['--estepper-frame-color' as string]: color }}
           onMouseOver={event => {
             event.stopPropagation();
             setHoveredFrame(envId);
@@ -352,12 +352,12 @@ export default function EStepperView({ steps, profile, error, cseDiagram, layout
       // the value a variable holds now (two calls of `make_withdraw` give two `withdraw`s). The
       // definition is in the tooltip.
       const title =
-        object?.kind === "function"
-          ? `function ${object.name ?? "lambda"}(${object.params.join(", ")})`
+        object?.kind === 'function'
+          ? `function ${object.name ?? 'lambda'}(${object.params.join(', ')})`
           : undefined;
       return (
         <span
-          className={classNames("estepper-ref", { hovered: hovered === id })}
+          className={classNames('estepper-ref', { hovered: hovered === id })}
           title={title}
           {...{ [REF_ATTRIBUTE]: id }}
           onMouseEnter={() => setHovered(id)}
@@ -389,11 +389,11 @@ export default function EStepperView({ steps, profile, error, cseDiagram, layout
           ),
         );
       const onUp = () => {
-        window.removeEventListener("pointermove", onMove);
-        window.removeEventListener("pointerup", onUp);
+        window.removeEventListener('pointermove', onMove);
+        window.removeEventListener('pointerup', onUp);
       };
-      window.addEventListener("pointermove", onMove);
-      window.addEventListener("pointerup", onUp);
+      window.addEventListener('pointermove', onMove);
+      window.addEventListener('pointerup', onUp);
     },
     [stackedProgramHeight, maxProgramHeight],
   );
@@ -433,11 +433,11 @@ export default function EStepperView({ steps, profile, error, cseDiagram, layout
         setProgramShare(width / paneSpace);
       };
       const onUp = () => {
-        window.removeEventListener("pointermove", onMove);
-        window.removeEventListener("pointerup", onUp);
+        window.removeEventListener('pointermove', onMove);
+        window.removeEventListener('pointerup', onUp);
       };
-      window.addEventListener("pointermove", onMove);
-      window.addEventListener("pointerup", onUp);
+      window.addEventListener('pointermove', onMove);
+      window.addEventListener('pointerup', onUp);
     },
     [paneSpace, programWidth],
   );
@@ -455,14 +455,14 @@ export default function EStepperView({ steps, profile, error, cseDiagram, layout
   );
 
   const usingHostDiagram = cseDiagram !== undefined && cseSnapshots !== null;
-  const explanation = step?.markers?.[0]?.explanation ?? "...";
-  const output = step?.output ?? "";
+  const explanation = step?.markers?.[0]?.explanation ?? '...';
+  const output = step?.output ?? '';
 
   return (
     <div
       ref={rootRef}
       style={fillHeight === undefined ? undefined : { height: fillHeight }}
-      className={classNames("sa-substituter", "sa-e-stepper", Classes.DARK)}
+      className={classNames('sa-substituter', 'sa-e-stepper', Classes.DARK)}
       onKeyDown={onKeyDown}
       tabIndex={-1}
     >
@@ -483,7 +483,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram, layout
             onChange={value => setStepValue(value + 1)}
             value={Math.min(stepValue, lastStep) - 1}
           />
-          <div style={{ display: "flex", justifyContent: "center" }}>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
             <ButtonGroup>
               <Button icon="double-chevron-left" onClick={stepPreviousBreakpoint} />
               <Button icon="chevron-left" onClick={stepPrevious} />
@@ -505,7 +505,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram, layout
                 aria-hidden
                 checked={!wide}
                 label="Vertical"
-                style={{ margin: 0, pointerEvents: "none" }}
+                style={{ margin: 0, pointerEvents: 'none' }}
               />
             </Button>
             {usingHostDiagram ? null : (
@@ -552,10 +552,10 @@ export default function EStepperView({ steps, profile, error, cseDiagram, layout
         )
       ) : (
         <>
-          <Card style={{ ...CARD_STYLE, margin: "8px 0" }}>
+          <Card style={{ ...CARD_STYLE, margin: '8px 0' }}>
             <Pre className="result-output">{explanation}</Pre>
           </Card>
-          <div ref={mainRef} className={classNames("estepper-main", { narrow: !wide })}>
+          <div ref={mainRef} className={classNames('estepper-main', { narrow: !wide })}>
             <div
               className="estepper-left"
               style={
@@ -568,7 +568,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram, layout
               {output ? (
                 <div style={{ marginTop: 4 }}>
                   <div className="estepper-output-toggle" onClick={() => setOutputOpen(o => !o)}>
-                    {outputOpen ? "▾" : "▸"} Output
+                    {outputOpen ? '▾' : '▸'} Output
                   </div>
                   {outputOpen ? <pre className="estepper-output">{output}</pre> : null}
                 </div>

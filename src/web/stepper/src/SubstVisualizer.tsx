@@ -1,12 +1,12 @@
-import { Button, ButtonGroup, Card, Classes, Divider, Pre, Slider } from "@blueprintjs/core";
-import { getHotkeyHandler, type HotkeyItem } from "@mantine/hooks";
-import type { SerializedStepperStep, SyntaxProfile } from "@sourceacademy/common-stepper";
-import classNames from "classnames";
-import { useCallback, useEffect, useState } from "react";
+import { Button, ButtonGroup, Card, Classes, Divider, Pre, Slider } from '@blueprintjs/core';
+import { getHotkeyHandler, type HotkeyItem } from '@mantine/hooks';
+import type { SerializedStepperStep, SyntaxProfile } from '@sourceacademy/common-stepper';
+import classNames from 'classnames';
+import { useCallback, useEffect, useState } from 'react';
 
-import { CustomASTRenderer } from "./render";
-import { sliderLabels } from "./sliderLabels";
-import { injectStepperStyles } from "./styles";
+import { CustomASTRenderer } from './render';
+import { sliderLabels } from './sliderLabels';
+import { injectStepperStyles } from './styles';
 
 function SubstDefaultText() {
   return (
@@ -94,7 +94,7 @@ function useWidth(): [(element: HTMLElement | null) => void, number] {
   useEffect(() => {
     if (!element) return;
     setWidth(Math.floor(element.getBoundingClientRect().width));
-    if (typeof ResizeObserver === "undefined") return;
+    if (typeof ResizeObserver === 'undefined') return;
     const observer = new ResizeObserver(entries =>
       setWidth(Math.floor(entries[0].contentRect.width)),
     );
@@ -201,7 +201,7 @@ export default function StepperView(props: StepperViewProps) {
   return (
     <div
       ref={rootRef}
-      className={classNames("sa-substituter", Classes.DARK)}
+      className={classNames('sa-substituter', Classes.DARK)}
       onKeyDown={hotkeyHandler}
       tabIndex={-1} // tab index necessary to fire keydown events on div element
     >

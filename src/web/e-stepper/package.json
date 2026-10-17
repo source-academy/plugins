@@ -5,7 +5,8 @@
   "description": "Host (web) plugin for the Source Academy environment stepper (e-stepper): renders the program and its environment diagram",
   "scripts": {
     "build": "rollup -c && node wrap.mjs",
-    "prepack": "yarn build"
+    "prepack": "yarn build",
+    "test": "vitest"
   },
   "license": "ISC",
   "files": [

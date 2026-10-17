@@ -71,9 +71,9 @@ export class Tree {
           // the whole tab.
           return already ? new AlreadyParsedTreeNode(already) : DataTreeNode.empty();
         }
-        case "empty":
+        case 'empty':
           return DataTreeNode.empty(node.displayValue);
-        case "leaf":
+        case 'leaf':
           return DataTreeNode.leaf(node.displayValue, node.label);
         case 'array': {
           const treeNode = new ArrayTreeNode();
