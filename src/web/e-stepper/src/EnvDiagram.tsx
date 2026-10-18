@@ -34,8 +34,8 @@ interface Props {
   onHoverFrame?: (frameId: string | null) => void;
   width: number;
   height: number;
-  /** Leave out the dead frames and objects. */
-  clearDead?: boolean;
+  /** Leave out the unreachable frames and objects. */
+  clearUnreachable?: boolean;
   /**
    * Called with a function that finds where an object or frame is drawn now (in this component's
    * coordinates, with the user's pan and zoom), whenever that changes; with `null` on unmount.
@@ -49,8 +49,8 @@ interface Props {
  */
 export default function EnvDiagram(props: Props) {
   const layout = useMemo(
-    () => layoutDiagram(props.frames, props.heap, { clearDead: props.clearDead }),
-    [props.frames, props.heap, props.clearDead],
+    () => layoutDiagram(props.frames, props.heap, { clearUnreachable: props.clearUnreachable }),
+    [props.frames, props.heap, props.clearUnreachable],
   );
   const fitScale = Math.min(1, props.width / layout.width, props.height / layout.height);
   const [view, setView] = useState({ scale: fitScale, x: 0, y: 0 });
@@ -146,10 +146,10 @@ function FrameDrawing(props: {
   lookedUp: Set<string>;
 }) {
   const { box } = props;
-  // What is dead is grey: the frame, its bindings and the arrows from it.
-  const dead = box.frame.isGarbage;
-  const color = dead ? DiagramColors.garbage : frameColor(box.index);
-  const textColor = dead ? DiagramColors.garbage : DiagramColors.text;
+  // What is unreachable is grey: the frame, its bindings and the arrows from it.
+  const unreachable = box.frame.isGarbage;
+  const color = unreachable ? DiagramColors.garbage : frameColor(box.index);
+  const textColor = unreachable ? DiagramColors.garbage : DiagramColors.text;
   const boxTop = box.y + C.headerHeight;
   return (
     <Group
@@ -205,7 +205,7 @@ function FrameDrawing(props: {
               x={row.valueX + C.dotRadius}
               y={row.y}
               radius={C.dotRadius}
-              fill={dead ? DiagramColors.garbage : DiagramColors.stroke}
+              fill={unreachable ? DiagramColors.garbage : DiagramColors.stroke}
             />
           ) : (
             <Text
@@ -215,7 +215,7 @@ function FrameDrawing(props: {
               fontFamily={FONT}
               fontSize={FONT_SIZE}
               fill={
-                dead
+                unreachable
                   ? DiagramColors.garbage
                   : row.value.kind === "unassigned"
                     ? DiagramColors.dimText
@@ -238,9 +238,9 @@ function ObjectDrawing(props: {
   const { box } = props;
   const object = box.object;
   // A hovered object keeps its outline and gets a darker background (its circles, its boxes).
-  const dead = object.isGarbage;
-  const stroke = dead ? DiagramColors.garbage : DiagramColors.stroke;
-  const textColor = dead ? DiagramColors.garbage : DiagramColors.text;
+  const unreachable = object.isGarbage;
+  const stroke = unreachable ? DiagramColors.garbage : DiagramColors.stroke;
+  const textColor = unreachable ? DiagramColors.garbage : DiagramColors.text;
   const strokeWidth = 2;
   const fill = props.hovered ? DiagramColors.hoverBackground : undefined;
   const label =

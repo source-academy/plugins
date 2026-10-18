@@ -244,8 +244,8 @@ export default function EStepperView({ steps, profile, error, cseDiagram, layout
   const [outputOpen, setOutputOpen] = useState(true);
   // Display options. "From program" (all the arrows from the program to objects in the diagram) is on until the user turns it off; hovering still draws an arrow to its object or frame.
   const [showArrows, setShowArrows] = useState(true);
-  // "Clear dead frames" lasts until the step changes, as in the CSE machine.
-  const [clearDead, setClearDead] = useState(false);
+  // "Clear unreachable objects" lasts until the step changes, as in the CSE machine.
+  const [clearUnreachable, setClearDead] = useState(false);
   const [anchors, setAnchors] = useState<{
     resolve: CseDiagramAnchorResolver | null;
     fromProgram: boolean;
@@ -443,7 +443,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram, layout
   );
 
   // The host draws the environments when it can, from the steps' CSE snapshots (all steps, so it
-  // can show frames from earlier steps as dead frames); otherwise the plugin's own diagram does.
+  // can show frames from earlier steps as unreachable frames); otherwise the plugin's own diagram does.
   // The snapshots' values carry the e-stepper's object ids (`#3`) as their `objectId`, so the
   // host's diagram and the program pane share the hovered object.
   const cseSnapshots = useMemo<CseSnapshot[] | null>(
@@ -509,7 +509,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram, layout
               />
             </Button>
             {usingHostDiagram ? null : (
-              // The host's diagram has its own toolbar for these (its arrow filters, "Clear Dead
+              // The host's diagram has its own toolbar for these (its arrow filters, "Clear Unreachable
               // Frames"); these are for the plugin's own diagram.
               <>
                 <Popover
@@ -529,9 +529,9 @@ export default function EStepperView({ steps, profile, error, cseDiagram, layout
                 <Button
                   icon="eraser"
                   style={{ marginLeft: 8 }}
-                  text="Clear dead frames"
+                  text="Clear unreachable objects"
                   disabled={
-                    clearDead ||
+                    clearUnreachable ||
                     !(step?.frames.some(f => f.isGarbage) || step?.heap.some(o => o.isGarbage))
                   }
                   onClick={() => setClearDead(true)}
@@ -603,7 +603,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram, layout
                   onHoverFrame={setHoveredFrame}
                   width={diagramSize.width}
                   height={diagramSize.height}
-                  clearDead={clearDead}
+                  clearUnreachable={clearUnreachable}
                   onAnchors={onAnchors}
                 />
               ) : null}

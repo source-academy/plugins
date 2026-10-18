@@ -585,7 +585,7 @@ describe("EStepperView", () => {
       expect(view.root.findByType(ProgramArrows).props.all).toBe(false);
     });
 
-    test("Clear dead frames is also available when only a heap object is dead", () => {
+    test("Clear unreachable objects is also available when only a heap object is unreachable", () => {
       const onlyObject: EStepperStep = {
         ...fixture[2],
         frames: fixture[2].frames.map(f => ({ ...f, isGarbage: false })),
@@ -594,33 +594,33 @@ describe("EStepperView", () => {
       const view = render({ steps: [onlyObject], profile });
       const clear = view.root
         .findAllByType(Button)
-        .find(b => b.props.text === "Clear dead frames")!;
+        .find(b => b.props.text === "Clear unreachable objects")!;
       expect(clear.props.disabled).toBe(false);
     });
 
-    test("Clear dead frames clears them from the diagram until the step changes", () => {
+    test("Clear unreachable objects clears them from the diagram until the step changes", () => {
       const view = render({ steps: fixture, profile });
       const diagram = () => view.root.find(n => n.props.onAnchors && n.props.frames);
       const clear = () =>
-        view.root.findAllByType(Button).find(b => b.props.text === "Clear dead frames")!;
-      // Only the last step has dead frames (E2).
+        view.root.findAllByType(Button).find(b => b.props.text === "Clear unreachable objects")!;
+      // Only the last step has unreachable frames (E2).
       expect(clear().props.disabled).toBe(true);
       act(() =>
         view.root
           .find(n => hasClass(n, "sa-e-stepper"))
           .props.onKeyDown({ key: "e", preventDefault: () => {} }),
       );
-      expect(diagram().props.clearDead).toBe(false);
+      expect(diagram().props.clearUnreachable).toBe(false);
       expect(clear().props.disabled).toBe(false);
       act(() => clear().props.onClick());
-      expect(diagram().props.clearDead).toBe(true);
+      expect(diagram().props.clearUnreachable).toBe(true);
       expect(clear().props.disabled).toBe(true);
       act(() =>
         view.root
           .find(n => hasClass(n, "sa-e-stepper"))
           .props.onKeyDown({ key: "b", preventDefault: () => {} }),
       );
-      expect(diagram().props.clearDead).toBe(false);
+      expect(diagram().props.clearUnreachable).toBe(false);
     });
   });
 

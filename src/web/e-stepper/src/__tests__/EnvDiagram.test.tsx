@@ -105,7 +105,7 @@ describe("EnvDiagram", () => {
     expect(onHover).toHaveBeenLastCalledWith(null);
   });
 
-  test("draws dead frames, their data and their arrows grey, and live ones in their colours", () => {
+  test("draws unreachable frames, their data and their arrows grey, and live ones in their colours", () => {
     const last = (steps as unknown as EStepperStep[])[2];
     const { root } = draw({ frames: last.frames, heap: last.heap, activeFrameId: "Global" });
     const outlines = root
@@ -121,7 +121,7 @@ describe("EnvDiagram", () => {
     expect(arrows).toContain(DiagramColors.stroke);
   });
 
-  test("draws the values in a dead frame grey too, not just its names", () => {
+  test("draws the values in a unreachable frame grey too, not just its names", () => {
     const frame = (id: string, parentId: string | null, isGarbage: boolean) => ({
       id,
       name: id === "Global" ? "global" : "f",

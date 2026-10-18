@@ -188,7 +188,7 @@ export type CseDiagramAnchorResolver = (target: {
 
 /** What {@link ICseDiagramService.createView} draws. */
 export interface CseDiagramViewProps {
-  /** A run's snapshots; frames from earlier snapshots are shown as dead frames. */
+  /** A run's snapshots; frames from earlier snapshots are shown as unreachable frames. */
   snapshots: CseSnapshot[];
   /** The 0-based index of the snapshot to draw. */
   step: number;
@@ -226,7 +226,7 @@ export interface CseDiagramViewProps {
 
 /**
  * A host's CSE machine visualization, lent to web plugins that want to draw environments the way
- * the CSE Machine tab does (arrow routing and filtering, alignment, printable mode, clearing dead
+ * the CSE Machine tab does (arrow routing and filtering, alignment, printable mode, clearing unreachable
  * frames, saving, zoom) instead of drawing them themselves — e.g. the environment stepper.
  */
 export interface ICseDiagramService {
