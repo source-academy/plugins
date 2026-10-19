@@ -1,5 +1,16 @@
 # @sourceacademy/common-cse-machine
 
+## 0.4.0
+
+### Minor Changes
+
+- e86833c: `CseDiagramViewProps.onAnchors` gets a second argument, `fromProgram`: whether the host's arrow menu asks for all arrows from the program to be drawn. When it is `false` the plugin draws such an arrow only while its object or frame is hovered. A host that omits it is taken to mean `true`.
+- 34091e7: Add `CseDiagramViewProps.onAnchors` (with `CseDiagramAnchorResolver` and `CseDiagramPoint`), so a host's CSE diagram can report where its objects and frames are drawn, and a plugin (the environment stepper) can draw arrows into it from its own panes.
+
+### Patch Changes
+
+- 43c5ded: The diagram anchor resolver may report the view's zoom (`scale`), so arrows into the diagram scale with it
+
 ## 0.3.1
 
 ### Patch Changes
