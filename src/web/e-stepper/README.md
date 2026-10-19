@@ -40,10 +40,10 @@ for Python §3/§4), see the
   read highlighted, and frames and objects that nothing refers to any more greyed out.
   - When the host lends its CSE machine diagram (`ICseDiagramService` in `IHostServices`; the
     Source Academy frontend does), the environments are drawn with it, as in the CSE machine, with
-    its toolbar (arrow filters, _Clear unreachable objects_). Each step carries its store as a CSE machine
+    its toolbar (arrow filters, _Clear Unreachable Objects_). Each step carries its store as a CSE machine
     snapshot for it.
   - Otherwise, the plugin draws them with its own Konva diagram (`EnvDiagram.tsx`), with the
-    options _From program_ (arrows from the program to the diagram) and _Clear unreachable objects_.
+    options _From program_ (arrows from the program to the diagram) and _Clear Unreachable Objects_.
 - **Controls:** a slider (0 is the start of the evaluation); buttons for the first, previous,
   next and last step; _Vertical_, which puts the program above the diagram instead of beside it.
   The arrangement, and the divider between the panes, stay as the user left them over runs.
