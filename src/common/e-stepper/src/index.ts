@@ -170,9 +170,17 @@ export interface EStepperLookup {
  * store it refers to, in the state *before* the step's reduction, as in the stepper.
  */
 export interface EStepperStep extends SerializedStepperStep {
-  /** All frames created so far, in creation order (the global frame first). */
+  /**
+   * The frames created so far that are reachable, in creation order (the global frame first), and
+   * those that become unreachable (`isGarbage`) in this step. What is unreachable stays so, so an
+   * evaluator need not repeat a frame in the steps after the one in which it becomes unreachable
+   * (all of them in every step would make the steps of a long run grow with the square of their
+   * number): a host works out the store at a step from that step and the ones before it — the
+   * latest version of each frame, those the step does not have being unreachable. An evaluator
+   * that does repeat them gives the same store.
+   */
   frames: EStepperFrame[];
-  /** All heap objects created so far, in creation order. */
+  /** The heap objects created so far that are reachable, and those that become unreachable in this step; as `frames`. */
   heap: EStepperHeapObject[];
   /** The frame the step's redex is evaluated in (the innermost enclosing `EnvBlock`'s frame). */
   activeFrameId: string;

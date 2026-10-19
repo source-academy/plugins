@@ -28,6 +28,7 @@ import { injectStepperStyles } from "../../stepper/src/styles";
 import { frameColor } from "./colors";
 import EnvDiagram from "./EnvDiagram";
 import ProgramArrows, { ENV_ATTRIBUTE, REF_ATTRIBUTE } from "./ProgramArrows";
+import { type Store, storeAt } from "./store";
 import { injectEStepperStyles } from "./styles";
 
 const DEFAULT_PROGRAM_HEIGHT = 240;
@@ -279,6 +280,11 @@ export default function EStepperView({ steps, profile, error, cseDiagram, layout
   const hasRun = lastStep > 0;
   const stepIndex = hasRun ? Math.min(stepValue, lastStep) - 1 : 0;
   const step = hasRun ? steps[stepIndex] : undefined;
+  // (the frames and objects that became unreachable in earlier steps are in those steps)
+  const store = useMemo<Store>(
+    () => (hasRun ? storeAt(steps, stepIndex) : { frames: [], heap: [] }),
+    [hasRun, steps, stepIndex],
+  );
   // The arrangement of the panes: side by side ("wide", the default) or one above the other
   // ("vertical"), as the user chooses, whatever the tab's width.
   const [vertical, setVertical] = useRemembered(layout, "vertical", false);
@@ -306,14 +312,14 @@ export default function EStepperView({ steps, profile, error, cseDiagram, layout
 
   // Frame colours by id, for the program's environment brackets (the diagram uses the same order).
   const frameColors = useMemo(
-    () => Object.fromEntries((step?.frames ?? []).map((f, i) => [f.id, frameColor(i)])),
-    [step],
+    () => Object.fromEntries(store.frames.map((f, i) => [f.id, frameColor(i)])),
+    [store],
   );
   const colorOf = (frameId: string) => frameColors[frameId] ?? frameColor(1);
   const objectOf = useMemo(() => {
-    const objects = new Map<string, EStepperHeapObject>((step?.heap ?? []).map(o => [o.id, o]));
+    const objects = new Map<string, EStepperHeapObject>(store.heap.map(o => [o.id, o]));
     return (id: string) => objects.get(id);
-  }, [step]);
+  }, [store]);
 
   const nodeRenderers: NodeRenderers = {
     EnvBlock: (node: StepperNode, renderChild) => {
@@ -532,7 +538,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram, layout
                   text="Clear Unreachable Objects"
                   disabled={
                     clearUnreachable ||
-                    !(step?.frames.some(f => f.isGarbage) || step?.heap.some(o => o.isGarbage))
+                    !(store.frames.some(f => f.isGarbage) || store.heap.some(o => o.isGarbage))
                   }
                   onClick={() => setClearDead(true)}
                 />
@@ -593,8 +599,8 @@ export default function EStepperView({ steps, profile, error, cseDiagram, layout
                 }) as React.ReactNode)
               ) : diagramSize.width > 0 && diagramSize.height > 0 ? (
                 <EnvDiagram
-                  frames={step!.frames}
-                  heap={step!.heap}
+                  frames={store.frames}
+                  heap={store.heap}
                   activeFrameId={step!.activeFrameId}
                   lookups={step!.lookups ?? []}
                   hovered={hovered}
