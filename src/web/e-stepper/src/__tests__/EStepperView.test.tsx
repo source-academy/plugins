@@ -598,6 +598,31 @@ describe("EStepperView", () => {
       expect(clear.props.disabled).toBe(false);
     });
 
+    test("frames that became unreachable in an earlier step are drawn, as unreachable", () => {
+      // The evaluator puts an unreachable frame in the step where it becomes so, and in no step after.
+      const later: EStepperStep = {
+        ...fixture[2],
+        frames: fixture[2].frames.filter(f => !f.isGarbage),
+        heap: fixture[2].heap.filter(o => !o.isGarbage),
+      };
+      const view = render({ steps: [fixture[2], later], profile });
+      const diagram = () => view.root.find(n => n.props.onAnchors && n.props.frames);
+      const unreachable = (frames: { id: string; isGarbage: boolean }[]) =>
+        frames.filter(f => f.isGarbage).map(f => f.id);
+      expect(unreachable(diagram().props.frames)).toEqual(["E2"]);
+      act(() =>
+        view.root
+          .find(n => hasClass(n, "sa-e-stepper"))
+          .props.onKeyDown({ key: "e", preventDefault: () => {} }),
+      );
+      expect(later.frames.map(f => f.id)).not.toContain("E2");
+      expect(unreachable(diagram().props.frames)).toEqual(["E2"]);
+      const clear = view.root
+        .findAllByType(Button)
+        .find(b => b.props.text === "Clear Unreachable Objects")!;
+      expect(clear.props.disabled).toBe(false);
+    });
+
     test("Clear Unreachable Objects clears them from the diagram until the step changes", () => {
       const view = render({ steps: fixture, profile });
       const diagram = () => view.root.find(n => n.props.onAnchors && n.props.frames);
