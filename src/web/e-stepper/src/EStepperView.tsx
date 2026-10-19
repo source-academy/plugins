@@ -244,7 +244,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram, layout
   const [outputOpen, setOutputOpen] = useState(true);
   // Display options. "From program" (all the arrows from the program to objects in the diagram) is on until the user turns it off; hovering still draws an arrow to its object or frame.
   const [showArrows, setShowArrows] = useState(true);
-  // "Clear unreachable objects" lasts until the step changes, as in the CSE machine.
+  // "Clear Unreachable Objects" lasts until the step changes, as in the CSE machine.
   const [clearUnreachable, setClearDead] = useState(false);
   const [anchors, setAnchors] = useState<{
     resolve: CseDiagramAnchorResolver | null;
@@ -529,7 +529,7 @@ export default function EStepperView({ steps, profile, error, cseDiagram, layout
                 <Button
                   icon="eraser"
                   style={{ marginLeft: 8 }}
-                  text="Clear unreachable objects"
+                  text="Clear Unreachable Objects"
                   disabled={
                     clearUnreachable ||
                     !(step?.frames.some(f => f.isGarbage) || step?.heap.some(o => o.isGarbage))
