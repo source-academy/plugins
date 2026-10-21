@@ -1,1 +1,4 @@
 .changeset/config.json
+.yarn
+**/dist
+**/node_modules

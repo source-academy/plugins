@@ -1,24 +1,24 @@
-import type { CseDiagramAnchorResolver } from "@sourceacademy/common-cse-machine";
+import type { CseDiagramAnchorResolver } from '@sourceacademy/common-cse-machine';
 import type {
   EStepperFrame,
   EStepperHeapObject,
   EStepperLookup,
   EStepperValue,
-} from "@sourceacademy/common-e-stepper";
-import { useEffect, useMemo, useState } from "react";
-import { Arrow, Circle, Group, Layer, Line, Rect, Stage, Text } from "react-konva";
+} from '@sourceacademy/common-e-stepper';
+import { useEffect, useMemo, useState } from 'react';
+import { Arrow, Circle, Group, Layer, Line, Rect, Stage, Text } from 'react-konva';
 
-import { DiagramColors, frameColor } from "./colors";
+import { DiagramColors, frameColor } from './colors';
 import {
+  LayoutConfig as C,
+  layoutDiagram,
+  valueLabel,
   type ArrowSpec,
   type FrameBox,
-  layoutDiagram,
-  LayoutConfig as C,
   type ObjectBox,
-  valueLabel,
-} from "./layout";
+} from './layout';
 
-const FONT = "Inconsolata, Consolas, monospace";
+const FONT = 'Inconsolata, Consolas, monospace';
 const FONT_SIZE = 13;
 
 interface Props {
@@ -67,12 +67,12 @@ export default function EnvDiagram(props: Props) {
       // Arrows end at the top, horizontally centred, of an object (a function's circles, a
       // list's boxes), and at the left edge of a frame's box.
       const at =
-        kind === "object"
+        kind === 'object'
           ? layout.objects.find(b => b.object.id === id)
           : layout.frames.find(b => b.frame.id === id);
       if (!at) return null;
       const point =
-        "object" in at
+        'object' in at
           ? { x: at.x + at.width / 2, y: at.y }
           : { x: at.x, y: at.y + C.headerHeight + at.height / 2 };
       return {
@@ -160,7 +160,7 @@ function FrameDrawing(props: {
       <Text
         x={box.x}
         y={box.y + 2}
-        text={box.frame.name === "global" ? box.frame.id : `${box.frame.id}  ${box.frame.name}`}
+        text={box.frame.name === 'global' ? box.frame.id : `${box.frame.id}  ${box.frame.name}`}
         fontFamily={FONT}
         fontSize={FONT_SIZE}
         fontStyle="bold"
@@ -175,7 +175,7 @@ function FrameDrawing(props: {
         strokeWidth={props.active ? 4 : 2}
         // Filled even when not hovered (transparently), so the whole box takes the mouse, not just
         // its outline and contents.
-        fill={props.hovered ? DiagramColors.hoverBackground : "rgba(0, 0, 0, 0)"}
+        fill={props.hovered ? DiagramColors.hoverBackground : 'rgba(0, 0, 0, 0)'}
         cornerRadius={6}
         shadowColor={props.active ? color : undefined}
         shadowBlur={props.active ? 10 : 0}
@@ -200,7 +200,7 @@ function FrameDrawing(props: {
             fontSize={FONT_SIZE}
             fill={textColor}
           />
-          {row.value.kind === "ref" ? (
+          {row.value.kind === 'ref' ? (
             <Circle
               x={row.valueX + C.dotRadius}
               y={row.y}
@@ -217,11 +217,11 @@ function FrameDrawing(props: {
               fill={
                 unreachable
                   ? DiagramColors.garbage
-                  : row.value.kind === "unassigned"
+                  : row.value.kind === 'unassigned'
                     ? DiagramColors.dimText
                     : DiagramColors.text
               }
-              fontStyle={row.value.kind === "builtin" ? "italic" : "normal"}
+              fontStyle={row.value.kind === 'builtin' ? 'italic' : 'normal'}
             />
           )}
         </Group>
@@ -244,7 +244,7 @@ function ObjectDrawing(props: {
   const strokeWidth = 2;
   const fill = props.hovered ? DiagramColors.hoverBackground : undefined;
   const label =
-    object.kind === "function" && object.name ? `${object.id} ${object.name}` : object.id;
+    object.kind === 'function' && object.name ? `${object.id} ${object.name}` : object.id;
   return (
     <Group
       opacity={object.isGarbage ? DiagramColors.garbageOpacity : 1}
@@ -259,7 +259,7 @@ function ObjectDrawing(props: {
         fontSize={FONT_SIZE - 1}
         fill={props.hovered ? textColor : DiagramColors.dimText}
       />
-      {object.kind === "function" ? (
+      {object.kind === 'function' ? (
         <>
           <Circle
             x={box.x + C.functionRadius}
@@ -317,7 +317,7 @@ function ObjectDrawing(props: {
             ),
           )}
           {object.elements.map((element, i) =>
-            element.kind === "ref" ? (
+            element.kind === 'ref' ? (
               <Circle
                 key={`v${i}`}
                 x={box.x + (i + 0.5) * C.cellWidth}
@@ -365,7 +365,7 @@ function ObjectDrawing(props: {
  * (whatever a producer calls the type): a string reads `'None'`, with quotes.
  */
 function isNone(value: EStepperValue): boolean {
-  return value.kind === "primitive" && value.display === "None";
+  return value.kind === 'primitive' && value.display === 'None';
 }
 
 function ArrowDrawing(props: { arrow: ArrowSpec }) {
@@ -379,7 +379,7 @@ function ArrowDrawing(props: { arrow: ArrowSpec }) {
       strokeWidth={1.5}
       pointerLength={7}
       pointerWidth={6}
-      dash={arrow.kind === "parent" ? [6, 4] : undefined}
+      dash={arrow.kind === 'parent' ? [6, 4] : undefined}
       opacity={arrow.garbage ? DiagramColors.garbageOpacity : 0.9}
       listening={false}
     />

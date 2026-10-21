@@ -1,4 +1,4 @@
-import type { RefId, SerializedDataVisualizerNode } from "@sourceacademy/common-data-visualizer";
+import type { RefId, SerializedDataVisualizerNode } from '@sourceacademy/common-data-visualizer';
 
 /**
  * Cycle-detection and pair/list/tree classification for one serialized data-visualizer node tree.
@@ -24,15 +24,15 @@ import type { RefId, SerializedDataVisualizerNode } from "@sourceacademy/common-
 
 /** A node's "type" for homogeneity comparisons — the closest equivalent to the old code's `typeof`. */
 function typeLabel(node: SerializedDataVisualizerNode): string {
-  return node.type === "leaf" ? node.label : node.type;
+  return node.type === 'leaf' ? node.label : node.type;
 }
 
 /** True for a node that can be a pair-chain link: an `"array"` with exactly two children. A native
  * (non-length-2) list is deliberately never tree/pair-eligible — see this file's module doc comment. */
 function isPairNode(
   node: SerializedDataVisualizerNode,
-): node is Extract<SerializedDataVisualizerNode, { type: "array" }> {
-  return node.type === "array" && node.children.length === 2;
+): node is Extract<SerializedDataVisualizerNode, { type: 'array' }> {
+  return node.type === 'array' && node.children.length === 2;
 }
 
 /**
@@ -56,7 +56,7 @@ function detectCyclesAndSharing(root: SerializedDataVisualizerNode): {
 
   function visit(node: SerializedDataVisualizerNode): void {
     switch (node.type) {
-      case "ref":
+      case 'ref':
         if (functionRefIds.has(node.refId)) {
           return;
         }
@@ -65,18 +65,18 @@ function detectCyclesAndSharing(root: SerializedDataVisualizerNode): {
           isCyclic = true;
         }
         return;
-      case "array":
+      case 'array':
         onPath.add(node.refId);
         for (const child of node.children) {
           visit(child);
         }
         onPath.delete(node.refId);
         return;
-      case "function":
+      case 'function':
         functionRefIds.add(node.refId);
         return;
-      case "leaf":
-      case "empty":
+      case 'leaf':
+      case 'empty':
         return;
     }
   }
@@ -93,20 +93,20 @@ function detectCyclesAndSharing(root: SerializedDataVisualizerNode): {
  * `"array"`/`"empty"`/leaf/`"function"` node — never a `"ref"`.
  */
 function isBinaryTreeNode(node: SerializedDataVisualizerNode, rootLabel: string | null): boolean {
-  if (node.type === "empty") {
+  if (node.type === 'empty') {
     return true;
   }
   if (!isPairNode(node)) {
     return false;
   }
   const [data, rest] = node.children;
-  if (data.type === "empty") {
+  if (data.type === 'empty') {
     return true;
   }
   // Binary Tree View draws a node's data inside its box and hangs only the left/right subtrees
   // below it, so it has nowhere to put a compound (list) entry - it would be drawn as if it were a
   // branch. Such a tree is shown in General Tree View instead.
-  if (data.type === "array") {
+  if (data.type === 'array') {
     return false;
   }
   if (!isPairNode(rest)) {
@@ -123,7 +123,7 @@ function isBinaryTreeNode(node: SerializedDataVisualizerNode, rootLabel: string 
   let count = 0;
   while (isPairNode(next)) {
     const [head] = next.children;
-    if (head.type !== "array" && typeLabel(head) === typeLabel(data)) {
+    if (head.type !== 'array' && typeLabel(head) === typeLabel(data)) {
       return false;
     }
     count++;
@@ -179,14 +179,14 @@ function isBinaryTreeNode(node: SerializedDataVisualizerNode, rootLabel: string 
  * not required to share one type.
  */
 function isGeneralTreeNode(node: SerializedDataVisualizerNode): boolean {
-  if (node.type === "empty") {
+  if (node.type === 'empty') {
     return true;
   }
   if (!isPairNode(node)) {
     return false;
   }
   const [data, rest] = node.children;
-  if (data.type === "array" && !isGeneralTreeNode(data)) {
+  if (data.type === 'array' && !isGeneralTreeNode(data)) {
     return false;
   }
   return isGeneralTreeNode(rest);
@@ -241,7 +241,7 @@ function computeLayout(root: SerializedDataVisualizerNode): TreeLayout {
     // same counter as the pairs there, so it neither overlaps a nested list's boxes nor falls below
     // the canvas.
     const head = node.children[0];
-    if (head.type === "function") {
+    if (head.type === 'function') {
       const fnDepth = depth + 1;
       if (nodeCountByDepth[fnDepth] === undefined) {
         nodeCountByDepth[fnDepth] = 0;
@@ -265,9 +265,9 @@ function computeLayout(root: SerializedDataVisualizerNode): TreeLayout {
  * {@link classify}). */
 function containsFunction(node: SerializedDataVisualizerNode): boolean {
   switch (node.type) {
-    case "function":
+    case 'function':
       return true;
-    case "array":
+    case 'array':
       return node.children.some(containsFunction);
     default:
       return false;

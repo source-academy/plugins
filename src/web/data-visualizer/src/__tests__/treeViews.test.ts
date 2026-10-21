@@ -1,60 +1,64 @@
-import type { SerializedDataVisualizerNode } from "@sourceacademy/common-data-visualizer";
-import { describe, expect, test, vi } from "vitest";
+import type { SerializedDataVisualizerNode } from '@sourceacademy/common-data-visualizer';
+import { Text } from 'react-konva';
+import { describe, expect, test, vi } from 'vitest';
+
+import { Config } from '../Config';
+import type { ClassificationResult } from '../classify';
+import { ArrowDrawable, BackwardArrowDrawable } from '../drawable/Drawable';
+import { AlreadyParsedTreeNode } from '../tree/AlreadyParsedTreeNode';
+import { BinaryTreeDrawer } from '../tree/BinaryTreeDrawer';
+import { GeneralTreeDrawer } from '../tree/GeneralTreeDrawer';
+import { Tree } from '../tree/Tree';
+import { ArrayTreeNode, DataTreeNode, FunctionTreeNode } from '../tree/TreeNode';
 
 // Same rationale as tree.test.ts: avoid Konva's Node-environment build requiring the optional
 // `canvas` package for what are, here, pure layout-arithmetic and warning-fallback checks.
-vi.mock("konva", () => ({
-  default: {
-    Text: class {
-      width() {
-        return 40;
-      }
-      height() {
-        return 25;
-      }
-    },
-  },
-}));
-vi.mock("react-konva", () => {
+vi.mock(
+  import('konva'),
+  () =>
+    ({
+      default: {
+        Text: class {
+          width() {
+            return 40;
+          }
+          height() {
+            return 25;
+          }
+        },
+      },
+    }) as any,
+);
+
+vi.mock(import('react-konva'), () => {
   const stub = (name: string) => {
     const fn = () => null;
-    Object.defineProperty(fn, "name", { value: name });
+    Object.defineProperty(fn, 'name', { value: name });
     return fn;
   };
   return {
-    Stage: stub("Stage"),
-    Layer: stub("Layer"),
-    Text: stub("Text"),
-    Group: stub("Group"),
-    Line: stub("Line"),
-    Rect: stub("Rect"),
-    Circle: stub("Circle"),
-    Arrow: stub("Arrow"),
-  };
+    Stage: stub('Stage'),
+    Layer: stub('Layer'),
+    Text: stub('Text'),
+    Group: stub('Group'),
+    Line: stub('Line'),
+    Rect: stub('Rect'),
+    Circle: stub('Circle'),
+    Arrow: stub('Arrow'),
+  } as any;
 });
 
-import { Text } from "react-konva";
-
-import type { ClassificationResult } from "../classify";
-import { Config } from "../Config";
-import { ArrowDrawable, BackwardArrowDrawable } from "../drawable/Drawable";
-import { AlreadyParsedTreeNode } from "../tree/AlreadyParsedTreeNode";
-import { BinaryTreeDrawer } from "../tree/BinaryTreeDrawer";
-import { GeneralTreeDrawer } from "../tree/GeneralTreeDrawer";
-import { Tree } from "../tree/Tree";
-import { ArrayTreeNode, DataTreeNode, FunctionTreeNode } from "../tree/TreeNode";
-
-const empty = (): SerializedDataVisualizerNode => ({ type: "empty" });
+const empty = (): SerializedDataVisualizerNode => ({ type: 'empty' });
 const leaf = (n: number): SerializedDataVisualizerNode => ({
-  type: "leaf",
+  type: 'leaf',
   displayValue: String(n),
-  label: "number",
+  label: 'number',
 });
 let nextRefId = 1;
 const pair = (
   a: SerializedDataVisualizerNode,
   b: SerializedDataVisualizerNode,
-): SerializedDataVisualizerNode => ({ type: "array", refId: nextRefId++, children: [a, b] });
+): SerializedDataVisualizerNode => ({ type: 'array', refId: nextRefId++, children: [a, b] });
 
 // SICP `list(data, left, right)` encoding — see classify.test.ts for the same helper's rationale.
 const binaryNode = (
@@ -106,12 +110,13 @@ type DrawerInternals = {
   minY: number;
 };
 const internals = (drawer: BinaryTreeDrawer | GeneralTreeDrawer): DrawerInternals =>
+  // @ts-expect-error drawNode is public in DrawerInternals but protected in the TreeDrawer classes
   drawer as DrawerInternals;
 
-describe("BinaryTreeDrawer", () => {
-  test("a non-binary-tree structure draws the fixed-size warning box instead of a tree", () => {
+describe(BinaryTreeDrawer, () => {
+  test('a non-binary-tree structure draws the fixed-size warning box instead of a tree', () => {
     const tree = Tree.fromSerializedNode(pair(leaf(1), leaf(2)));
-    const drawer = tree.draw("binaryTree") as BinaryTreeDrawer;
+    const drawer = tree.draw('binaryTree') as BinaryTreeDrawer;
     const element = drawer.draw(0, 0, 0) as React.ReactElement<{
       width: number;
       height: number;
@@ -121,12 +126,12 @@ describe("BinaryTreeDrawer", () => {
     expect(element.props.height).toBe(100);
     const text = element.props.children.props.children;
     expect(text.type).toBe(Text);
-    expect(text.props.text).toBe("Binary Tree View only supports binary trees (no cycles)");
+    expect(text.props.text).toBe('Binary Tree View only supports binary trees (no cycles)');
   });
 
-  test("a single-node binary tree draws without throwing, to a positive finite size", () => {
+  test('a single-node binary tree draws without throwing, to a positive finite size', () => {
     const tree = Tree.fromSerializedNode(binaryNode(1));
-    const drawer = tree.draw("binaryTree") as BinaryTreeDrawer;
+    const drawer = tree.draw('binaryTree') as BinaryTreeDrawer;
     expect(() => drawer.draw(0, 0, 0)).not.toThrow();
     expect(drawer.width).toBeGreaterThan(0);
     expect(drawer.height).toBeGreaterThan(0);
@@ -134,28 +139,28 @@ describe("BinaryTreeDrawer", () => {
     expect(Number.isFinite(drawer.height)).toBe(true);
   });
 
-  test("a deeper binary tree draws without throwing, wider and taller than a single node", () => {
-    const single = Tree.fromSerializedNode(binaryNode(1)).draw("binaryTree") as BinaryTreeDrawer;
+  test('a deeper binary tree draws without throwing, wider and taller than a single node', () => {
+    const single = Tree.fromSerializedNode(binaryNode(1)).draw('binaryTree') as BinaryTreeDrawer;
     single.draw(0, 0, 0);
 
     const deep = Tree.fromSerializedNode(
       binaryNode(1, binaryNode(2, binaryNode(4), binaryNode(5)), binaryNode(3)),
-    ).draw("binaryTree") as BinaryTreeDrawer;
+    ).draw('binaryTree') as BinaryTreeDrawer;
     expect(() => deep.draw(0, 0, 0)).not.toThrow();
     expect(deep.width).toBeGreaterThan(single.width);
     expect(deep.height).toBeGreaterThan(single.height);
   });
 
   test("an empty value carries the language's spelling of it through to the root node", () => {
-    const tree = Tree.fromSerializedNode({ type: "empty", displayValue: "None" });
-    expect((tree.rootNode as DataTreeNode).displayValue).toBe("None");
+    const tree = Tree.fromSerializedNode({ type: 'empty', displayValue: 'None' });
+    expect((tree.rootNode as DataTreeNode).displayValue).toBe('None');
   });
 
-  test("the bare empty terminator is a trivial valid binary tree, drawn via the measured-text branch", () => {
+  test('the bare empty terminator is a trivial valid binary tree, drawn via the measured-text branch', () => {
     // Per isBinaryTreeNode: a binary tree is `null`, or a 3-element list — a bare *leaf* value is
     // neither, so (unlike this case) it fails classification and hits the warning box instead.
     const tree = Tree.fromSerializedNode(empty());
-    const drawer = tree.draw("binaryTree") as BinaryTreeDrawer;
+    const drawer = tree.draw('binaryTree') as BinaryTreeDrawer;
     drawer.draw(0, 0, 0);
     // Per the mocked Konva.Text in the shared mock above.
     expect(drawer.width).toBe(40);
@@ -171,7 +176,7 @@ describe("BinaryTreeDrawer", () => {
   // The cycle-arrow logic below is still real, hand-ported code (see this PR's description) - just
   // unreachable via the one entry point the rest of the app actually uses. These tests exist to
   // protect it from silent regression anyway.
-  test("a forward reference to an earlier-drawn node draws a forward ArrowDrawable", () => {
+  test('a forward reference to an earlier-drawn node draws a forward ArrowDrawable', () => {
     const target = new ArrayTreeNode();
     target.drawableX = 500;
     target.drawableY = 500; // "already drawn" further down/right than the reference site below
@@ -186,7 +191,7 @@ describe("BinaryTreeDrawer", () => {
     expect(drawables[0].type).toBe(ArrowDrawable);
   });
 
-  test("a backward reference to an earlier-drawn node draws a BackwardArrowDrawable and pulls minX/minY negative", () => {
+  test('a backward reference to an earlier-drawn node draws a BackwardArrowDrawable and pulls minX/minY negative', () => {
     const target = new ArrayTreeNode();
     target.drawableX = -50;
     target.drawableY = -50; // "already drawn" above/left of the reference site below
@@ -203,7 +208,7 @@ describe("BinaryTreeDrawer", () => {
     expect(internals(drawer).minY).toBeLessThan(0);
   });
 
-  test("a function-value node draws its own content via createDrawable", () => {
+  test('a function-value node draws its own content via createDrawable', () => {
     const fn = new FunctionTreeNode();
     const tree = new Tree(fn, [], fakeClassification());
     const drawer = new BinaryTreeDrawer(tree, fakeClassification());
@@ -215,22 +220,22 @@ describe("BinaryTreeDrawer", () => {
   });
 });
 
-describe("BinaryTreeDrawer canvas (issue #84)", () => {
+describe('BinaryTreeDrawer canvas (issue #84)', () => {
   // Python value -> wire node, the way py-slang serializes it (2-element list -> pair).
   type Py = null | number | string | Py[];
   const py = (v: Py): SerializedDataVisualizerNode =>
     v === null
       ? empty()
       : Array.isArray(v)
-        ? { type: "array", refId: nextRefId++, children: v.map(py) }
-        : typeof v === "number"
+        ? { type: 'array', refId: nextRefId++, children: v.map(py) }
+        : typeof v === 'number'
           ? leaf(v)
-          : { type: "leaf", displayValue: v, label: "string" };
+          : { type: 'leaf', displayValue: v, label: 'string' };
   const N = null;
 
   test.each<[string, Py]>([
     [
-      "left-skewed (case 1)",
+      'left-skewed (case 1)',
       [
         1,
         [
@@ -252,13 +257,13 @@ describe("BinaryTreeDrawer canvas (issue #84)", () => {
       ],
     ],
     [
-      "right-skewed (case 2)",
-      ["A", [N, [["B", [N, [["C", [N, [["D", [N, [N, N]]], N]]], N]]], N]]],
+      'right-skewed (case 2)',
+      ['A', [N, [['B', [N, [['C', [N, [['D', [N, [N, N]]], N]]], N]]], N]]],
     ],
-    ["right child only (case 3)", [10, [N, [[15, [N, [N, N]]], N]]]],
-  ])("every box of a %s tree is drawn inside the canvas", (_: string, value: Py) => {
+    ['right child only (case 3)', [10, [N, [[15, [N, [N, N]]], N]]]],
+  ])('every box of a %s tree is drawn inside the canvas', (_: string, value: Py) => {
     const tree = Tree.fromSerializedNode(py(value));
-    const drawer = tree.draw("binaryTree") as BinaryTreeDrawer;
+    const drawer = tree.draw('binaryTree') as BinaryTreeDrawer;
     const stage = drawer.draw(0, 0, 0) as React.ReactElement<{
       width: number;
       height: number;
@@ -287,7 +292,7 @@ describe("BinaryTreeDrawer canvas (issue #84)", () => {
   });
 });
 
-describe("BinaryTreeDrawer canvas margin", () => {
+describe('BinaryTreeDrawer canvas margin', () => {
   // DataVisualizerView draws with a 1px margin (Config.StrokeWidth / 2), not 0. With a margin the
   // root's data slot is also "to the right of" runningX2's initial 0, so it must not be counted as
   // a right branch: that would widen even a single node's canvas by hundreds of pixels.
@@ -298,32 +303,32 @@ describe("BinaryTreeDrawer canvas margin", () => {
     right: SerializedDataVisualizerNode = empty(),
   ): SerializedDataVisualizerNode => pair(leaf1(), pair(left, pair(right, empty())));
   const widthAt = (value: SerializedDataVisualizerNode, m: number): number => {
-    const drawer = Tree.fromSerializedNode(value).draw("binaryTree") as BinaryTreeDrawer;
+    const drawer = Tree.fromSerializedNode(value).draw('binaryTree') as BinaryTreeDrawer;
     return (drawer.draw(m, m, 0) as React.ReactElement<{ width: number }>).props.width;
   };
 
   test.each<[string, () => SerializedDataVisualizerNode]>([
-    ["a single node", () => node()],
-    ["a node with a right child", () => node(empty(), node())],
-    ["a node with a left child", () => node(node())],
+    ['a single node', () => node()],
+    ['a node with a right child', () => node(empty(), node())],
+    ['a node with a left child', () => node(node())],
   ])(
-    "%s: the canvas grows only by the margin, not by a phantom branch",
+    '%s: the canvas grows only by the margin, not by a phantom branch',
     (_: string, make: () => SerializedDataVisualizerNode) => {
       expect(widthAt(make(), margin)).toBe(widthAt(make(), 0) + margin * 2);
     },
   );
 });
 
-describe("GeneralTreeDrawer", () => {
-  test("draws a list of functions as a tree with three data items, not the warning box (issue #113)", () => {
+describe(GeneralTreeDrawer, () => {
+  test('draws a list of functions as a tree with three data items, not the warning box (issue #113)', () => {
     // draw_data(llist(lambda x : x, lambda y: y, lambda z: z))
     const fn = (): SerializedDataVisualizerNode => ({
-      type: "function",
+      type: 'function',
       refId: nextRefId++,
-      displayValue: "<function>",
+      displayValue: '<function>',
     });
     const tree = Tree.fromSerializedNode(pair(fn(), pair(fn(), pair(fn(), empty()))));
-    const drawer = tree.draw("generalTree") as GeneralTreeDrawer;
+    const drawer = tree.draw('generalTree') as GeneralTreeDrawer;
     const element = drawer.draw(0, 0, 0) as React.ReactElement<{ width: number }>;
     expect(element.props.width).not.toBe(445);
     const drawn = internals(drawer).drawables;
@@ -331,17 +336,17 @@ describe("GeneralTreeDrawer", () => {
   });
 
   test.each([
-    ["llist(f, f, f)", "flat"],
-    ["llist(llist(1, 2), f)", "nestedFirst"],
-    ["llist(1, llist(f, 2), f)", "mixed"],
-    ["llist(llist(llist(f)), f, llist(f, f))", "deep"],
+    ['llist(f, f, f)', 'flat'],
+    ['llist(llist(1, 2), f)', 'nestedFirst'],
+    ['llist(1, llist(f, 2), f)', 'mixed'],
+    ['llist(llist(llist(f)), f, llist(f, f))', 'deep'],
   ])(
-    "functions in %s are drawn inside the canvas without overlapping anything",
+    'functions in %s are drawn inside the canvas without overlapping anything',
     (_: string, shape: string) => {
       const fn = (): SerializedDataVisualizerNode => ({
-        type: "function",
+        type: 'function',
         refId: nextRefId++,
-        displayValue: "<function>",
+        displayValue: '<function>',
       });
       const llist = (...elements: SerializedDataVisualizerNode[]): SerializedDataVisualizerNode =>
         elements.reduceRight<SerializedDataVisualizerNode>((acc, e) => pair(e, acc), empty());
@@ -352,7 +357,7 @@ describe("GeneralTreeDrawer", () => {
         deep: () => llist(llist(llist(fn())), fn(), llist(fn(), fn())),
       };
       const tree = Tree.fromSerializedNode(shapes[shape]());
-      const drawer = tree.draw("generalTree") as GeneralTreeDrawer;
+      const drawer = tree.draw('generalTree') as GeneralTreeDrawer;
       const stage = drawer.draw(0, 0, 0) as React.ReactElement<{ width: number; height: number }>;
 
       // Every drawn pair (two boxes wide) and function glyph (two large circles wide), with its extent.
@@ -393,6 +398,7 @@ describe("GeneralTreeDrawer", () => {
       for (const a of boxes) {
         for (const b of boxes) {
           if (a !== b && a.y === b.y) {
+            // eslint-disable-next-line vitest/no-conditional-expect
             expect(a.x + a.w <= b.x || b.x + b.w <= a.x).toBe(true);
           }
         }
@@ -400,12 +406,12 @@ describe("GeneralTreeDrawer", () => {
     },
   );
 
-  test("a non-general-tree structure draws the fixed-size warning box instead of a tree", () => {
+  test('a non-general-tree structure draws the fixed-size warning box instead of a tree', () => {
     // An *improper* list (here, a bare 2-tuple whose second slot is a leaf rather than another pair
     // or the empty terminator) is the only shape General Tree View actually rejects — a binary-tree-
     // shaped input is itself a valid (proper-list) general tree, see classify.test.ts.
     const tree = Tree.fromSerializedNode(pair(leaf(1), leaf(2)));
-    const drawer = tree.draw("generalTree") as GeneralTreeDrawer;
+    const drawer = tree.draw('generalTree') as GeneralTreeDrawer;
     const element = drawer.draw(0, 0, 0) as React.ReactElement<{
       width: number;
       height: number;
@@ -415,12 +421,12 @@ describe("GeneralTreeDrawer", () => {
     expect(element.props.height).toBe(100);
     const text = element.props.children.props.children;
     expect(text.type).toBe(Text);
-    expect(text.props.text).toBe("General Tree View only supports trees (no cycles)");
+    expect(text.props.text).toBe('General Tree View only supports trees (no cycles)');
   });
 
-  test("a childless general tree node draws without throwing, to a positive finite size", () => {
+  test('a childless general tree node draws without throwing, to a positive finite size', () => {
     const tree = Tree.fromSerializedNode(generalNode(1));
-    const drawer = tree.draw("generalTree") as GeneralTreeDrawer;
+    const drawer = tree.draw('generalTree') as GeneralTreeDrawer;
     expect(() => drawer.draw(0, 0, 0)).not.toThrow();
     expect(drawer.width).toBeGreaterThan(0);
     expect(drawer.height).toBeGreaterThan(0);
@@ -428,31 +434,31 @@ describe("GeneralTreeDrawer", () => {
     expect(Number.isFinite(drawer.height)).toBe(true);
   });
 
-  test("more siblings draw wider, without throwing", () => {
+  test('more siblings draw wider, without throwing', () => {
     const two = Tree.fromSerializedNode(generalNode(1, generalNode(2), generalNode(3))).draw(
-      "generalTree",
+      'generalTree',
     ) as GeneralTreeDrawer;
     two.draw(0, 0, 0);
 
     const four = Tree.fromSerializedNode(
       generalNode(1, generalNode(2), generalNode(3), generalNode(4), generalNode(5)),
-    ).draw("generalTree") as GeneralTreeDrawer;
+    ).draw('generalTree') as GeneralTreeDrawer;
     expect(() => four.draw(0, 0, 1)).not.toThrow();
     expect(four.width).toBeGreaterThan(two.width);
   });
 
-  test("the bare empty terminator is a trivial valid general tree, drawn via the measured-text branch", () => {
+  test('the bare empty terminator is a trivial valid general tree, drawn via the measured-text branch', () => {
     // Mirrors BinaryTreeDrawer's equivalent test above: isGeneralTreeNode({type:"empty"}) is true,
     // same as isBinaryTreeNode, so this hits GeneralTreeDrawer's own DataTreeNode/measured-text
     // branch rather than the warning box.
     const tree = Tree.fromSerializedNode(empty());
-    const drawer = tree.draw("generalTree") as GeneralTreeDrawer;
+    const drawer = tree.draw('generalTree') as GeneralTreeDrawer;
     drawer.draw(0, 0, 0);
     expect(drawer.width).toBe(40);
     expect(drawer.height).toBe(25);
   });
 
-  test("a flat llist-style general tree (label directly followed by compound children) draws without throwing", () => {
+  test('a flat llist-style general tree (label directly followed by compound children) draws without throwing', () => {
     // llist(1, llist(2, None, None), llist(3, None, None)) — see classify.test.ts for why this is a
     // valid general tree despite not using the nested-children-list encoding `generalNode` builds.
     const leafTree = (n: number): SerializedDataVisualizerNode =>
@@ -460,7 +466,7 @@ describe("GeneralTreeDrawer", () => {
     const tree = Tree.fromSerializedNode(
       pair(leaf(1), pair(leafTree(2), pair(leafTree(3), empty()))),
     );
-    const drawer = tree.draw("generalTree") as GeneralTreeDrawer;
+    const drawer = tree.draw('generalTree') as GeneralTreeDrawer;
     expect(() => drawer.draw(0, 0, 0)).not.toThrow();
     expect(drawer.width).toBeGreaterThan(0);
     expect(drawer.height).toBeGreaterThan(0);
@@ -472,7 +478,7 @@ describe("GeneralTreeDrawer", () => {
   // path. GeneralTreeDrawer hand-ports this logic separately from BinaryTreeDrawer (it's a distinct
   // class, not a shared base method), so it gets its own copy of these tests rather than assuming
   // "BinaryTreeDrawer passing" implies this one is also transcribed correctly.
-  test("a forward reference to an earlier-drawn node draws a forward ArrowDrawable", () => {
+  test('a forward reference to an earlier-drawn node draws a forward ArrowDrawable', () => {
     const target = new ArrayTreeNode();
     target.drawableX = 500;
     target.drawableY = 500;
@@ -487,7 +493,7 @@ describe("GeneralTreeDrawer", () => {
     expect(drawables[0].type).toBe(ArrowDrawable);
   });
 
-  test("a backward reference to an earlier-drawn node draws a BackwardArrowDrawable and pulls minX/minY negative", () => {
+  test('a backward reference to an earlier-drawn node draws a BackwardArrowDrawable and pulls minX/minY negative', () => {
     const target = new ArrayTreeNode();
     target.drawableX = -50;
     target.drawableY = -50;
@@ -504,7 +510,7 @@ describe("GeneralTreeDrawer", () => {
     expect(internals(drawer).minY).toBeLessThan(0);
   });
 
-  test("a function-value node draws its own content via createDrawable", () => {
+  test('a function-value node draws its own content via createDrawable', () => {
     const fn = new FunctionTreeNode();
     const tree = new Tree(fn, [], fakeClassification());
     const drawer = new GeneralTreeDrawer(tree, fakeClassification());
@@ -516,10 +522,10 @@ describe("GeneralTreeDrawer", () => {
   });
 });
 
-describe("Tree.draw view mode dispatch", () => {
-  test("returns the matching drawer instance for each view mode", () => {
+describe('Tree.draw view mode dispatch', () => {
+  test('returns the matching drawer instance for each view mode', () => {
     const tree = Tree.fromSerializedNode(leaf(1));
-    expect(tree.draw("binaryTree")).toBeInstanceOf(BinaryTreeDrawer);
-    expect(tree.draw("generalTree")).toBeInstanceOf(GeneralTreeDrawer);
+    expect(tree.draw('binaryTree')).toBeInstanceOf(BinaryTreeDrawer);
+    expect(tree.draw('generalTree')).toBeInstanceOf(GeneralTreeDrawer);
   });
 });

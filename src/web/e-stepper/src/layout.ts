@@ -15,7 +15,7 @@ import type {
   EStepperFrame,
   EStepperHeapObject,
   EStepperValue,
-} from "@sourceacademy/common-e-stepper";
+} from '@sourceacademy/common-e-stepper';
 
 export const LayoutConfig = {
   charWidth: 7.8,
@@ -73,7 +73,7 @@ export interface ObjectBox {
   height: number;
 }
 
-export type ArrowKind = "parent" | "binding" | "environment" | "element";
+export type ArrowKind = 'parent' | 'binding' | 'environment' | 'element';
 
 export interface ArrowSpec {
   key: string;
@@ -99,23 +99,23 @@ export function textWidth(text: string): number {
 /** The text shown for a non-reference value in a frame or list cell. */
 export function valueLabel(value: EStepperValue): string {
   switch (value.kind) {
-    case "primitive":
+    case 'primitive':
       return value.display;
-    case "builtin":
+    case 'builtin':
       return value.name;
-    case "unassigned":
-      return "—";
-    case "ref":
-      return "";
+    case 'unassigned':
+      return '—';
+    case 'ref':
+      return '';
   }
 }
 
 function valueWidth(value: EStepperValue): number {
-  return value.kind === "ref" ? 3 * C.dotRadius : textWidth(valueLabel(value));
+  return value.kind === 'ref' ? 3 * C.dotRadius : textWidth(valueLabel(value));
 }
 
 function objectSize(object: EStepperHeapObject): { width: number; height: number } {
-  if (object.kind === "function") {
+  if (object.kind === 'function') {
     return { width: 4 * C.functionRadius, height: 2 * C.functionRadius };
   }
   return { width: Math.max(1, object.elements.length) * C.cellWidth, height: C.cellHeight };
@@ -160,7 +160,7 @@ export function layoutDiagram(
   // first frame (in order) that reaches it through its bindings and owned objects.
   const owner = new Map<string, string>();
   for (const o of heap) {
-    if (o.kind === "function" && frameById.has(o.envId)) owner.set(o.id, o.envId);
+    if (o.kind === 'function' && frameById.has(o.envId)) owner.set(o.id, o.envId);
   }
   const ownedOrder = new Map<string, string[]>(frames.map(f => [f.id, []]));
   const claim = (objectId: string, frameId: string): void => {
@@ -171,13 +171,13 @@ export function layoutDiagram(
     if (ownedOrder.get(frameId)!.includes(objectId)) return;
     owner.set(objectId, frameId);
     ownedOrder.get(frameId)!.push(objectId);
-    if (object.kind === "list") {
-      for (const e of object.elements) if (e.kind === "ref") claim(e.objectId, frameId);
+    if (object.kind === 'list') {
+      for (const e of object.elements) if (e.kind === 'ref') claim(e.objectId, frameId);
     }
   };
   for (const f of frames) {
-    for (const o of heap) if (o.kind === "function" && o.envId === f.id) claim(o.id, f.id);
-    for (const b of f.bindings) if (b.value.kind === "ref") claim(b.value.objectId, f.id);
+    for (const o of heap) if (o.kind === 'function' && o.envId === f.id) claim(o.id, f.id);
+    for (const b of f.bindings) if (b.value.kind === 'ref') claim(b.value.objectId, f.id);
   }
   const unowned = heap.filter(o => !owner.has(o.id));
 
@@ -194,7 +194,7 @@ export function layoutDiagram(
     for (const frame of row) {
       const contentWidth = Math.max(
         C.frameMinWidth - 2 * C.padding,
-        ...frame.bindings.map(b => textWidth(b.name + ":") + C.padding + valueWidth(b.value)),
+        ...frame.bindings.map(b => textWidth(b.name + ':') + C.padding + valueWidth(b.value)),
         textWidth(`${frame.id} ${frame.name}`) - C.padding,
       );
       const frameWidth = contentWidth + 2 * C.padding;
@@ -203,7 +203,7 @@ export function layoutDiagram(
         name: b.name,
         value: b.value,
         y: boxTop + C.padding / 2 + i * C.rowHeight + C.rowHeight / 2,
-        valueX: x + C.padding + textWidth(b.name + ":") + C.padding,
+        valueX: x + C.padding + textWidth(b.name + ':') + C.padding,
       }));
       const frameHeight = Math.max(C.rowHeight, frame.bindings.length * C.rowHeight) + C.padding;
       frameBoxes.push({
@@ -265,19 +265,19 @@ export function layoutDiagram(
     if (parent) {
       arrows.push({
         key: `parent:${box.frame.id}`,
-        kind: "parent",
+        kind: 'parent',
         from: { x: box.x + box.width / 2, y: boxTop },
         to: { x: parent.x + parent.width / 2, y: parent.y + C.headerHeight + parent.height },
         garbage: box.frame.isGarbage,
       });
     }
     for (const row of box.rows) {
-      if (row.value.kind !== "ref") continue;
+      if (row.value.kind !== 'ref') continue;
       const target = objectBoxById.get(row.value.objectId);
       if (!target) continue;
       arrows.push({
         key: `binding:${box.frame.id}:${row.name}`,
-        kind: "binding",
+        kind: 'binding',
         from: { x: row.valueX + C.dotRadius, y: row.y },
         to: arrowTarget(target),
         garbage: box.frame.isGarbage,
@@ -286,24 +286,24 @@ export function layoutDiagram(
   }
   for (const box of objectBoxes) {
     const object = box.object;
-    if (object.kind === "function") {
+    if (object.kind === 'function') {
       const env = frameBoxById.get(object.envId);
       if (!env) continue;
       arrows.push({
         key: `environment:${object.id}`,
-        kind: "environment",
+        kind: 'environment',
         from: { x: box.x + 3 * C.functionRadius, y: box.y + C.functionRadius },
         to: { x: env.x + env.width, y: env.y + C.headerHeight + C.padding },
         garbage: object.isGarbage,
       });
     } else {
       object.elements.forEach((e, i) => {
-        if (e.kind !== "ref") return;
+        if (e.kind !== 'ref') return;
         const target = objectBoxById.get(e.objectId);
         if (!target) return;
         arrows.push({
           key: `element:${object.id}:${i}`,
-          kind: "element",
+          kind: 'element',
           from: { x: box.x + (i + 0.5) * C.cellWidth, y: box.y + C.cellHeight / 2 },
           to: arrowTarget(target),
           garbage: object.isGarbage,

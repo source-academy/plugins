@@ -1,25 +1,25 @@
-import type { EStepperMessage, EStepperStep } from "@sourceacademy/common-e-stepper";
-import { act, createElement } from "react";
-import TestRenderer from "react-test-renderer";
-import { describe, expect, test, vi } from "vitest";
+import type { EStepperMessage, EStepperStep } from '@sourceacademy/common-e-stepper';
+import { act, createElement } from 'react';
+import TestRenderer from 'react-test-renderer';
+import { describe, expect, test, vi } from 'vitest';
 
-vi.mock("konva", () => ({ default: {} }));
-vi.mock("react-konva", () => {
+import { EStepperHostPlugin } from '../EStepperHostPlugin';
+import steps from './makeWithdrawSteps.json';
+
+vi.mock(import('konva'), () => ({ default: {} as any }));
+vi.mock(import('react-konva'), () => {
   const stub = (name: string) => (props: Record<string, unknown>) =>
     createElement(`konva-${name.toLowerCase()}`, props, props.children as never);
   return Object.fromEntries(
-    ["Stage", "Layer", "Text", "Group", "Line", "Rect", "Circle", "Arrow"].map(n => [n, stub(n)]),
+    ['Stage', 'Layer', 'Text', 'Group', 'Line', 'Rect', 'Circle', 'Arrow'].map(n => [n, stub(n)]),
   );
 });
 
 // Blueprint's overlays need a DOM to unmount (the options menu goes when the host draws the diagram).
-vi.mock("@blueprintjs/core", async (importOriginal: () => Promise<object>) => ({
+vi.mock(import('@blueprintjs/core'), async importOriginal => ({
   ...(await importOriginal()),
-  Popover: (props: Record<string, unknown>) => createElement("popover-stub", props),
+  Popover: ((props: Record<string, unknown>) => createElement('popover-stub', props)) as any,
 }));
-
-import { EStepperHostPlugin } from "../EStepperHostPlugin";
-import steps from "./makeWithdrawSteps.json";
 
 type PluginArgs = ConstructorParameters<typeof EStepperHostPlugin>;
 
@@ -27,7 +27,7 @@ function setUp(hostServices?: PluginArgs[3]) {
   let deliver!: (message: EStepperMessage) => void;
   const sent: EStepperMessage[] = [];
   const channel = {
-    name: "__e_stepper",
+    name: '__e_stepper',
     subscribe: (fn: (message: EStepperMessage) => void) => (deliver = fn),
     unsubscribe: () => {},
     send: (message: EStepperMessage) => sent.push(message),
@@ -38,28 +38,28 @@ function setUp(hostServices?: PluginArgs[3]) {
   // Stubs with only what the plugin uses.
   const conduit = {} as PluginArgs[0];
   const tabServiceStub = tabService as unknown as PluginArgs[2];
-  const plugin = new EStepperHostPlugin(conduit, [channel as never], tabServiceStub, hostServices);
+  const plugin = new EStepperHostPlugin(conduit, [channel], tabServiceStub, hostServices);
   return { plugin, deliver: (m: EStepperMessage) => act(() => deliver(m)), sent, tab, tabService };
 }
 
-describe("EStepperHostPlugin", () => {
+describe(EStepperHostPlugin, () => {
   test("registers and reveals the E-Stepper tab, and asks for the last run's steps", () => {
     const { tab, tabService, sent } = setUp();
-    expect(tab).toMatchObject({ id: "e-stepper", label: "E-Stepper", iconName: "flow-review" });
-    expect(tabService.revealTab).toHaveBeenCalledWith("e-stepper");
-    expect(sent).toEqual([{ type: "request" }]);
+    expect(tab).toMatchObject({ id: 'e-stepper', label: 'E-Stepper', iconName: 'flow-review' });
+    expect(tabService.revealTab).toHaveBeenCalledWith('e-stepper');
+    expect(sent).toEqual([{ type: 'request' }]);
   });
 
-  test("keeps the latest steps or error", () => {
+  test('keeps the latest steps or error', () => {
     const { plugin, deliver } = setUp();
-    deliver({ type: "steps", steps: steps as unknown as EStepperStep[] });
+    deliver({ type: 'steps', steps: steps as unknown as EStepperStep[] });
     expect(plugin.getState().steps).toHaveLength(3);
-    deliver({ type: "error", error: "SyntaxError" });
-    expect(plugin.getState()).toMatchObject({ steps: [], error: "SyntaxError" });
+    deliver({ type: 'error', error: 'SyntaxError' });
+    expect(plugin.getState()).toMatchObject({ steps: [], error: 'SyntaxError' });
   });
 
   test("lends the host's CSE diagram to the tab", () => {
-    const createView = vi.fn(() => createElement("host-cse-view"));
+    const createView = vi.fn(() => createElement('host-cse-view'));
     const { tab, deliver } = setUp({ cseDiagram: { createView } });
     let view!: TestRenderer.ReactTestRenderer;
     act(() => {
@@ -68,14 +68,14 @@ describe("EStepperHostPlugin", () => {
       });
     });
     deliver({
-      type: "steps",
+      type: 'steps',
       steps: (steps as unknown as EStepperStep[]).map((s, i) => ({
         ...s,
         cse: { stepIndex: i, control: [], stash: [], environments: [] },
       })),
     });
     expect(createView).toHaveBeenCalled();
-    expect(view.root.findAllByType("host-cse-view" as unknown as React.ElementType)).toHaveLength(
+    expect(view.root.findAllByType('host-cse-view' as unknown as React.ElementType)).toHaveLength(
       1,
     );
   });

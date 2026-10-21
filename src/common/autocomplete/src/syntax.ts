@@ -1,16 +1,18 @@
 export interface SyntaxHighlightRequest {
-  type: "request";
+  type: 'request';
 }
 export interface SyntaxHighlightResponse {
-  type: "response";
+  type: 'response';
   data: TransferredSyntaxHighlightData;
 }
 export interface SyntaxHighlightAck {
-  type: "ack";
+  type: 'ack';
 }
 
 export type SyntaxHighlightMessage =
-  SyntaxHighlightRequest | SyntaxHighlightResponse | SyntaxHighlightAck;
+  | SyntaxHighlightRequest
+  | SyntaxHighlightResponse
+  | SyntaxHighlightAck;
 
 /**
  * References an implementation supplied by an existing Ace mode.
@@ -26,7 +28,6 @@ export interface ModeHook {
  * The arguments and return value must be structured-cloneable.
  */
 // Ace mode extensions have different signatures, so the RPC boundary must accept arbitrary arguments.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ModeRpcFunction = (...args: any[]) => unknown;
 
 /** A mode function can either reuse an Ace implementation or run remotely. */
@@ -84,7 +85,7 @@ export interface SyntaxHighlightData {
  */
 export type TransferredSyntaxHighlightData = Omit<
   SyntaxHighlightData,
-  "indents" | "outdents" | "autoOutdent"
+  'indents' | 'outdents' | 'autoOutdent'
 > & {
   indents: TransferredModeFunction;
   outdents: TransferredModeFunction;

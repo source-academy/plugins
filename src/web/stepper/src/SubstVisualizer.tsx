@@ -1,12 +1,12 @@
-import { Button, ButtonGroup, Card, Classes, Divider, Pre, Slider } from "@blueprintjs/core";
-import { getHotkeyHandler, type HotkeyItem } from "@mantine/hooks";
-import type { SerializedStepperStep, SyntaxProfile } from "@sourceacademy/common-stepper";
-import classNames from "classnames";
-import { useCallback, useEffect, useState } from "react";
+import { Button, ButtonGroup, Card, Classes, Divider, Pre, Slider } from '@blueprintjs/core';
+import { getHotkeyHandler, type HotkeyItem } from '@mantine/hooks';
+import type { SerializedStepperStep, SyntaxProfile } from '@sourceacademy/common-stepper';
+import classNames from 'classnames';
+import { useCallback, useEffect, useState } from 'react';
 
-import { CustomASTRenderer } from "./render";
-import { sliderLabels } from "./sliderLabels";
-import { injectStepperStyles } from "./styles";
+import { CustomASTRenderer } from './render';
+import { sliderLabels } from './sliderLabels';
+import { injectStepperStyles } from './styles';
 
 function SubstDefaultText() {
   return (
@@ -70,7 +70,7 @@ function SubstOutputDisplay(props: { content: string }) {
   }
   return (
     <Card>
-      <Pre className="stepper-output" style={{ color: "#dd8c60" }}>
+      <Pre className="stepper-output" style={{ color: '#dd8c60' }}>
         {props.content}
       </Pre>
     </Card>
@@ -94,7 +94,7 @@ function useWidth(): [(element: HTMLElement | null) => void, number] {
   useEffect(() => {
     if (!element) return;
     setWidth(Math.floor(element.getBoundingClientRect().width));
-    if (typeof ResizeObserver === "undefined") return;
+    if (typeof ResizeObserver === 'undefined') return;
     const observer = new ResizeObserver(entries =>
       setWidth(Math.floor(entries[0].contentRect.width)),
     );
@@ -126,7 +126,7 @@ export default function StepperView(props: StepperViewProps) {
     // Search forward from current step for a DebuggerStatement redex
     for (let i = stepValue; i < props.content.length; i++) {
       const markers = props.content[i].markers;
-      if (markers?.some(marker => marker.redexNodeType === "DebuggerStatement")) {
+      if (markers?.some(marker => marker.redexNodeType === 'DebuggerStatement')) {
         setStepValue(i + 1); // +1 because stepValue is 1-indexed
         return;
       }
@@ -139,7 +139,7 @@ export default function StepperView(props: StepperViewProps) {
     // Start searching from the step BEFORE the current one
     for (let i = stepValue - 2; i >= 0; i--) {
       const markers = props.content[i].markers;
-      const isDebuggerStep = markers?.some(marker => marker.redexNodeType === "DebuggerStatement");
+      const isDebuggerStep = markers?.some(marker => marker.redexNodeType === 'DebuggerStatement');
       if (isDebuggerStep) {
         setStepValue(i + 1); // Convert back to 1-based indexing
         return;
@@ -155,16 +155,16 @@ export default function StepperView(props: StepperViewProps) {
   // Setup hotkey bindings
   const hotkeyBindings: HotkeyItem[] = hasRunCode
     ? [
-        ["a", stepPreviousBreakpoint],
-        ["f", stepNext],
-        ["b", stepPrevious],
-        ["e", stepNextBreakpoint],
+        ['a', stepPreviousBreakpoint],
+        ['f', stepNext],
+        ['b', stepPrevious],
+        ['e', stepNextBreakpoint],
       ]
     : [
-        ["a", () => {}],
-        ["f", () => {}],
-        ["b", () => {}],
-        ["e", () => {}],
+        ['a', () => {}],
+        ['f', () => {}],
+        ['b', () => {}],
+        ['e', () => {}],
       ];
   const hotkeyHandler = getHotkeyHandler(hotkeyBindings);
 
@@ -174,9 +174,9 @@ export default function StepperView(props: StepperViewProps) {
       // Right now, prioritize the first marker
       const markers = props.content[contIndex].markers;
       if (markers === undefined || markers[0] === undefined) {
-        return "...";
+        return '...';
       } else {
-        return markers[0].explanation ?? "...";
+        return markers[0].explanation ?? '...';
       }
     },
     [lastStepValue, props.content],
@@ -193,7 +193,7 @@ export default function StepperView(props: StepperViewProps) {
   const getOutput = useCallback(
     (value: number): string => {
       const contIndex = value <= lastStepValue ? value - 1 : 0;
-      return props.content[contIndex]?.output ?? "";
+      return props.content[contIndex]?.output ?? '';
     },
     [lastStepValue, props.content],
   );
@@ -201,7 +201,7 @@ export default function StepperView(props: StepperViewProps) {
   return (
     <div
       ref={rootRef}
-      className={classNames("sa-substituter", Classes.DARK)}
+      className={classNames('sa-substituter', Classes.DARK)}
       onKeyDown={hotkeyHandler}
       tabIndex={-1} // tab index necessary to fire keydown events on div element
     >
@@ -216,7 +216,7 @@ export default function StepperView(props: StepperViewProps) {
         onChange={value => setStepValue(value + 1)}
         value={(stepValue <= lastStepValue ? stepValue : 1) - 1}
       />
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <ButtonGroup>
           <Button
             disabled={!hasRunCode}
@@ -227,7 +227,7 @@ export default function StepperView(props: StepperViewProps) {
           <Button disabled={!hasRunCode} icon="chevron-right" onClick={stepNext} />
           <Button disabled={!hasRunCode} icon="double-chevron-right" onClick={stepNextBreakpoint} />
         </ButtonGroup>
-      </div>{" "}
+      </div>{' '}
       <br />
       {hasRunCode ? (
         <CustomASTRenderer {...getAST(stepValue)} profile={props.profile} />

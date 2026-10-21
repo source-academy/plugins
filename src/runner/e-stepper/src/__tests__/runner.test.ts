@@ -1,13 +1,12 @@
-import { expect, test } from "vitest";
-
 import {
   E_STEPPER_CHANNEL_ID,
   RUNNER_ID,
   type EStepperStep,
-} from "@sourceacademy/common-e-stepper";
-import { STEPPER_CHANNEL_ID } from "@sourceacademy/common-stepper";
-import { BaseStepperRunnerPlugin } from "@sourceacademy/runner-stepper";
-import { BaseEStepperRunnerPlugin } from "..";
+} from '@sourceacademy/common-e-stepper';
+import { STEPPER_CHANNEL_ID } from '@sourceacademy/common-stepper';
+import { BaseStepperRunnerPlugin } from '@sourceacademy/runner-stepper';
+import { expect, test } from 'vitest';
+import { BaseEStepperRunnerPlugin } from '..';
 
 class FakeChannel {
   name = E_STEPPER_CHANNEL_ID;
@@ -29,10 +28,10 @@ class FakeChannel {
 }
 
 const step = (i: number): EStepperStep => ({
-  ast: { type: "Literal", nodeId: String(i), value: i },
-  frames: [{ id: "Global", name: "global", parentId: null, bindings: [], isGarbage: false }],
+  ast: { type: 'Literal', nodeId: String(i), value: i },
+  frames: [{ id: 'Global', name: 'global', parentId: null, bindings: [], isGarbage: false }],
   heap: [],
-  activeFrameId: "Global",
+  activeFrameId: 'Global',
 });
 
 // A trivial concrete e-stepper: every "AST" (a number n) becomes n steps.
@@ -43,7 +42,6 @@ class CountingEStepper extends BaseEStepperRunnerPlugin<number> {
 }
 
 const make = <T>(Cls: new (...args: never[]) => T, channel: FakeChannel): T =>
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   new (Cls as any)({} as any, [channel as any]);
 
 test("attaches to the e-stepper channel, not the stepper's", () => {
@@ -52,16 +50,16 @@ test("attaches to the e-stepper channel, not the stepper's", () => {
   expect(BaseStepperRunnerPlugin.channelAttach).toEqual([STEPPER_CHANNEL_ID]);
 });
 
-test("has the e-stepper runner id", () => {
+test('has the e-stepper runner id', () => {
   expect(make(CountingEStepper, new FakeChannel()).id).toBe(RUNNER_ID);
 });
 
-test("sendSteps computes, caches and pushes steps; request replays them", async () => {
+test('sendSteps computes, caches and pushes steps; request replays them', async () => {
   const channel = new FakeChannel();
   const plugin = make(CountingEStepper, channel);
   await plugin.sendSteps(2);
-  expect(channel.sent).toEqual([{ type: "steps", steps: [step(0), step(1)] }]);
-  channel.emit({ type: "request" });
+  expect(channel.sent).toEqual([{ type: 'steps', steps: [step(0), step(1)] }]);
+  channel.emit({ type: 'request' });
   expect(channel.sent).toHaveLength(2);
   expect(channel.sent[1]).toEqual(channel.sent[0]);
 });
@@ -70,22 +68,22 @@ test("ships the language's syntax profile with the steps", async () => {
   const channel = new FakeChannel();
   class WithProfile extends CountingEStepper {
     protected override getSyntaxProfile() {
-      return { templates: { Literal: [{ prop: "value" }] } };
+      return { templates: { Literal: [{ prop: 'value' }] } };
     }
   }
   await make(WithProfile, channel).sendSteps(1);
   expect(channel.sent).toEqual([
-    { type: "steps", steps: [step(0)], profile: { templates: { Literal: [{ prop: "value" }] } } },
+    { type: 'steps', steps: [step(0)], profile: { templates: { Literal: [{ prop: 'value' }] } } },
   ]);
 });
 
-test("sendSteps reports errors instead of throwing", async () => {
+test('sendSteps reports errors instead of throwing', async () => {
   const channel = new FakeChannel();
   class Boom extends BaseEStepperRunnerPlugin<number> {
     getSteps(): never {
-      throw new Error("kaboom");
+      throw new Error('kaboom');
     }
   }
   await make(Boom, channel).sendSteps(1);
-  expect(channel.sent).toEqual([{ type: "error", error: "kaboom" }]);
+  expect(channel.sent).toEqual([{ type: 'error', error: 'kaboom' }]);
 });

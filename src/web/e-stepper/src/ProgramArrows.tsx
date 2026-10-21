@@ -1,10 +1,10 @@
-import type { CseDiagramAnchorResolver, CseDiagramPoint } from "@sourceacademy/common-cse-machine";
-import { useLayoutEffect, useRef, useState } from "react";
+import type { CseDiagramAnchorResolver, CseDiagramPoint } from '@sourceacademy/common-cse-machine';
+import { useLayoutEffect, useRef, useState } from 'react';
 
 /** An arrow from a badge or bracket in the program pane to an object or frame in the diagram. */
 export interface ProgramArrow {
   key: string;
-  kind: "object" | "frame";
+  kind: 'object' | 'frame';
   /** The object's or frame's id. */
   id: string;
   /** In the overlay's coordinates (pixels from the top-left of the panes' container). */
@@ -15,8 +15,8 @@ export interface ProgramArrow {
 }
 
 /** The marks in the program pane that arrows start from. */
-export const REF_ATTRIBUTE = "data-estepper-ref";
-export const ENV_ATTRIBUTE = "data-estepper-env";
+export const REF_ATTRIBUTE = 'data-estepper-ref';
+export const ENV_ATTRIBUTE = 'data-estepper-env';
 
 const HEAD_LENGTH = 8;
 const HEAD_HALF_WIDTH = 4;
@@ -25,7 +25,7 @@ const fmt = (p: CseDiagramPoint) => `${round(p.x)} ${round(p.y)}`;
 
 /** How an arrow arrives at its target: along the axis it travelled, down onto the top of an
  * object, or from the left into the left edge of a frame. */
-export type Arrival = "axis" | "above" | "left";
+export type Arrival = 'axis' | 'above' | 'left';
 
 /**
  * The curve from `from` to `to` and its arrowhead. The curve leaves along the axis the two points
@@ -37,7 +37,7 @@ export type Arrival = "axis" | "above" | "left";
 export function arrowGeometry(
   from: CseDiagramPoint,
   to: CseDiagramPoint,
-  arrival: Arrival = "axis",
+  arrival: Arrival = 'axis',
   scale = 1,
 ): { path: string; head: string } {
   const dx = to.x - from.x;
@@ -49,9 +49,9 @@ export function arrowGeometry(
   const lead = dx > 0 ? Math.max(24, Math.min(dx / 2, 120)) : 40;
   const c1 = horizontal ? { x: from.x + reach, y: from.y } : { x: from.x, y: from.y + reach };
   const c2 =
-    arrival === "above"
+    arrival === 'above'
       ? { x: to.x, y: to.y - drop }
-      : arrival === "left"
+      : arrival === 'left'
         ? { x: to.x - lead, y: to.y }
         : horizontal
           ? { x: to.x - reach, y: to.y }
@@ -95,7 +95,7 @@ export function computeProgramArrows(
   const programRect = program.getBoundingClientRect();
   const diagramRect = diagram.getBoundingClientRect();
   const arrows: ProgramArrow[] = [];
-  const collect = (attribute: string, kind: ProgramArrow["kind"]) => {
+  const collect = (attribute: string, kind: ProgramArrow['kind']) => {
     program.querySelectorAll(`[${attribute}]`).forEach((mark, index) => {
       const id = mark.getAttribute(attribute)!;
       const rect = mark.getBoundingClientRect();
@@ -116,8 +116,8 @@ export function computeProgramArrows(
       });
     });
   };
-  collect(REF_ATTRIBUTE, "object");
-  collect(ENV_ATTRIBUTE, "frame");
+  collect(REF_ATTRIBUTE, 'object');
+  collect(ENV_ATTRIBUTE, 'frame');
   return arrows;
 }
 
@@ -135,7 +135,7 @@ interface Props {
   colorOfFrame: (frameId: string) => string;
 }
 
-const REF_COLOR = "#c5cbd3";
+const REF_COLOR = '#c5cbd3';
 
 /**
  * Draws the arrows from the program pane into the diagram, over both: the arrows to objects all the
@@ -156,8 +156,8 @@ export default function ProgramArrows({
 
   useLayoutEffect(() => {
     const container = svgRef.current?.parentElement;
-    const program = container?.querySelector(".estepper-program");
-    const diagram = container?.querySelector(".estepper-diagram");
+    const program = container?.querySelector('.estepper-program');
+    const diagram = container?.querySelector('.estepper-diagram');
     const next =
       resolve && container && program && diagram
         ? computeProgramArrows(container, program, diagram, resolve)
@@ -166,14 +166,14 @@ export default function ProgramArrows({
   });
 
   useLayoutEffect(() => {
-    if (typeof window === "undefined") return;
-    const program = svgRef.current?.parentElement?.querySelector(".estepper-program");
+    if (typeof window === 'undefined') return;
+    const program = svgRef.current?.parentElement?.querySelector('.estepper-program');
     const remeasure = () => setScrolled(n => n + 1);
-    program?.addEventListener("scroll", remeasure);
-    window.addEventListener("resize", remeasure);
+    program?.addEventListener('scroll', remeasure);
+    window.addEventListener('resize', remeasure);
     return () => {
-      program?.removeEventListener("scroll", remeasure);
-      window.removeEventListener("resize", remeasure);
+      program?.removeEventListener('scroll', remeasure);
+      window.removeEventListener('resize', remeasure);
     };
   }, []);
 
@@ -181,15 +181,15 @@ export default function ProgramArrows({
     <svg ref={svgRef} className="estepper-program-arrows" data-testid="estepper-program-arrows">
       {arrows.map(arrow => {
         const emphasized =
-          arrow.kind === "object" ? hovered === arrow.id : hoveredFrame === arrow.id;
-        if (!emphasized && (arrow.kind === "frame" || !all)) return null;
+          arrow.kind === 'object' ? hovered === arrow.id : hoveredFrame === arrow.id;
+        if (!emphasized && (arrow.kind === 'frame' || !all)) return null;
         const { path, head } = arrowGeometry(
           arrow.from,
           arrow.to,
-          arrow.kind === "object" ? "above" : "left",
+          arrow.kind === 'object' ? 'above' : 'left',
           arrow.scale,
         );
-        const color = arrow.kind === "frame" ? colorOfFrame(arrow.id) : REF_COLOR;
+        const color = arrow.kind === 'frame' ? colorOfFrame(arrow.id) : REF_COLOR;
         return (
           <g key={arrow.key} opacity={emphasized ? 1 : 0.55}>
             <path

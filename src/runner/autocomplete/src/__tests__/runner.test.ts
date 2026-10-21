@@ -1,4 +1,3 @@
-import { BaseAutoCompleteRunnerPlugin } from "..";
 import {
   AUTOCOMPLETE_CHANNEL_ID,
   RUNNER_PLUGIN_ID,
@@ -9,20 +8,21 @@ import {
   type SyntaxHighlightData,
   type SyntaxHighlightMessage,
   type TransferredSyntaxHighlightData,
-} from "@sourceacademy/common-autocomplete";
+} from '@sourceacademy/common-autocomplete';
 import {
   makeRpc,
   type IChannel,
   type IConduit,
   type IRpcMessage,
-} from "@sourceacademy/conductor/conduit";
-import { afterEach, expect, test, vi } from "vitest";
+} from '@sourceacademy/conductor/conduit';
+import { afterEach, expect, test, vi } from 'vitest';
+import { BaseAutoCompleteRunnerPlugin } from '..';
 
 afterEach(() => {
   vi.useRealTimers();
 });
 
-test("should have a valid channel id", () => {
+test('should have a valid channel id', () => {
   expect(BaseAutoCompleteRunnerPlugin.channelAttach).toEqual([
     AUTOCOMPLETE_CHANNEL_ID,
     SYNTAX_CHANNEL_ID,
@@ -35,19 +35,19 @@ class TestRunner extends BaseAutoCompleteRunnerPlugin {
   get mode(): SyntaxHighlightData {
     return {
       highlightRules: {},
-      foldingRules: { hookFrom: "ace/mode/folding/cstyle", args: [] },
-      lineCommentStart: "//",
+      foldingRules: { hookFrom: 'ace/mode/folding/cstyle', args: [] },
+      lineCommentStart: '//',
       pairQuotesAfter: {},
       indents: (value: string) => `indented:${value}`,
-      outdents: { hookFrom: "ace/mode/text" },
+      outdents: { hookFrom: 'ace/mode/text' },
       autoOutdent: (value: string) => `outdented:${value}`,
-      id: "rpc-test",
+      id: 'rpc-test',
     };
   }
 
   autocomplete(code: string, row: number, column: number): AutoCompleteEntry[] {
     this.autocompleteCalls.push([code, row, column]);
-    return [{ name: "result", meta: "var" as AutoCompleteEntry["meta"] }];
+    return [{ name: 'result', meta: 'var' as AutoCompleteEntry['meta'] }];
   }
 }
 
@@ -61,7 +61,7 @@ class FunctionOutdentsRunner extends TestRunner {
 }
 
 class TestChannel<T> implements IChannel<T> {
-  readonly name = "test";
+  readonly name = 'test';
   private readonly subscribers = new Set<(message: T) => void>();
   peer?: TestChannel<T>;
 
@@ -96,55 +96,55 @@ const makeChannelPair = (): [TestChannel<unknown>, TestChannel<unknown>] => {
   return [runner, web];
 };
 
-test("exposes the runner plugin identity", () => {
+test('exposes the runner plugin identity', () => {
   const [runnerAutocomplete] = makeChannelPair();
   const [runnerSyntax, webSyntax] = makeChannelPair();
   const plugin = new TestRunner(
     {} as IConduit,
     [runnerAutocomplete, runnerSyntax] as IChannel<unknown>[],
   );
-  webSyntax.send({ type: "ack" });
+  webSyntax.send({ type: 'ack' });
 
   expect(plugin.id).toBe(RUNNER_PLUGIN_ID);
 });
 
-test("responds to autocomplete requests over its Conductor channel", () => {
+test('responds to autocomplete requests over its Conductor channel', () => {
   const [runnerAutocomplete, webAutocomplete] = makeChannelPair();
   const [runnerSyntax, webSyntax] = makeChannelPair();
   const plugin = new TestRunner(
     {} as IConduit,
     [runnerAutocomplete, runnerSyntax] as IChannel<unknown>[],
   );
-  webSyntax.send({ type: "ack" });
+  webSyntax.send({ type: 'ack' });
 
   let response: AutoCompleteMessage | undefined;
   webAutocomplete.subscribe(message => {
-    if ((message as AutoCompleteMessage).type === "response") {
+    if ((message as AutoCompleteMessage).type === 'response') {
       response = message as AutoCompleteMessage;
     }
   });
   webAutocomplete.send({
-    type: "request",
+    type: 'request',
     requestId: 17,
-    code: "res",
+    code: 'res',
     row: 2,
     column: 3,
   });
   webAutocomplete.send({
-    type: "response",
+    type: 'response',
     requestId: 99,
     declarations: [],
   });
 
-  expect(plugin.autocompleteCalls).toEqual([["res", 2, 3]]);
+  expect(plugin.autocompleteCalls).toEqual([['res', 2, 3]]);
   expect(response).toEqual({
-    type: "response",
+    type: 'response',
     requestId: 17,
-    declarations: [{ name: "result", meta: "var" }],
+    declarations: [{ name: 'result', meta: 'var' }],
   });
 });
 
-test("retries syntax transfer until the web plugin acknowledges it", () => {
+test('retries syntax transfer until the web plugin acknowledges it', () => {
   vi.useFakeTimers();
   const [runnerAutocomplete] = makeChannelPair();
   const [runnerSyntax, webSyntax] = makeChannelPair();
@@ -152,7 +152,7 @@ test("retries syntax transfer until the web plugin acknowledges it", () => {
 
   const responses: SyntaxHighlightMessage[] = [];
   webSyntax.subscribe(message => {
-    if ((message as SyntaxHighlightMessage).type === "response") {
+    if ((message as SyntaxHighlightMessage).type === 'response') {
       responses.push(message as SyntaxHighlightMessage);
     }
   });
@@ -160,12 +160,12 @@ test("retries syntax transfer until the web plugin acknowledges it", () => {
   vi.advanceTimersByTime(3000);
   expect(responses).toHaveLength(3);
 
-  webSyntax.send({ type: "ack" });
+  webSyntax.send({ type: 'ack' });
   vi.advanceTimersByTime(3000);
   expect(responses).toHaveLength(3);
 });
 
-test("transfers callable mode properties as RPC references", async () => {
+test('transfers callable mode properties as RPC references', async () => {
   const [runnerAutocomplete] = makeChannelPair();
   const [runnerSyntax, webSyntax] = makeChannelPair();
 
@@ -177,9 +177,9 @@ test("transfers callable mode properties as RPC references", async () => {
   let transferredMode: TransferredSyntaxHighlightData | undefined;
   webSyntax.subscribe(message => {
     const syntaxMessage = message as SyntaxHighlightMessage;
-    if (syntaxMessage.type === "response") {
+    if (syntaxMessage.type === 'response') {
       transferredMode = syntaxMessage.data;
-      webSyntax.send({ type: "ack" });
+      webSyntax.send({ type: 'ack' });
     }
   });
   const remote = makeRpc<Record<never, never>, ModeRpc>(
@@ -187,23 +187,23 @@ test("transfers callable mode properties as RPC references", async () => {
     {},
   );
 
-  webSyntax.send({ type: "request" });
+  webSyntax.send({ type: 'request' });
 
-  expect(transferredMode?.indents).toEqual({ rpc: "indents" });
-  expect(transferredMode?.outdents).toEqual({ hookFrom: "ace/mode/text" });
-  expect(transferredMode?.autoOutdent).toEqual({ rpc: "autoOutdent" });
-  await expect(remote.indents("line")).resolves.toBe("indented:line");
-  await expect(remote.autoOutdent("line")).resolves.toBe("outdented:line");
+  expect(transferredMode?.indents).toEqual({ rpc: 'indents' });
+  expect(transferredMode?.outdents).toEqual({ hookFrom: 'ace/mode/text' });
+  expect(transferredMode?.autoOutdent).toEqual({ rpc: 'autoOutdent' });
+  await expect(remote.indents('line')).resolves.toBe('indented:line');
+  await expect(remote.autoOutdent('line')).resolves.toBe('outdented:line');
   expect(() =>
     (
       plugin as unknown as {
         __callModeFunction(name: keyof ModeRpc, args: unknown[]): unknown;
       }
-    ).__callModeFunction("outdents", ["line"]),
+    ).__callModeFunction('outdents', ['line']),
   ).toThrow('Mode function "outdents" is configured with a hook and cannot be called over RPC.');
 });
 
-test("exposes a callable outdents mode function over RPC", async () => {
+test('exposes a callable outdents mode function over RPC', async () => {
   const [runnerAutocomplete] = makeChannelPair();
   const [runnerSyntax, webSyntax] = makeChannelPair();
   new FunctionOutdentsRunner(
@@ -211,8 +211,8 @@ test("exposes a callable outdents mode function over RPC", async () => {
     [runnerAutocomplete, runnerSyntax] as IChannel<unknown>[],
   );
   webSyntax.subscribe(message => {
-    if ((message as SyntaxHighlightMessage).type === "response") {
-      webSyntax.send({ type: "ack" });
+    if ((message as SyntaxHighlightMessage).type === 'response') {
+      webSyntax.send({ type: 'ack' });
     }
   });
   const remote = makeRpc<Record<never, never>, ModeRpc>(
@@ -220,7 +220,7 @@ test("exposes a callable outdents mode function over RPC", async () => {
     {},
   );
 
-  webSyntax.send({ type: "request" });
+  webSyntax.send({ type: 'request' });
 
-  await expect(remote.outdents("line")).resolves.toBe("should-outdent:line");
+  await expect(remote.outdents('line')).resolves.toBe('should-outdent:line');
 });

@@ -1,12 +1,12 @@
-export const WEB_ID = "__web_module_loader";
-export const RUNNER_ID = "__runner_module_loader";
+export const WEB_ID = '__web_module_loader';
+export const RUNNER_ID = '__runner_module_loader';
 
-export const CHANNEL_ID = "module_config";
+export const CHANNEL_ID = 'module_config';
 
 export enum ModuleLoaderMessageType {
-  REQUEST_MODULE = "request_module",
-  MODULE_RESPONSE = "module_response",
-  MODULE_ERROR = "module_error",
+  REQUEST_MODULE = 'request_module',
+  MODULE_RESPONSE = 'module_response',
+  MODULE_ERROR = 'module_error',
 }
 
 export type ModuleLoaderMessage =

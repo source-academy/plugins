@@ -20,19 +20,19 @@
  */
 
 /** The channel the data visualizer runner and host plugins communicate over. */
-export const DATA_VISUALIZER_CHANNEL_ID = "__data_visualizer";
+export const DATA_VISUALIZER_CHANNEL_ID = '__data_visualizer';
 
 /** The id of the runner (worker-side) data visualizer plugin. */
-export const RUNNER_ID = "__runner_data_visualizer";
+export const RUNNER_ID = '__runner_data_visualizer';
 
 /** The id of the web/host (browser-side) data visualizer plugin. */
-export const WEB_ID = "__web_data_visualizer";
+export const WEB_ID = '__web_data_visualizer';
 
 /**
  * The id used to look the data visualizer up in the plugin directory (i.e. the argument to
  * `IRunnerPlugin.hostLoadPlugin`). The host resolves this to the web plugin's bundle URL.
  */
-export const DATA_VISUALIZER_DIRECTORY_ID = "data-visualizer";
+export const DATA_VISUALIZER_DIRECTORY_ID = 'data-visualizer';
 
 /**
  * Identifies one distinct compound value (a pair/array or a function) within a single top-level
@@ -59,9 +59,9 @@ export type RefId = number;
  * distinguishes "pair" from "list" for classification purposes by `children.length`, not by tag.
  */
 export type SerializedDataVisualizerNode =
-  | { type: "array"; refId: RefId; children: SerializedDataVisualizerNode[] }
+  | { type: 'array'; refId: RefId; children: SerializedDataVisualizerNode[] }
   | {
-      type: "empty";
+      type: 'empty';
       /**
        * How the language writes its empty value (e.g. `"None"` for Python), shown when the empty value
        * is drawn on its own. Inside a pair/array it is always drawn as a diagonal slash instead. Omit it
@@ -69,9 +69,9 @@ export type SerializedDataVisualizerNode =
        */
       displayValue?: string;
     }
-  | { type: "leaf"; displayValue: string; label: string }
-  | { type: "function"; refId: RefId; displayValue: string }
-  | { type: "ref"; refId: RefId };
+  | { type: 'leaf'; displayValue: string; label: string }
+  | { type: 'function'; refId: RefId; displayValue: string }
+  | { type: 'ref'; refId: RefId };
 
 /** One row = the fully-serialized arguments of a single `draw_data(...)` call. */
 export type SerializedDataVisualizerRow = SerializedDataVisualizerNode[];
@@ -86,7 +86,7 @@ export type SerializedDataVisualizerRow = SerializedDataVisualizerNode[];
  * (e.g. because the tab was closed) is always brought fully up to date by the next one.
  */
 export interface DataVisualizerRowsMessage {
-  type: "rows";
+  type: 'rows';
   rows: SerializedDataVisualizerRow[];
 }
 
@@ -95,7 +95,7 @@ export interface DataVisualizerRowsMessage {
  * display when the data visualizer tab is (re)opened without re-running the program.
  */
 export interface DataVisualizerRequestMessage {
-  type: "request";
+  type: 'request';
 }
 
 /** Every message that may cross the {@link DATA_VISUALIZER_CHANNEL_ID} channel. */

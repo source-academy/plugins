@@ -1,33 +1,33 @@
-import type { CseDiagramViewProps } from "@sourceacademy/common-cse-machine";
-import type { EStepperStep, SyntaxProfile } from "@sourceacademy/common-e-stepper";
-import { act, createElement } from "react";
-import { Button, Checkbox, Popover, Slider, Switch } from "@blueprintjs/core";
-import TestRenderer from "react-test-renderer";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { Button, Checkbox, Popover, Slider, Switch } from '@blueprintjs/core';
+import type { CseDiagramViewProps } from '@sourceacademy/common-cse-machine';
+import type { EStepperStep, SyntaxProfile } from '@sourceacademy/common-e-stepper';
+import { act, createElement } from 'react';
+import TestRenderer from 'react-test-renderer';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
+
+import EStepperView, { nextBreakpoint, previousBreakpoint, sliderLabels } from '../EStepperView';
+import ProgramArrows from '../ProgramArrows';
+import steps from './makeWithdrawSteps.json';
+import pythonProfile from './pythonProfile.json';
 
 // As in the data visualizer's tests: avoid Konva's Node build (it requires the optional `canvas`).
-vi.mock("konva", () => ({ default: {} }));
-vi.mock("react-konva", () => {
+vi.mock(import('konva'), () => ({ default: {} as any }));
+vi.mock(import('react-konva'), () => {
   const stub = (name: string) => (props: Record<string, unknown>) =>
     createElement(`konva-${name.toLowerCase()}`, props, props.children as never);
   return Object.fromEntries(
-    ["Stage", "Layer", "Text", "Group", "Line", "Rect", "Circle", "Arrow"].map(n => [n, stub(n)]),
+    ['Stage', 'Layer', 'Text', 'Group', 'Line', 'Rect', 'Circle', 'Arrow'].map(n => [n, stub(n)]),
   );
 });
 
 // Blueprint's overlays need a DOM; the tests read the options menu's content from the props.
-vi.mock("@blueprintjs/core", async (importOriginal: () => Promise<object>) => ({
+vi.mock(import('@blueprintjs/core'), async (importOriginal: () => Promise<object>) => ({
   ...(await importOriginal()),
-  Popover: (props: Record<string, unknown>) => createElement("popover-stub", props),
+  Popover: ((props: Record<string, unknown>) => createElement('popover-stub', props)) as any,
 }));
-
-import EStepperView, { nextBreakpoint, previousBreakpoint, sliderLabels } from "../EStepperView";
-import ProgramArrows from "../ProgramArrows";
-import steps from "./makeWithdrawSteps.json";
 
 /** A stubbed Konva shape's host element type (see the react-konva mock above). */
 const konva = (type: string) => type as unknown as React.ElementType;
-import pythonProfile from "./pythonProfile.json";
 
 // Both produced by py-slang's e-stepper: three steps of make_withdraw, and its Python profile.
 const fixture = steps as unknown as EStepperStep[];
@@ -37,24 +37,24 @@ const profile = pythonProfile as unknown as SyntaxProfile;
 const withRefs: EStepperStep = {
   ...fixture[2],
   ast: {
-    type: "Program",
-    nodeId: "p",
+    type: 'Program',
+    nodeId: 'p',
     body: [
       {
-        type: "ExpressionStatement",
-        nodeId: "s",
+        type: 'ExpressionStatement',
+        nodeId: 's',
         expression: {
-          type: "CallExpression",
-          nodeId: "c",
+          type: 'CallExpression',
+          nodeId: 'c',
           callee: {
-            type: "Builtin",
-            nodeId: "f",
-            name: "print",
-            hoverText: "built-in function print",
+            type: 'Builtin',
+            nodeId: 'f',
+            name: 'print',
+            hoverText: 'built-in function print',
           },
           arguments: [
-            { type: "Ref", nodeId: "r1", objectId: "#2" },
-            { type: "Ref", nodeId: "r2", objectId: "#4" },
+            { type: 'Ref', nodeId: 'r1', objectId: '#2' },
+            { type: 'Ref', nodeId: 'r2', objectId: '#4' },
           ],
         },
       },
@@ -75,35 +75,35 @@ function render(props: Parameters<typeof EStepperView>[0], width = 600) {
 
 /** Whether a node has the CSS class `name` (among its space-separated classes). */
 const hasClass = (node: TestRenderer.ReactTestInstance, name: string): boolean =>
-  typeof node.props.className === "string" && node.props.className.split(" ").includes(name);
+  typeof node.props.className === 'string' && node.props.className.split(' ').includes(name);
 
 const text = (node: TestRenderer.ReactTestInstance): string =>
-  node.children.map(c => (typeof c === "string" ? c : text(c))).join("");
+  node.children.map(c => (typeof c === 'string' ? c : text(c))).join('');
 
-describe("EStepperView", () => {
+describe(EStepperView, () => {
   // The slider remounts when the tab's size is known (it measures its track then), and a Blueprint
   // slider takes its listeners off the document when it goes away.
   beforeEach(() => {
-    vi.stubGlobal("document", {
+    vi.stubGlobal('document', {
       addEventListener() {},
       removeEventListener() {},
-      getElementById: () => ({ textContent: "" }),
+      getElementById: () => ({ textContent: '' }),
     });
   });
 
-  test("shows the welcome text before anything has run", () => {
+  test('shows the welcome text before anything has run', () => {
     const view = render({ steps: [] });
-    expect(text(view.root)).toContain("Welcome to the environment stepper");
+    expect(text(view.root)).toContain('Welcome to the environment stepper');
   });
 
-  test("the welcome text links to the guide for students", () => {
+  test('the welcome text links to the guide for students', () => {
     const view = render({ steps: [] });
-    const link = view.root.findByType("a");
-    expect(link.props.href).toBe("https://docs.sourceacademy.org/python/e-stepper/");
-    expect(link.props.target).toBe("_blank");
+    const link = view.root.findByType('a');
+    expect(link.props.href).toBe('https://docs.sourceacademy.org/python/e-stepper/');
+    expect(link.props.target).toBe('_blank');
   });
 
-  test("the slider counts the steps taken: 0 on the left, the total on the right", () => {
+  test('the slider counts the steps taken: 0 on the left, the total on the right', () => {
     const run = Array.from({ length: 174 }, (_, i) => ({ ...fixture[0], key: i }));
     const view = render({ steps: run, profile });
     const slider = () => view.root.findByType(Slider);
@@ -118,13 +118,13 @@ describe("EStepperView", () => {
     expect(slider().props.value).toBe(173);
     act(() =>
       view.root
-        .find(n => hasClass(n, "sa-e-stepper"))
-        .props.onKeyDown({ key: "a", preventDefault: () => {} }),
+        .find(n => hasClass(n, 'sa-e-stepper'))
+        .props.onKeyDown({ key: 'a', preventDefault: () => {} }),
     );
     expect(slider().props.value).toBe(0);
   });
 
-  test("a run of one step gives the slider a valid range, disabled", () => {
+  test('a run of one step gives the slider a valid range, disabled', () => {
     const view = render({ steps: [fixture[0]], profile });
     const slider = view.root.findByType(Slider);
     expect(slider.props.min).toBe(0);
@@ -134,7 +134,7 @@ describe("EStepperView", () => {
     expect(render({ steps: fixture, profile }).root.findByType(Slider).props.disabled).toBe(false);
   });
 
-  test("labels the ends of the slider and a round step in between, never crowding the end", () => {
+  test('labels the ends of the slider and a round step in between, never crowding the end', () => {
     expect(sliderLabels(0)).toEqual([0]);
     expect(sliderLabels(1)).toEqual([0, 1]);
     expect(sliderLabels(10)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
@@ -147,13 +147,13 @@ describe("EStepperView", () => {
     expect(sliderLabels(37)).toEqual([0, 4, 8, 12, 16, 20, 24, 28, 32, 37]);
   });
 
-  describe("breakpoints", () => {
+  describe('breakpoints', () => {
     /** Ten steps; steps 4 and 8 (1-based) are breakpoints. */
-    const stop: EStepperStep["markers"] = [
+    const stop: EStepperStep['markers'] = [
       {
-        explanation: "Running breakpoint()",
-        redexType: "beforeMarker",
-        redexNodeType: "DebuggerStatement",
+        explanation: 'Running breakpoint()',
+        redexType: 'beforeMarker',
+        redexNodeType: 'DebuggerStatement',
       },
     ];
     const run = Array.from({ length: 10 }, (_, i) => ({
@@ -161,53 +161,53 @@ describe("EStepperView", () => {
       markers: i === 3 || i === 7 ? stop : [{ explanation: `step ${i + 1}` }],
     }));
 
-    test("the next breakpoint after a step, or else the last step", () => {
+    test('the next breakpoint after a step, or else the last step', () => {
       expect([1, 3].map(v => nextBreakpoint(run, v))).toEqual([4, 4]);
       expect([4, 7].map(v => nextBreakpoint(run, v))).toEqual([8, 8]);
       expect([8, 9, 10].map(v => nextBreakpoint(run, v))).toEqual([10, 10, 10]);
     });
 
-    test("the previous breakpoint before a step, or else the first step", () => {
+    test('the previous breakpoint before a step, or else the first step', () => {
       expect([10, 9, 8].map(v => previousBreakpoint(run, v))).toEqual([8, 8, 4]);
       expect([5, 4].map(v => previousBreakpoint(run, v))).toEqual([4, 1]);
       expect(previousBreakpoint(run, 1)).toBe(1);
     });
 
-    test("without breakpoints they are the first and last step", () => {
-      const plain = run.map(s => ({ ...s, markers: [{ explanation: "x" }] }));
+    test('without breakpoints they are the first and last step', () => {
+      const plain = run.map(s => ({ ...s, markers: [{ explanation: 'x' }] }));
       expect(nextBreakpoint(plain, 3)).toBe(10);
       expect(previousBreakpoint(plain, 7)).toBe(1);
       expect(nextBreakpoint([], 1)).toBe(1);
     });
 
-    test("the double arrows and a / e jump between them", () => {
+    test('the double arrows and a / e jump between them', () => {
       const view = render({ steps: run, profile });
       const slider = () => view.root.findByType(Slider).props.value as number;
       const press = (key: string) =>
         act(() =>
           view.root
-            .find(n => hasClass(n, "sa-e-stepper"))
+            .find(n => hasClass(n, 'sa-e-stepper'))
             .props.onKeyDown({ key, preventDefault: () => {} }),
         );
       const arrow = (icon: string) =>
         view.root.findAllByType(Button).find(b => b.props.icon === icon)!;
       expect(slider()).toBe(0);
-      press("e");
+      press('e');
       expect(slider()).toBe(3); // step 4, the first breakpoint (the slider counts from 0)
-      act(() => arrow("double-chevron-right").props.onClick());
+      act(() => arrow('double-chevron-right').props.onClick());
       expect(slider()).toBe(7);
-      press("e");
+      press('e');
       expect(slider()).toBe(9); // no more: the last step
-      press("a");
+      press('a');
       expect(slider()).toBe(7);
-      act(() => arrow("double-chevron-left").props.onClick());
+      act(() => arrow('double-chevron-left').props.onClick());
       expect(slider()).toBe(3);
-      press("a");
+      press('a');
       expect(slider()).toBe(0);
     });
   });
 
-  test("has no step controls before anything has run, and has them once there are steps", () => {
+  test('has no step controls before anything has run, and has them once there are steps', () => {
     const before = render({ steps: [] });
     expect(before.root.findAllByType(Slider)).toHaveLength(0);
     expect(before.root.findAllByType(Button)).toHaveLength(0);
@@ -216,76 +216,76 @@ describe("EStepperView", () => {
     expect(after.root.findAllByType(Button).length).toBeGreaterThan(0);
   });
 
-  test("shows a runner error", () => {
+  test('shows a runner error', () => {
     const view = render({ steps: [], error: "NameError: name 'x' is not defined" });
     expect(text(view.root)).toContain("NameError: name 'x' is not defined");
   });
 
-  test("renders a function body under evaluation as a bracket labelled with its frame", () => {
+  test('renders a function body under evaluation as a bracket labelled with its frame', () => {
     const view = render({ steps: [fixture[1]], profile });
-    const blocks = view.root.findAll(n => n.props.className === "estepper-envblock");
+    const blocks = view.root.findAll(n => n.props.className === 'estepper-envblock');
     expect(blocks).toHaveLength(1);
-    const label = blocks[0].find(n => n.props.className === "estepper-envblock-label");
-    expect(text(label)).toBe("E2");
+    const label = blocks[0].find(n => n.props.className === 'estepper-envblock-label');
+    expect(text(label)).toBe('E2');
   });
 
   test("renders references as badges only; a function object's name is in its tooltip", () => {
     const view = render({ steps: [withRefs], profile });
-    expect(view.root.findAll(n => hasClass(n, "estepper-ref"))).toHaveLength(2);
-    const badges = view.root.findAll(n => n.props.className === "estepper-ref-badge").map(text);
-    expect(badges).toEqual(["#2", "#4"]);
-    expect(view.root.findAll(n => n.props.className === "estepper-ref-name")).toHaveLength(0);
+    expect(view.root.findAll(n => hasClass(n, 'estepper-ref'))).toHaveLength(2);
+    const badges = view.root.findAll(n => n.props.className === 'estepper-ref-badge').map(text);
+    expect(badges).toEqual(['#2', '#4']);
+    expect(view.root.findAll(n => n.props.className === 'estepper-ref-name')).toHaveLength(0);
     const titles = view.root
-      .findAll(n => hasClass(n, "estepper-ref"))
+      .findAll(n => hasClass(n, 'estepper-ref'))
       .map(n => n.props.title as string | undefined);
-    expect(titles[0]).toBe("function withdraw(amount)");
+    expect(titles[0]).toBe('function withdraw(amount)');
   });
 
-  test("hovering a reference highlights it", () => {
+  test('hovering a reference highlights it', () => {
     const view = render({ steps: [withRefs], profile });
-    const [first] = view.root.findAll(n => hasClass(n, "estepper-ref"));
+    const [first] = view.root.findAll(n => hasClass(n, 'estepper-ref'));
     act(() => first.props.onMouseEnter());
-    const hovered = view.root.findAll(n => hasClass(n, "estepper-ref") && hasClass(n, "hovered"));
+    const hovered = view.root.findAll(n => hasClass(n, 'estepper-ref') && hasClass(n, 'hovered'));
     expect(hovered).toHaveLength(1);
-    expect(text(hovered[0])).toContain("#2");
+    expect(text(hovered[0])).toContain('#2');
     act(() => hovered[0].props.onMouseLeave());
-    expect(view.root.findAll(n => hasClass(n, "hovered"))).toHaveLength(0);
+    expect(view.root.findAll(n => hasClass(n, 'hovered'))).toHaveLength(0);
   });
 
   test("shows the step's explanation and the program's output", () => {
     const view = render({ steps: [fixture[2]], profile });
     const all = text(view.root);
-    expect(all).toContain("Evaluation complete");
-    expect(all).toContain("Output");
-    expect(all).toContain("50");
+    expect(all).toContain('Evaluation complete');
+    expect(all).toContain('Output');
+    expect(all).toContain('50');
   });
 
-  test("draws the environment diagram for the current step", () => {
+  test('draws the environment diagram for the current step', () => {
     const view = render({ steps: [fixture[1]], profile });
-    expect(view.root.findAllByType(konva("konva-stage"))).toHaveLength(1);
+    expect(view.root.findAllByType(konva('konva-stage'))).toHaveLength(1);
   });
 
-  test("stacks the panes when Vertical is chosen, with a divider that resizes the program pane", () => {
+  test('stacks the panes when Vertical is chosen, with a divider that resizes the program pane', () => {
     const view = render({ steps: [fixture[1]], profile });
     act(() =>
       view.root
         .findAllByType(Button)
-        .find(b => b.props["aria-label"] === "Vertical")!
+        .find(b => b.props['aria-label'] === 'Vertical')!
         .props.onClick(),
     );
-    const main = view.root.find(n => hasClass(n, "estepper-main"));
-    expect(hasClass(main, "narrow")).toBe(true);
+    const main = view.root.find(n => hasClass(n, 'estepper-main'));
+    expect(hasClass(main, 'narrow')).toBe(true);
     const listeners: Record<string, (e: { clientY: number }) => void> = {};
-    vi.stubGlobal("window", {
+    vi.stubGlobal('window', {
       addEventListener: (type: string, fn: (e: { clientY: number }) => void) =>
         (listeners[type] = fn),
       removeEventListener: (type: string) => delete listeners[type],
     });
-    const divider = view.root.find(n => hasClass(n, "estepper-divider"));
+    const divider = view.root.find(n => hasClass(n, 'estepper-divider'));
     act(() => divider.props.onPointerDown({ clientY: 100 }));
     act(() => listeners.pointermove({ clientY: 160 }));
-    const left = view.root.find(n => hasClass(n, "estepper-left"));
-    expect(left.props.style.flex).toBe("0 0 300px");
+    const left = view.root.find(n => hasClass(n, 'estepper-left'));
+    expect(left.props.style.flex).toBe('0 0 300px');
     act(() => listeners.pointerup({ clientY: 160 }));
     expect(listeners.pointermove).toBeUndefined();
     vi.unstubAllGlobals();
@@ -297,52 +297,52 @@ describe("EStepperView", () => {
     act(() =>
       first.root
         .findAllByType(Button)
-        .find(b => b.props["aria-label"] === "Vertical")!
+        .find(b => b.props['aria-label'] === 'Vertical')!
         .props.onClick(),
     );
     act(() => first.unmount());
     const second = render({ steps: [fixture[1]], profile, layout });
-    const main = second.root.find(n => hasClass(n, "estepper-main"));
-    expect(hasClass(main, "narrow")).toBe(true);
+    const main = second.root.find(n => hasClass(n, 'estepper-main'));
+    expect(hasClass(main, 'narrow')).toBe(true);
   });
 
-  test("the divider can not be dragged out of view: the diagram below keeps its least height", () => {
+  test('the divider can not be dragged out of view: the diagram below keeps its least height', () => {
     // The panes' container is 600px high (see `render`'s node mock): 80px stay for the diagram,
     // and 26px for the divider and its gaps.
     const view = render({ steps: [fixture[1]], profile });
     act(() =>
       view.root
         .findAllByType(Button)
-        .find(b => b.props["aria-label"] === "Vertical")!
+        .find(b => b.props['aria-label'] === 'Vertical')!
         .props.onClick(),
     );
     const listeners: Record<string, (e: { clientY: number }) => void> = {};
-    vi.stubGlobal("window", {
+    vi.stubGlobal('window', {
       addEventListener: (type: string, fn: (e: { clientY: number }) => void) =>
         (listeners[type] = fn),
       removeEventListener: (type: string) => delete listeners[type],
     });
-    const divider = view.root.find(n => hasClass(n, "estepper-divider"));
+    const divider = view.root.find(n => hasClass(n, 'estepper-divider'));
     act(() => divider.props.onPointerDown({ clientY: 0 }));
     act(() => listeners.pointermove({ clientY: 100000 }));
-    const left = view.root.find(n => hasClass(n, "estepper-left"));
-    expect(left.props.style.flex).toBe("0 0 494px");
+    const left = view.root.find(n => hasClass(n, 'estepper-left'));
+    expect(left.props.style.flex).toBe('0 0 494px');
     act(() => listeners.pointerup({ clientY: 100000 }));
     // And back: the divider is still there to be dragged.
     act(() =>
-      view.root.find(n => hasClass(n, "estepper-divider")).props.onPointerDown({ clientY: 0 }),
+      view.root.find(n => hasClass(n, 'estepper-divider')).props.onPointerDown({ clientY: 0 }),
     );
     act(() => listeners.pointermove({ clientY: -100000 }));
     // The program may shrink to about one line.
-    expect(view.root.find(n => hasClass(n, "estepper-left")).props.style.flex).toBe("0 0 40px");
+    expect(view.root.find(n => hasClass(n, 'estepper-left')).props.style.flex).toBe('0 0 40px');
     vi.unstubAllGlobals();
   });
 
-  test("the slider measures its track again when the tab is resized (a click maps to the right step)", () => {
+  test('the slider measures its track again when the tab is resized (a click maps to the right step)', () => {
     const observers: ((entries: { contentRect: { width: number; height: number } }[]) => void)[] =
       [];
     vi.stubGlobal(
-      "ResizeObserver",
+      'ResizeObserver',
       class {
         constructor(callback: (typeof observers)[number]) {
           observers.push(callback);
@@ -364,7 +364,7 @@ describe("EStepperView", () => {
     const observers: ((entries: { contentRect: { width: number; height: number } }[]) => void)[] =
       [];
     vi.stubGlobal(
-      "ResizeObserver",
+      'ResizeObserver',
       class {
         constructor(callback: (typeof observers)[number]) {
           observers.push(callback);
@@ -376,11 +376,11 @@ describe("EStepperView", () => {
     const view = render({ steps: [fixture[1]], profile }, 1200);
     const narrow = () =>
       hasClass(
-        view.root.find(n => hasClass(n, "estepper-main")),
-        "narrow",
+        view.root.find(n => hasClass(n, 'estepper-main')),
+        'narrow',
       );
     const vertical = () =>
-      view.root.findAllByType(Button).find(b => b.props["aria-label"] === "Vertical")!;
+      view.root.findAllByType(Button).find(b => b.props['aria-label'] === 'Vertical')!;
     const resize = (width: number) =>
       act(() => observers.forEach(cb => cb([{ contentRect: { width, height: 600 } }])));
     // Wide at first: side by side, the box not ticked.
@@ -398,18 +398,18 @@ describe("EStepperView", () => {
     act(() => vertical().props.onClick());
     expect(narrow()).toBe(false);
     // The button states its state; the checkbox in it is only a picture.
-    expect(vertical().props["aria-pressed"]).toBe(false);
+    expect(vertical().props['aria-pressed']).toBe(false);
     act(() => vertical().props.onClick());
-    expect(vertical().props["aria-pressed"]).toBe(true);
+    expect(vertical().props['aria-pressed']).toBe(true);
     expect(view.root.findByType(Checkbox).props.tabIndex).toBe(-1);
     vi.unstubAllGlobals();
   });
 
-  test("side by side in a tab too narrow for both panes: the program keeps its least width, never negative", () => {
+  test('side by side in a tab too narrow for both panes: the program keeps its least width, never negative', () => {
     const observers: ((entries: { contentRect: { width: number; height: number } }[]) => void)[] =
       [];
     vi.stubGlobal(
-      "ResizeObserver",
+      'ResizeObserver',
       class {
         constructor(callback: (typeof observers)[number]) {
           observers.push(callback);
@@ -419,7 +419,7 @@ describe("EStepperView", () => {
       },
     );
     const view = render({ steps: [fixture[1]], profile }, 1200);
-    const left = () => view.root.find(n => hasClass(n, "estepper-left")).props.style.flex;
+    const left = () => view.root.find(n => hasClass(n, 'estepper-left')).props.style.flex;
     for (const width of [250, 150, 10]) {
       act(() => observers.forEach(cb => cb([{ contentRect: { width, height: 600 } }])));
       expect(left()).toBe(`0 0 ${Math.min(44, Math.max(0, width - 18))}px`);
@@ -427,14 +427,14 @@ describe("EStepperView", () => {
     vi.unstubAllGlobals();
   });
 
-  test("puts the panes side by side in a wide tab, with a divider that resizes the program pane", () => {
+  test('puts the panes side by side in a wide tab, with a divider that resizes the program pane', () => {
     // The tab's size, as the ResizeObservers report it (one for the tab, one for the diagram).
     const observers: ((entries: { contentRect: { width: number; height: number } }[]) => void)[] =
       [];
     const resize = (width: number) =>
       observers.forEach(callback => callback([{ contentRect: { width, height: 600 } }]));
     vi.stubGlobal(
-      "ResizeObserver",
+      'ResizeObserver',
       class {
         constructor(callback: (typeof observers)[number]) {
           observers.push(callback);
@@ -444,25 +444,25 @@ describe("EStepperView", () => {
       },
     );
     const view = render({ steps: [fixture[1]], profile }, 1200);
-    const main = view.root.find(n => hasClass(n, "estepper-main"));
-    expect(hasClass(main, "narrow")).toBe(false);
-    const left = () => view.root.find(n => hasClass(n, "estepper-left")).props.style.flex;
+    const main = view.root.find(n => hasClass(n, 'estepper-main'));
+    expect(hasClass(main, 'narrow')).toBe(false);
+    const left = () => view.root.find(n => hasClass(n, 'estepper-left')).props.style.flex;
     // 1200px wide, of which 1182px are left for the panes (2 gaps of 8px, and 2px of divider).
     expect(left()).toBe(`0 0 ${Math.round(0.45 * 1182)}px`);
     const listeners: Record<string, (e: { clientX: number }) => void> = {};
-    vi.stubGlobal("window", {
+    vi.stubGlobal('window', {
       addEventListener: (type: string, fn: (e: { clientX: number }) => void) =>
         (listeners[type] = fn),
       removeEventListener: (type: string) => delete listeners[type],
     });
-    const divider = view.root.find(n => hasClass(n, "estepper-divider"));
-    expect(hasClass(divider, "vertical")).toBe(true);
+    const divider = view.root.find(n => hasClass(n, 'estepper-divider'));
+    expect(hasClass(divider, 'vertical')).toBe(true);
     act(() => divider.props.onPointerDown({ clientX: 600, preventDefault: () => {} }));
     act(() => listeners.pointermove({ clientX: 480 }));
     expect(left()).toBe(`0 0 ${Math.round(0.45 * 1182) - 120}px`);
     // The program keeps at least 44px (about three characters), the diagram 200px.
     act(() => listeners.pointermove({ clientX: 0 }));
-    expect(left()).toBe("0 0 44px");
+    expect(left()).toBe('0 0 44px');
     act(() => listeners.pointermove({ clientX: 2000 }));
     expect(left()).toBe(`0 0 ${1182 - 200}px`);
     act(() => listeners.pointerup({ clientX: 2000 }));
@@ -473,7 +473,7 @@ describe("EStepperView", () => {
     vi.unstubAllGlobals();
   });
 
-  test("fills the height down to the bottom of the browser window", () => {
+  test('fills the height down to the bottom of the browser window', () => {
     let renderer!: TestRenderer.ReactTestRenderer;
     const element = <EStepperView steps={[fixture[1]]} profile={profile} />;
     act(() => {
@@ -483,10 +483,10 @@ describe("EStepperView", () => {
         }),
       });
     });
-    const root = () => renderer.root.find(n => hasClass(n, "sa-e-stepper"));
+    const root = () => renderer.root.find(n => hasClass(n, 'sa-e-stepper'));
     // (The test environment has no window until stubbed: then the height is worked out again.)
     const browser = { innerHeight: 1000, addEventListener() {}, removeEventListener() {} };
-    vi.stubGlobal("window", browser);
+    vi.stubGlobal('window', browser);
     act(() => renderer.update(<EStepperView steps={[fixture[1]]} profile={profile} />));
     // From its top (200px) to the window's bottom (1000px), less a 16px gap...
     expect(root().props.style).toEqual({ height: 784 });
@@ -497,7 +497,7 @@ describe("EStepperView", () => {
     vi.unstubAllGlobals();
   });
 
-  test("leaves room for the margins and paddings of the containers around it", () => {
+  test('leaves room for the margins and paddings of the containers around it', () => {
     // As in the Source Academy frontend: a margin on the tab, and margins and paddings on the
     // panels around it, each of which would make a panel scroll if the tab went down to the
     // bottom of the window regardless.
@@ -514,16 +514,16 @@ describe("EStepperView", () => {
         createNodeMock: () => element,
       });
     });
-    vi.stubGlobal("window", { innerHeight: 676, addEventListener() {}, removeEventListener() {} });
-    vi.stubGlobal("document", { body: {} });
-    vi.stubGlobal("getComputedStyle", (e: { m: number }) => ({
+    vi.stubGlobal('window', { innerHeight: 676, addEventListener() {}, removeEventListener() {} });
+    vi.stubGlobal('document', { body: {} });
+    vi.stubGlobal('getComputedStyle', (e: { m: number }) => ({
       marginBottom: `${e.m}px`,
-      paddingBottom: "0px",
-      borderBottomWidth: "0px",
+      paddingBottom: '0px',
+      borderBottomWidth: '0px',
     }));
     act(() => renderer.update(<EStepperView steps={[fixture[1]]} profile={profile} />));
     // 676 - 164 - ceil(15 + 6.4 + 6.4 + 9.6)
-    expect(renderer.root.find(n => hasClass(n, "sa-e-stepper")).props.style).toEqual({
+    expect(renderer.root.find(n => hasClass(n, 'sa-e-stepper')).props.style).toEqual({
       height: 676 - 164 - 38,
     });
     vi.unstubAllGlobals();
@@ -531,37 +531,37 @@ describe("EStepperView", () => {
 
   test("the explanation takes the height of its text, whatever the host's styles", () => {
     const view = render({ steps: [fixture[1]], profile });
-    const card = view.root.findAll(n => hasClass(n, "bp6-card") || hasClass(n, "bp5-card"))[0];
-    expect(card.props.style).toMatchObject({ height: "auto", flex: "0 0 auto" });
+    const card = view.root.findAll(n => hasClass(n, 'bp6-card') || hasClass(n, 'bp5-card'))[0];
+    expect(card.props.style).toMatchObject({ height: 'auto', flex: '0 0 auto' });
   });
 
-  test("steps with the buttons and the keyboard", () => {
+  test('steps with the buttons and the keyboard', () => {
     const view = render({ steps: fixture, profile });
     const explanation = () =>
-      text(view.root.findAll(n => n.props.className === "result-output")[0]);
+      text(view.root.findAll(n => n.props.className === 'result-output')[0]);
     const press = (key: string) =>
       act(() =>
         view.root
-          .find(n => hasClass(n, "sa-e-stepper"))
+          .find(n => hasClass(n, 'sa-e-stepper'))
           .props.onKeyDown({ key, preventDefault: () => {} }),
       );
-    expect(explanation()).toBe("Start of evaluation");
-    press("e");
-    expect(explanation()).toBe("Evaluation complete");
-    press("b");
-    expect(explanation()).toBe("Assigned balance = 50 in frame E1");
-    press("a");
-    expect(explanation()).toBe("Start of evaluation");
-    press("f");
-    expect(explanation()).toBe("Assigned balance = 50 in frame E1");
+    expect(explanation()).toBe('Start of evaluation');
+    press('e');
+    expect(explanation()).toBe('Evaluation complete');
+    press('b');
+    expect(explanation()).toBe('Assigned balance = 50 in frame E1');
+    press('a');
+    expect(explanation()).toBe('Start of evaluation');
+    press('f');
+    expect(explanation()).toBe('Assigned balance = 50 in frame E1');
     const buttons = view.root.findAllByType(Button);
     act(() => buttons[3].props.onClick());
-    expect(explanation()).toBe("Evaluation complete");
+    expect(explanation()).toBe('Evaluation complete');
     act(() => buttons[0].props.onClick());
-    expect(explanation()).toBe("Start of evaluation");
+    expect(explanation()).toBe('Start of evaluation');
   });
 
-  describe("display options", () => {
+  describe('display options', () => {
     /** The options menu's switches, by label; the menu's content is rendered on its own. */
     function options(view: TestRenderer.ReactTestRenderer) {
       let menu!: TestRenderer.ReactTestRenderer;
@@ -572,11 +572,11 @@ describe("EStepperView", () => {
         menu.root.findAllByType(Switch).map(sw => [sw.props.label as string, sw]),
       );
     }
-    test("arrows are on by default; turning them off leaves the arrows of what is hovered", () => {
+    test('arrows are on by default; turning them off leaves the arrows of what is hovered', () => {
       const view = render({ steps: fixture, profile });
       const diagram = view.root.find(n => n.props.onAnchors && n.props.frames);
       act(() => diagram.props.onAnchors(() => ({ x: 1, y: 2 })));
-      const arrows = options(view)["From program"];
+      const arrows = options(view)['From program'];
       expect(arrows.props.checked).toBe(true);
       expect(view.root.findAllByType(ProgramArrows)).toHaveLength(1);
       expect(view.root.findByType(ProgramArrows).props.all).toBe(true);
@@ -585,7 +585,7 @@ describe("EStepperView", () => {
       expect(view.root.findByType(ProgramArrows).props.all).toBe(false);
     });
 
-    test("Clear Unreachable Objects is also available when only a heap object is unreachable", () => {
+    test('Clear Unreachable Objects is also available when only a heap object is unreachable', () => {
       const onlyObject: EStepperStep = {
         ...fixture[2],
         frames: fixture[2].frames.map(f => ({ ...f, isGarbage: false })),
@@ -594,21 +594,21 @@ describe("EStepperView", () => {
       const view = render({ steps: [onlyObject], profile });
       const clear = view.root
         .findAllByType(Button)
-        .find(b => b.props.text === "Clear Unreachable Objects")!;
+        .find(b => b.props.text === 'Clear Unreachable Objects')!;
       expect(clear.props.disabled).toBe(false);
     });
 
-    test("Clear Unreachable Objects clears them from the diagram until the step changes", () => {
+    test('Clear Unreachable Objects clears them from the diagram until the step changes', () => {
       const view = render({ steps: fixture, profile });
       const diagram = () => view.root.find(n => n.props.onAnchors && n.props.frames);
       const clear = () =>
-        view.root.findAllByType(Button).find(b => b.props.text === "Clear Unreachable Objects")!;
+        view.root.findAllByType(Button).find(b => b.props.text === 'Clear Unreachable Objects')!;
       // Only the last step has unreachable frames (E2).
       expect(clear().props.disabled).toBe(true);
       act(() =>
         view.root
-          .find(n => hasClass(n, "sa-e-stepper"))
-          .props.onKeyDown({ key: "e", preventDefault: () => {} }),
+          .find(n => hasClass(n, 'sa-e-stepper'))
+          .props.onKeyDown({ key: 'e', preventDefault: () => {} }),
       );
       expect(diagram().props.clearUnreachable).toBe(false);
       expect(clear().props.disabled).toBe(false);
@@ -617,18 +617,18 @@ describe("EStepperView", () => {
       expect(clear().props.disabled).toBe(true);
       act(() =>
         view.root
-          .find(n => hasClass(n, "sa-e-stepper"))
-          .props.onKeyDown({ key: "b", preventDefault: () => {} }),
+          .find(n => hasClass(n, 'sa-e-stepper'))
+          .props.onKeyDown({ key: 'b', preventDefault: () => {} }),
       );
       expect(diagram().props.clearUnreachable).toBe(false);
     });
   });
 
-  test("the output strip can be collapsed", () => {
+  test('the output strip can be collapsed', () => {
     const view = render({ steps: [fixture[2]], profile });
-    const toggle = view.root.find(n => hasClass(n, "estepper-output-toggle"));
+    const toggle = view.root.find(n => hasClass(n, 'estepper-output-toggle'));
     act(() => toggle.props.onClick());
-    expect(view.root.findAll(n => hasClass(n, "estepper-output"))).toHaveLength(0);
+    expect(view.root.findAll(n => hasClass(n, 'estepper-output'))).toHaveLength(0);
   });
 
   describe("with the host's CSE machine diagram", () => {
@@ -638,7 +638,7 @@ describe("EStepperView", () => {
     }));
     const service = () => {
       const createView = vi.fn((props: CseDiagramViewProps) =>
-        createElement("host-cse-view", { "data-step": props.step }),
+        createElement('host-cse-view', { 'data-step': props.step }),
       );
       return { createView };
     };
@@ -660,31 +660,31 @@ describe("EStepperView", () => {
       expect(view.root.findAllByType(ProgramArrows)).toHaveLength(0);
     });
 
-    test("draws the environments with it, at the current step", () => {
+    test('draws the environments with it, at the current step', () => {
       const cseDiagram = service();
       const view = render({ steps: withCse, profile, cseDiagram });
-      expect(view.root.findAllByType(konva("konva-stage"))).toHaveLength(0);
-      expect(view.root.findByType(konva("host-cse-view")).props["data-step"]).toBe(0);
+      expect(view.root.findAllByType(konva('konva-stage'))).toHaveLength(0);
+      expect(view.root.findByType(konva('host-cse-view')).props['data-step']).toBe(0);
       const call = cseDiagram.createView.mock.calls.at(-1)![0];
       expect(call.snapshots).toHaveLength(withCse.length);
       act(() =>
         view.root
-          .find(n => hasClass(n, "sa-e-stepper"))
-          .props.onKeyDown({ key: "e", preventDefault: () => {} }),
+          .find(n => hasClass(n, 'sa-e-stepper'))
+          .props.onKeyDown({ key: 'e', preventDefault: () => {} }),
       );
-      expect(view.root.findByType(konva("host-cse-view")).props["data-step"]).toBe(
+      expect(view.root.findByType(konva('host-cse-view')).props['data-step']).toBe(
         withCse.length - 1,
       );
     });
 
-    test("falls back to its own diagram when the steps carry no CSE snapshots", () => {
+    test('falls back to its own diagram when the steps carry no CSE snapshots', () => {
       const cseDiagram = service();
       const view = render({ steps: fixture, profile, cseDiagram });
       expect(cseDiagram.createView).not.toHaveBeenCalled();
-      expect(view.root.findAllByType(konva("konva-stage"))).toHaveLength(1);
+      expect(view.root.findAllByType(konva('konva-stage'))).toHaveLength(1);
     });
 
-    test("gives it the frame colours, and shares the hovered frame with it", () => {
+    test('gives it the frame colours, and shares the hovered frame with it', () => {
       const cseDiagram = service();
       // From the step inside the call of withdraw, which shows an environment bracket.
       const view = render({ steps: withCse.slice(1), profile, cseDiagram });
@@ -692,8 +692,8 @@ describe("EStepperView", () => {
       const first = withCse[1];
       expect(Object.keys(props().frameColors ?? {})).toEqual(first.frames.map(f => f.id));
       // The program's environment blocks report hovering...
-      const label = view.root.findAll(n => hasClass(n, "estepper-envblock-label"))[0];
-      const block = view.root.findAll(n => hasClass(n, "estepper-envblock"))[0];
+      const label = view.root.findAll(n => hasClass(n, 'estepper-envblock-label'))[0];
+      const block = view.root.findAll(n => hasClass(n, 'estepper-envblock'))[0];
       const stopPropagation = vi.fn();
       act(() => block.props.onMouseOver({ stopPropagation }));
       expect(props().hoveredFrame).toBe(text(label));
@@ -704,19 +704,19 @@ describe("EStepperView", () => {
       // ...and a frame hovered in the diagram is highlighted in the program.
       act(() => props().onHoverFrame!(text(label)));
       expect(
-        view.root.findAll(n => hasClass(n, "estepper-envblock") && hasClass(n, "hovered")),
+        view.root.findAll(n => hasClass(n, 'estepper-envblock') && hasClass(n, 'hovered')),
       ).not.toHaveLength(0);
     });
 
-    test("shares the hovered object with it", () => {
+    test('shares the hovered object with it', () => {
       const cseDiagram = service();
       const view = render({ steps: withCse, profile, cseDiagram });
       const { onHover } = cseDiagram.createView.mock.calls.at(-1)![0];
-      act(() => onHover!("#1"));
-      expect(cseDiagram.createView.mock.calls.at(-1)![0].hovered).toBe("#1");
+      act(() => onHover!('#1'));
+      expect(cseDiagram.createView.mock.calls.at(-1)![0].hovered).toBe('#1');
       act(() => onHover!(null));
       expect(cseDiagram.createView.mock.calls.at(-1)![0].hovered).toBeNull();
-      expect(view.root.findAllByType(konva("konva-stage"))).toHaveLength(0);
+      expect(view.root.findAllByType(konva('konva-stage'))).toHaveLength(0);
     });
   });
 });

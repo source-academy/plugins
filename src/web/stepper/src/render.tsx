@@ -1,20 +1,20 @@
-import { Classes, Icon, Popover } from "@blueprintjs/core";
+import { Classes, Icon, Popover } from '@blueprintjs/core';
 import type {
   FunctionValueRule,
   SerializedStepperNode,
   SerializedStepperStep,
   SyntaxProfile,
   SyntaxTemplatePart,
-} from "@sourceacademy/common-stepper";
-import classNames from "classnames";
-import { useCallback } from "react";
+} from '@sourceacademy/common-stepper';
+import classNames from 'classnames';
+import { useCallback } from 'react';
 
 /**
  * The serialized AST nodes are plain JSON. `Record<string, any>` lets the renderer read the
  * language-specific fields (e.g. `left`, `operator`, `params`) without per-node typing, exactly as
  * the original (class-based) renderer did after casting.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- language-specific AST fields are read untyped, exactly as the original class-based renderer did after casting
+
 export type StepperNode = SerializedStepperNode & Record<string, any>;
 
 /**
@@ -61,16 +61,16 @@ interface RenderContext {
 
 /** Maps a profile token class to the stepper's CSS colour class. */
 const TOKEN_CLASS: Record<string, string> = {
-  operator: "stepper-operator",
-  identifier: "stepper-identifier",
-  literal: "stepper-literal",
-  conditional: "stepper-conditional-operator",
+  operator: 'stepper-operator',
+  identifier: 'stepper-identifier',
+  literal: 'stepper-literal',
+  conditional: 'stepper-conditional-operator',
 };
 
 /** Reads a node property by a (possibly dotted, e.g. `"id.name"`) path, for profile `prop` parts. */
 function readNodeProp(node: StepperNode, path: string): unknown {
   return path
-    .split(".")
+    .split('.')
     .reduce<unknown>(
       (value, key) => (value == null ? value : (value as Record<string, unknown>)[key]),
       node,
@@ -117,14 +117,14 @@ function FunctionDefinitionPopoverContent({
   renderFunctionArguments,
 }: FunctionDefinitionPopoverContentProps) {
   return (
-    <div className={classNames("stepper-popover", Classes.DARK)}>
+    <div className={classNames('stepper-popover', Classes.DARK)}>
       <div className="stepper-display">
         <Icon icon="code" />
-        <span>{" Function definition"}</span>
+        <span>{' Function definition'}</span>
         <pre className={Classes.CODE_BLOCK}>
           <code>
             {renderFunctionArguments(node.params, renderNode, styleWrapper, popoverDepth)}
-            <span className="stepper-identifier">{" => "}</span>
+            <span className="stepper-identifier">{' => '}</span>
             {renderNode(node.body, {
               styleWrapper: styleWrapper ?? (_node => p => p),
               popoverDepth: popoverDepth + 1,
@@ -157,10 +157,10 @@ function ProfileFunctionDefinitionPopover({
   profile,
 }: ProfileFunctionDefinitionPopoverProps) {
   return (
-    <div className={classNames("stepper-popover", Classes.DARK)}>
+    <div className={classNames('stepper-popover', Classes.DARK)}>
       <div className="stepper-display">
         <Icon icon="code" />
-        <span>{" Function definition"}</span>
+        <span>{' Function definition'}</span>
         <pre className={Classes.CODE_BLOCK}>
           <code>
             {renderNode(node, {
@@ -184,7 +184,7 @@ function ProfileFunctionDefinitionPopover({
  */
 function ProfileHoverTextPopover({ text }: { text: string }) {
   return (
-    <div className={classNames("stepper-popover", Classes.DARK)}>
+    <div className={classNames('stepper-popover', Classes.DARK)}>
       <div className="stepper-display">
         <Icon icon="info-sign" />
         <span>{` ${text}`}</span>
@@ -196,7 +196,7 @@ function ProfileHoverTextPopover({ text }: { text: string }) {
 /** Popover body for an `image` part: the inline opaque-value thumbnail, enlarged to be legible. */
 function EnlargedThumbnailPopover({ src, alt }: { src: string; alt?: string }) {
   return (
-    <div className={classNames("stepper-popover", Classes.DARK)}>
+    <div className={classNames('stepper-popover', Classes.DARK)}>
       <div className="stepper-display">
         {alt ? (
           <>
@@ -204,7 +204,7 @@ function EnlargedThumbnailPopover({ src, alt }: { src: string; alt?: string }) {
             <span>{` ${alt}`}</span>
           </>
         ) : null}
-        <img className="stepper-opaque-thumbnail-large" src={src} alt={alt ?? ""} />
+        <img className="stepper-opaque-thumbnail-large" src={src} alt={alt ?? ''} />
       </div>
     </div>
   );
@@ -223,7 +223,7 @@ function renderNode(
   const renderers = {
     Literal(node: StepperNode) {
       const stringifyLiteralValue = (value: unknown) =>
-        typeof value === "string" ? '"' + value + '"' : value !== null ? String(value) : "null";
+        typeof value === 'string' ? '"' + value + '"' : value !== null ? String(value) : 'null';
       return (
         <span className="stepper-literal">
           {node.raw ? node.raw : stringifyLiteralValue(node.value)}
@@ -307,7 +307,7 @@ function renderNode(
         (result, item) => (
           <span>
             {result}
-            {", "}
+            {', '}
             {item}
           </span>
         ),
@@ -315,9 +315,9 @@ function renderNode(
       );
       return (
         <span>
-          {"["}
+          {'['}
           {renderedArguments}
-          {"]"}
+          {']'}
         </span>
       );
     },
@@ -327,7 +327,7 @@ function renderNode(
        * corresponding to the name of lambda expression
        */
       function muTermStyleWrapper(targetNode: StepperNode) {
-        if (targetNode.type === "Identifier" && targetNode.name === node.name) {
+        if (targetNode.type === 'Identifier' && targetNode.name === node.name) {
           function addHovering(preprocessed: React.ReactNode): React.ReactNode {
             return (
               <span className="stepper-mu-term">
@@ -383,7 +383,7 @@ function renderNode(
       ) : (
         <span>
           {renderFunctionArguments(node.params, renderNode, styleWrapper, popoverDepth)}
-          <span className="stepper-identifier">{" => "}</span>
+          <span className="stepper-identifier">{' => '}</span>
           {renderNode(node.body, {
             styleWrapper: composeStyleWrapper(styleWrapper, muTermStyleWrapper)!,
             popoverDepth: popoverDepth,
@@ -396,12 +396,12 @@ function renderNode(
         styleWrapper: styleWrapper,
         popoverDepth: popoverDepth,
       });
-      if (node.callee.type === "ArrowFunctionExpression" && node.callee.name === undefined) {
+      if (node.callee.type === 'ArrowFunctionExpression' && node.callee.name === undefined) {
         renderedCallee = (
           <span>
-            {"("}
+            {'('}
             {renderedCallee}
-            {")"}
+            {')'}
           </span>
         );
       }
@@ -427,12 +427,12 @@ function renderNode(
       return (
         <span>
           <span>
-            <span className="stepper-identifier">{"if "}</span>
-            {"("}
+            <span className="stepper-identifier">{'if '}</span>
+            {'('}
             <span>
               {renderNode(node.test, { styleWrapper: styleWrapper, popoverDepth: popoverDepth })}
             </span>
-            {") "}
+            {') '}
           </span>
           <span>
             {renderNode(node.consequent, {
@@ -442,7 +442,7 @@ function renderNode(
           </span>
           {node.alternate && (
             <span>
-              <span className="stepper-identifier">{" else "}</span>
+              <span className="stepper-identifier">{' else '}</span>
               {renderNode(node.alternate, {
                 styleWrapper: styleWrapper,
                 popoverDepth: popoverDepth,
@@ -455,23 +455,23 @@ function renderNode(
     ReturnStatement(node: StepperNode) {
       return (
         <span>
-          <span className="stepper-operator">{"return "}</span>
+          <span className="stepper-operator">{'return '}</span>
           {node.argument &&
             renderNode(node.argument, { styleWrapper: styleWrapper, popoverDepth: popoverDepth })}
-          {";"}
+          {';'}
         </span>
       );
     },
     BlockStatement(node: StepperNode) {
       return (
         <span>
-          {"{"}
+          {'{'}
           {node.body.map((ast: StepperNode, index: number) => (
-            <div key={index} style={{ marginLeft: "15px" }}>
+            <div key={index} style={{ marginLeft: '15px' }}>
               {renderNode(ast, { styleWrapper, popoverDepth: popoverDepth })}
             </div>
           ))}
-          {"}"}
+          {'}'}
         </span>
       );
     },
@@ -479,7 +479,7 @@ function renderNode(
       return (
         <span>
           {renderNode(node.expression, { styleWrapper: styleWrapper, popoverDepth: popoverDepth })}
-          {";"}
+          {';'}
         </span>
       );
     },
@@ -489,7 +489,7 @@ function renderNode(
           <span className="stepper-identifier">{`function ${node.id.name}`}</span>
           <span>{renderArguments(node.params)}</span>
           <span>
-            {" "}
+            {' '}
             {renderNode(node.body, { styleWrapper: styleWrapper, popoverDepth: popoverDepth })}
           </span>
         </span>
@@ -501,11 +501,11 @@ function renderNode(
           <span className="stepper-identifier">{node.kind} </span>
           {node.declarations.map((ast: StepperNode, idx: number) => (
             <span key={idx}>
-              {idx !== 0 && ", "}
+              {idx !== 0 && ', '}
               {renderNode(ast, { styleWrapper: styleWrapper, popoverDepth: popoverDepth })}
             </span>
           ))}
-          {";"}
+          {';'}
         </span>
       );
     },
@@ -513,10 +513,10 @@ function renderNode(
       return (
         <span>
           {renderNode(node.id, { styleWrapper: styleWrapper, popoverDepth: popoverDepth })}
-          {" = "}
+          {' = '}
           {node.init
             ? renderNode(node.init, { styleWrapper: styleWrapper, popoverDepth: popoverDepth })
-            : "undefined"}
+            : 'undefined'}
         </span>
       );
     },
@@ -532,7 +532,7 @@ function renderNode(
     styleWrapper: StyleWrapper | undefined,
     popoverDepth: number,
   ) => {
-    if (!nodes) return "()";
+    if (!nodes) return '()';
     const args: React.ReactNode[] = nodes.map(arg =>
       renderNodeFn(arg, {
         styleWrapper: styleWrapper ?? (_node => p => p),
@@ -543,7 +543,7 @@ function renderNode(
       (result, item) => (
         <span>
           {result}
-          {", "}
+          {', '}
           {item}
         </span>
       ),
@@ -552,9 +552,9 @@ function renderNode(
     if (args.length !== 1) {
       renderedArguments = (
         <span>
-          {"("}
+          {'('}
           {renderedArguments}
-          {")"}
+          {')'}
         </span>
       );
     }
@@ -562,7 +562,7 @@ function renderNode(
   };
 
   const renderArguments = (nodes: StepperNode[] | undefined) => {
-    if (!nodes) return "()";
+    if (!nodes) return '()';
     const args: React.ReactNode[] = nodes.map(arg =>
       renderNode(arg, { styleWrapper: styleWrapper, popoverDepth: popoverDepth }),
     );
@@ -570,7 +570,7 @@ function renderNode(
       (result, item) => (
         <span>
           {result}
-          {", "}
+          {', '}
           {item}
         </span>
       ),
@@ -578,9 +578,9 @@ function renderNode(
     );
     renderedArguments = (
       <span>
-        {"("}
+        {'('}
         {renderedArguments}
-        {")"}
+        {')'}
       </span>
     );
     return renderedArguments;
@@ -600,22 +600,22 @@ function renderNode(
     });
     const cls = (c?: string) => (c ? TOKEN_CLASS[c] : undefined);
     const renderPart = (part: SyntaxTemplatePart, key: number): React.ReactNode => {
-      if (typeof part === "string") return <span key={key}>{part}</span>;
-      if ("token" in part)
+      if (typeof part === 'string') return <span key={key}>{part}</span>;
+      if ('token' in part)
         return (
           <span key={key} className={cls(part.cls)}>
             {part.token}
           </span>
         );
-      if ("prop" in part) {
+      if ('prop' in part) {
         const value = readNodeProp(node, part.prop);
         return (
           <span key={key} className={cls(part.cls)}>
-            {value == null ? "" : String(value)}
+            {value == null ? '' : String(value)}
           </span>
         );
       }
-      if ("child" in part) {
+      if ('child' in part) {
         const child = node[part.child] as StepperNode | null | undefined;
         return (
           <span key={key}>
@@ -623,7 +623,7 @@ function renderNode(
           </span>
         );
       }
-      if ("list" in part) {
+      if ('list' in part) {
         const items = (node[part.list] as StepperNode[] | undefined) ?? [];
         if (items.length === 0) return null;
         return (
@@ -638,19 +638,19 @@ function renderNode(
           </span>
         );
       }
-      if ("block" in part) {
+      if ('block' in part) {
         const items = (node[part.block] as StepperNode[] | undefined) ?? [];
         return (
           <span key={key}>
             {items.map((item, i) => (
-              <div key={i} style={{ marginLeft: "15px" }}>
+              <div key={i} style={{ marginLeft: '15px' }}>
                 {renderNode(item, childContext({}))}
               </div>
             ))}
           </span>
         );
       }
-      if ("lines" in part) {
+      if ('lines' in part) {
         const items = (node[part.lines] as StepperNode[] | undefined) ?? [];
         return (
           <span key={key}>
@@ -660,21 +660,21 @@ function renderNode(
           </span>
         );
       }
-      if ("when" in part) {
+      if ('when' in part) {
         return node[part.when] ? (
           <span key={key}>{part.parts.map((p, i) => renderPart(p, i))}</span>
         ) : null;
       }
-      if ("unless" in part) {
+      if ('unless' in part) {
         return node[part.unless] ? null : (
           <span key={key}>{part.parts.map((p, i) => renderPart(p, i))}</span>
         );
       }
-      if ("image" in part) {
+      if ('image' in part) {
         const src = readNodeProp(node, part.image);
-        if (typeof src !== "string" || !src.startsWith("data:")) return null;
+        if (typeof src !== 'string' || !src.startsWith('data:')) return null;
         const alt = part.altProp === undefined ? undefined : readNodeProp(node, part.altProp);
-        const altText = alt == null ? "" : String(alt);
+        const altText = alt == null ? '' : String(alt);
         return (
           <Popover
             key={key}
@@ -686,7 +686,7 @@ function renderNode(
             content={<EnlargedThumbnailPopover src={src} alt={altText} />}
           >
             <img
-              className={classNames("stepper-opaque-thumbnail", cls(part.cls))}
+              className={classNames('stepper-opaque-thumbnail', cls(part.cls))}
               src={src}
               alt={altText}
             />
@@ -712,7 +712,7 @@ function renderNode(
     // Recursive hovering: identifiers in the body that refer back to this function (by name) are
     // themselves wrapped in the same popover, so a recursive definition stays explorable.
     const muTermWrapper: StyleWrapper = (targetNode: StepperNode) =>
-      targetNode.type === "Identifier" && targetNode.name === funcName
+      targetNode.type === 'Identifier' && targetNode.name === funcName
         ? (preprocessed: React.ReactNode) => (
             <span className="stepper-mu-term">
               <Popover
@@ -782,7 +782,7 @@ function renderNode(
   } else if (profile) {
     const functionRule = functionValueRuleFor(currentNode.type);
     const funcName = functionRule ? readNodeProp(currentNode, functionRule.nameProp) : undefined;
-    if (functionRule && funcName != null && funcName !== "" && !renderContext.expandFunctionValue) {
+    if (functionRule && funcName != null && funcName !== '' && !renderContext.expandFunctionValue) {
       // A named function value: collapse to a mu-term. It is atomic, so never parenthesised.
       result = renderProfileFunctionValue(currentNode, String(funcName));
       isParenthesis = false;
@@ -798,7 +798,7 @@ function renderNode(
     // just whichever branch happened to run first. See SyntaxProfile.hoverText.
     const hoverRule = profile.hoverText?.find(rule => rule.type === currentNode.type);
     const hoverText = hoverRule ? readNodeProp(currentNode, hoverRule.textProp) : undefined;
-    if (typeof hoverText === "string" && hoverText !== "") {
+    if (typeof hoverText === 'string' && hoverText !== '') {
       const content = result;
       result = (
         <Popover
@@ -822,9 +822,9 @@ function renderNode(
   if (isParenthesis) {
     result = (
       <span>
-        {"("}
+        {'('}
         {result}
-        {")"}
+        {')'}
       </span>
     );
   }
@@ -855,7 +855,7 @@ export function CustomASTRenderer(
           // Match by stable node id rather than object identity, which does not survive
           // serialization across the runner/host channel.
           if (marker.redexId !== undefined && marker.redexId === node.nodeId) {
-            const Wrapper = node.type === "FunctionDeclaration" ? "div" : "span";
+            const Wrapper = node.type === 'FunctionDeclaration' ? 'div' : 'span';
             returnNode = <Wrapper className={marker.redexType}>{returnNode}</Wrapper>;
           }
         });
@@ -891,12 +891,14 @@ function expressionNeedsParenthesis(
   const opPrecedence = profile?.operatorPrecedence ?? OPERATOR_PRECEDENCE;
 
   const nodePrecedence = exprPrecedence[node.type as keyof typeof exprPrecedence] as
-    number | undefined;
+    | number
+    | undefined;
   if (nodePrecedence === NEEDS_PARENTHESES) {
     return true;
   }
   const parentNodePrecedence = exprPrecedence[parentNode.type as keyof typeof exprPrecedence] as
-    number | undefined;
+    | number
+    | undefined;
   if (nodePrecedence === undefined || parentNodePrecedence === undefined) {
     return false;
   }
@@ -908,7 +910,7 @@ function expressionNeedsParenthesis(
     );
   }
 
-  if (!("operator" in node) || !("operator" in parentNode)) {
+  if (!('operator' in node) || !('operator' in parentNode)) {
     return false;
   }
 
@@ -916,14 +918,14 @@ function expressionNeedsParenthesis(
     // Not a `LogicalExpression` or `BinaryExpression`
     return false;
   }
-  if (node.operator === "**" && parentNode.operator === "**") {
+  if (node.operator === '**' && parentNode.operator === '**') {
     // Exponentiation operator has right-to-left associativity
     return !isRightHand;
   }
   if (
     nodePrecedence === 13 &&
     parentNodePrecedence === 13 &&
-    (node.operator === "??" || parentNode.operator === "??")
+    (node.operator === '??' || parentNode.operator === '??')
   ) {
     return true;
   }
@@ -936,31 +938,31 @@ function expressionNeedsParenthesis(
     : nodeOperatorPrecedence <= parentNodeOperatorPrecedence;
 }
 const OPERATOR_PRECEDENCE = {
-  "||": 2,
-  "??": 3,
-  "&&": 4,
-  "|": 5,
-  "^": 6,
-  "&": 7,
-  "==": 8,
-  "!=": 8,
-  "===": 8,
-  "!==": 8,
-  "<": 9,
-  ">": 9,
-  "<=": 9,
-  ">=": 9,
+  '||': 2,
+  '??': 3,
+  '&&': 4,
+  '|': 5,
+  '^': 6,
+  '&': 7,
+  '==': 8,
+  '!=': 8,
+  '===': 8,
+  '!==': 8,
+  '<': 9,
+  '>': 9,
+  '<=': 9,
+  '>=': 9,
   in: 9,
   instanceof: 9,
-  "<<": 10,
-  ">>": 10,
-  ">>>": 10,
-  "+": 11,
-  "-": 11,
-  "*": 12,
-  "%": 12,
-  "/": 12,
-  "**": 13,
+  '<<': 10,
+  '>>': 10,
+  '>>>': 10,
+  '+': 11,
+  '-': 11,
+  '*': 12,
+  '%': 12,
+  '/': 12,
+  '**': 13,
 };
 const NEEDS_PARENTHESES = 17;
 const EXPRESSIONS_PRECEDENCE = {

@@ -1,24 +1,24 @@
+import type { ICseDiagramService, IHostServices } from '@sourceacademy/common-cse-machine';
 import {
   E_STEPPER_CHANNEL_ID,
   WEB_ID,
   type EStepperMessage,
   type EStepperStep,
   type SyntaxProfile,
-} from "@sourceacademy/common-e-stepper";
-import type { ICseDiagramService, IHostServices } from "@sourceacademy/common-cse-machine";
-import type { ITabService, Tab } from "@sourceacademy/common-tabs";
+} from '@sourceacademy/common-e-stepper';
+import type { ITabService, Tab } from '@sourceacademy/common-tabs';
 import {
   checkIsPluginClass,
   type IChannel,
   type IConduit,
   type IPlugin,
-} from "@sourceacademy/conductor/conduit";
-import { createElement, useSyncExternalStore } from "react";
+} from '@sourceacademy/conductor/conduit';
+import { createElement, useSyncExternalStore } from 'react';
 
-import EStepperView, { type PaneLayout } from "./EStepperView";
+import EStepperView, { type PaneLayout } from './EStepperView';
 
 /** The side-content tab id used by the host to show/hide the e-stepper tab. */
-const TAB_ID = "e-stepper";
+const TAB_ID = 'e-stepper';
 
 /**
  * The user's arrangement of the panes, kept on `globalThis` for the page. Neither the plugin nor this
@@ -26,7 +26,7 @@ const TAB_ID = "e-stepper";
  * bundle is wrapped in a factory (see `wrap.mjs`) that the host calls again each time, so even a
  * module-level variable is new on every Run. The divider is to stay where the user put it.
  */
-const LAYOUT_KEY = Symbol.for("sourceacademy.e-stepper.layout");
+const LAYOUT_KEY = Symbol.for('sourceacademy.e-stepper.layout');
 const layout: PaneLayout = ((globalThis as Record<symbol, unknown>)[LAYOUT_KEY] ??= {});
 
 interface State {
@@ -61,16 +61,16 @@ export class EStepperHostPlugin implements IPlugin {
   ) {
     this.__channel = channel;
     this.__channel.subscribe(message => {
-      if (message.type === "steps") {
+      if (message.type === 'steps') {
         this.__state = { steps: message.steps, profile: message.profile, error: null };
         this.__emit();
-      } else if (message.type === "error") {
+      } else if (message.type === 'error') {
         this.__state = { steps: [], error: message.error };
         this.__emit();
       }
     });
     // Ask the runner to replay any steps it already computed (e.g. tab opened after a run).
-    this.__channel.send({ type: "request" });
+    this.__channel.send({ type: 'request' });
 
     const subscribe = (listener: () => void) => this.subscribe(listener);
     const getState = () => this.getState();
@@ -88,9 +88,9 @@ export class EStepperHostPlugin implements IPlugin {
 
     const tab: Tab = {
       id: TAB_ID,
-      label: "E-Stepper",
+      label: 'E-Stepper',
       // The Stepper's icon: the two never appear together (Stepper: Python §1-2, E-Stepper: §3-4).
-      iconName: "flow-review",
+      iconName: 'flow-review',
       body: createElement(EStepperTab),
     };
     tabService.registerTab(tab);
