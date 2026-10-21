@@ -585,7 +585,7 @@ describe(EStepperView, () => {
       expect(view.root.findByType(ProgramArrows).props.all).toBe(false);
     });
 
-    test("Clear Unreachable Objects is also available when only a heap object is unreachable", () => {
+    test('Clear Unreachable Objects is also available when only a heap object is unreachable', () => {
       const onlyObject: EStepperStep = {
         ...fixture[2],
         frames: fixture[2].frames.map(f => ({ ...f, isGarbage: false })),
@@ -594,15 +594,15 @@ describe(EStepperView, () => {
       const view = render({ steps: [onlyObject], profile });
       const clear = view.root
         .findAllByType(Button)
-        .find(b => b.props.text === "Clear Unreachable Objects")!;
+        .find(b => b.props.text === 'Clear Unreachable Objects')!;
       expect(clear.props.disabled).toBe(false);
     });
 
-    test("Clear Unreachable Objects clears them from the diagram until the step changes", () => {
+    test('Clear Unreachable Objects clears them from the diagram until the step changes', () => {
       const view = render({ steps: fixture, profile });
       const diagram = () => view.root.find(n => n.props.onAnchors && n.props.frames);
       const clear = () =>
-        view.root.findAllByType(Button).find(b => b.props.text === "Clear Unreachable Objects")!;
+        view.root.findAllByType(Button).find(b => b.props.text === 'Clear Unreachable Objects')!;
       // Only the last step has unreachable frames (E2).
       expect(clear().props.disabled).toBe(true);
       act(() =>

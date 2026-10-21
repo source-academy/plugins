@@ -126,12 +126,12 @@ test('the global frame is neutral, other frames get distinct colours', () => {
   expect(new Set(colors).size).toBe(4);
 });
 
-describe("layoutDiagram with unreachable frames cleared", () => {
+describe('layoutDiagram with unreachable frames cleared', () => {
   const full = layoutDiagram(last.frames, last.heap);
   const cleared = layoutDiagram(last.frames, last.heap, { clearUnreachable: true });
   const deadObjects = last.heap.filter(o => o.isGarbage).map(o => o.id);
 
-  test("garbage frames and objects are left out, and the rest stays", () => {
+  test('garbage frames and objects are left out, and the rest stays', () => {
     const unreachable = last.frames.filter(f => f.isGarbage).map(f => f.id);
     expect(unreachable.length).toBeGreaterThan(0);
     expect(cleared.frames.map(b => b.frame.id)).toEqual(
@@ -147,7 +147,7 @@ describe("layoutDiagram with unreachable frames cleared", () => {
     expect(cleared.arrows.every(a => !a.garbage)).toBe(true);
   });
 
-  test("nothing changes when nothing is unreachable", () => {
+  test('nothing changes when nothing is unreachable', () => {
     const live = last.frames.map(f => ({ ...f, isGarbage: false }));
     const heap = last.heap.map(o => ({ ...o, isGarbage: false }));
     expect(layoutDiagram(live, heap, { clearUnreachable: true })).toEqual(
@@ -155,7 +155,7 @@ describe("layoutDiagram with unreachable frames cleared", () => {
     );
   });
 
-  test("a live frame keeps its colour index when unreachable frames before it are left out", () => {
+  test('a live frame keeps its colour index when unreachable frames before it are left out', () => {
     const frame = (id: string, isGarbage: boolean) => ({
       id,
       name: 'f',
