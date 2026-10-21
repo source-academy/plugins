@@ -110,6 +110,7 @@ type DrawerInternals = {
   minY: number;
 };
 const internals = (drawer: BinaryTreeDrawer | GeneralTreeDrawer): DrawerInternals =>
+  // @ts-expect-error drawNode is public in DrawerInternals but protected in the TreeDrawer classes
   drawer as DrawerInternals;
 
 describe(BinaryTreeDrawer, () => {
@@ -397,6 +398,7 @@ describe(GeneralTreeDrawer, () => {
       for (const a of boxes) {
         for (const b of boxes) {
           if (a !== b && a.y === b.y) {
+            // eslint-disable-next-line vitest/no-conditional-expect
             expect(a.x + a.w <= b.x || b.x + b.w <= a.x).toBe(true);
           }
         }

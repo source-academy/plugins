@@ -128,10 +128,10 @@ function arrowTarget(box: ObjectBox): Point {
 
 export interface LayoutOptions {
   /**
-   * Leave out what is dead: garbage frames and garbage heap objects. A live frame's ancestors are
+   * Leave out what is unreachable: garbage frames and garbage heap objects. A live frame's ancestors are
    * live, so the frames left are still a tree.
    */
-  clearDead?: boolean;
+  clearUnreachable?: boolean;
 }
 
 export function layoutDiagram(
@@ -139,8 +139,8 @@ export function layoutDiagram(
   allHeap: EStepperHeapObject[],
   options: LayoutOptions = {},
 ): DiagramLayout {
-  const frames = options.clearDead ? allFrames.filter(f => !f.isGarbage) : allFrames;
-  const heap = options.clearDead ? allHeap.filter(o => !o.isGarbage) : allHeap;
+  const frames = options.clearUnreachable ? allFrames.filter(f => !f.isGarbage) : allFrames;
+  const heap = options.clearUnreachable ? allHeap.filter(o => !o.isGarbage) : allHeap;
   const frameById = new Map(frames.map(f => [f.id, f]));
   const objectById = new Map(heap.map(o => [o.id, o]));
 
@@ -208,8 +208,8 @@ export function layoutDiagram(
       const frameHeight = Math.max(C.rowHeight, frame.bindings.length * C.rowHeight) + C.padding;
       frameBoxes.push({
         frame,
-        // The frame's colour index is its place in the step's whole frame list, dead frames
-        // included, so it keeps its colour when the dead ones are left out.
+        // The frame's colour index is its place in the step's whole frame list, unreachable frames
+        // included, so it keeps its colour when the unreachable ones are left out.
         index: allFrames.indexOf(frame),
         x,
         y,
