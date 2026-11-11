@@ -21,7 +21,7 @@
     "@changesets/cli": "^3.0.0",
     "@sourceacademy/conductor": "^0.8.0",
     "@sourceacademy/plugin-directory": "source-academy/plugin-directory#main",
-    "@types/node": "^25.9.1",
+    "@types/node": "^26.0.0",
     "@vitest/coverage-istanbul": "^5.0.0",
     "commander": "^15.0.0",
     "eslint": "^10.0.3",
