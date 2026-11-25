@@ -5,6 +5,7 @@
  */
 import type { Tab } from "@sourceacademy/common-tabs";
 import { plugins } from "@sourceacademy/plugin-directory";
+import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, test, vi } from "vitest";
 
 // Only the tab that a host plugin registers matters here, not the view in it (which has its own
@@ -62,4 +63,17 @@ describe("plugin directory", () => {
       });
     },
   );
+});
+
+// What a host loads is the directory.json that `yarn build` generates, not the package above, so
+// it must carry the tabs too (it once did not, and the frontend then showed no Stepper tab).
+// CI builds before it tests; without a build there is nothing to check.
+describe.skipIf(!existsSync("dist/directory.json"))("the generated directory.json", () => {
+  const generated: { id: string; tab?: unknown }[] = JSON.parse(
+    existsSync("dist/directory.json") ? readFileSync("dist/directory.json", "utf-8") : "[]",
+  );
+
+  test.each(plugins.filter(plugin => plugin.tab))("describes the tab of $id", ({ id, tab }) => {
+    expect(generated.find(plugin => plugin.id === id)?.tab).toEqual(tab);
+  });
 });
