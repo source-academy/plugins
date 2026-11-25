@@ -81,4 +81,52 @@ describe("EStepperHostPlugin", () => {
       1,
     );
   });
+
+  describe("batches", () => {
+    const some = steps as unknown as EStepperStep[];
+    const one = some.slice(0, 1);
+    const rest = some.slice(1);
+
+    test("each batch continues the steps before it, and the end is kept", () => {
+      const { plugin, deliver } = setUp();
+      deliver({ type: "batch", index: 0, steps: one });
+      expect(plugin.getState().steps).toHaveLength(1);
+      expect(plugin.getState().end).toBeUndefined();
+      deliver({ type: "batch", index: 1, steps: rest, end: { status: "complete" } });
+      expect(plugin.getState().steps).toHaveLength(some.length);
+      expect(plugin.getState().end).toEqual({ status: "complete" });
+    });
+
+    test("a cut-off trace keeps its steps and says why", () => {
+      const { plugin, deliver } = setUp();
+      deliver({ type: "batch", index: 0, steps: some });
+      deliver({
+        type: "batch",
+        index: some.length,
+        steps: [],
+        end: { status: "cut-off", reason: "too long" },
+      });
+      expect(plugin.getState()).toMatchObject({
+        error: null,
+        end: { status: "cut-off", reason: "too long" },
+      });
+      expect(plugin.getState().steps).toHaveLength(some.length);
+    });
+
+    test("a batch at index 0 starts the run afresh, and one that skips ahead is dropped", () => {
+      const { plugin, deliver } = setUp();
+      deliver({ type: "batch", index: 0, steps: some, end: { status: "complete" } });
+      deliver({ type: "batch", index: 0, steps: one });
+      expect(plugin.getState().steps).toHaveLength(1);
+      expect(plugin.getState().end).toBeUndefined();
+      deliver({ type: "batch", index: 9, steps: rest });
+      expect(plugin.getState().steps).toHaveLength(1);
+    });
+
+    test("a trace sent whole is a complete one", () => {
+      const { plugin, deliver } = setUp();
+      deliver({ type: "steps", steps: some });
+      expect(plugin.getState().end).toEqual({ status: "complete" });
+    });
+  });
 });
