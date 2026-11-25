@@ -2,6 +2,7 @@ import { describe, test, expect, vi } from "vitest";
 import { CseMachinePlugin } from "..";
 import {
   CSE_CHANNEL,
+  CSE_MESSAGE_TYPE_SNAPSHOT_BATCH,
   CSE_MESSAGE_TYPE_SNAPSHOTS,
   RUNNER_ID,
   type CseSnapshot,
@@ -143,5 +144,88 @@ describe("sendSnapshots", () => {
     };
     plugin.sendSnapshots([snap]);
     expect(channel.send.mock.calls[0][0].snapshots[0]).toEqual(snap);
+  });
+});
+
+// ── Batches ───────────────────────────────────────────────────────────────────
+
+describe("sendBatch / endRun", () => {
+  const at = (stepIndex: number): CseSnapshot => ({ ...minimalSnapshot(), stepIndex });
+
+  test("each batch continues the run, with the index of its first snapshot", () => {
+    const ch = makeChannel();
+    const plugin = makePlugin(ch);
+    plugin.sendBatch([at(0), at(1)]);
+    plugin.sendBatch([at(2)], [2]);
+    expect(ch.send).toHaveBeenNthCalledWith(1, {
+      type: CSE_MESSAGE_TYPE_SNAPSHOT_BATCH,
+      index: 0,
+      snapshots: [at(0), at(1)],
+      breakpointSteps: [],
+    });
+    expect(ch.send).toHaveBeenNthCalledWith(2, {
+      type: CSE_MESSAGE_TYPE_SNAPSHOT_BATCH,
+      index: 2,
+      snapshots: [at(2)],
+      breakpointSteps: [2],
+    });
+  });
+
+  test("sends nothing for no snapshots", () => {
+    const ch = makeChannel();
+    makePlugin(ch).sendBatch([]);
+    expect(ch.send).not.toHaveBeenCalled();
+  });
+
+  test("endRun sends a last empty batch that says the run completed", () => {
+    const ch = makeChannel();
+    const plugin = makePlugin(ch);
+    plugin.sendBatch([at(0)]);
+    plugin.endRun();
+    expect(ch.send).toHaveBeenLastCalledWith({
+      type: CSE_MESSAGE_TYPE_SNAPSHOT_BATCH,
+      index: 1,
+      snapshots: [],
+      end: { status: "complete" },
+    });
+  });
+
+  test("endRun can say that the run was cut off, and why", () => {
+    const ch = makeChannel();
+    const plugin = makePlugin(ch);
+    plugin.sendBatch([at(0)]);
+    plugin.endRun({ status: "cut-off", reason: "too many steps" });
+    expect(ch.send).toHaveBeenLastCalledWith(
+      expect.objectContaining({ end: { status: "cut-off", reason: "too many steps" } }),
+    );
+  });
+
+  test("the next batch after endRun starts a new run", () => {
+    const ch = makeChannel();
+    const plugin = makePlugin(ch);
+    plugin.sendBatch([at(0), at(1)]);
+    plugin.endRun();
+    plugin.sendBatch([at(0)]);
+    expect(ch.send).toHaveBeenLastCalledWith(expect.objectContaining({ index: 0 }));
+  });
+
+  test("a run with no snapshots at all can still be ended", () => {
+    const ch = makeChannel();
+    makePlugin(ch).endRun();
+    expect(ch.send).toHaveBeenCalledWith({
+      type: CSE_MESSAGE_TYPE_SNAPSHOT_BATCH,
+      index: 0,
+      snapshots: [],
+      end: { status: "complete" },
+    });
+  });
+
+  test("sendSnapshots (a whole run) starts the count again", () => {
+    const ch = makeChannel();
+    const plugin = makePlugin(ch);
+    plugin.sendBatch([at(0), at(1)]);
+    plugin.sendSnapshots([at(0)]);
+    plugin.sendBatch([at(0)]);
+    expect(ch.send).toHaveBeenLastCalledWith(expect.objectContaining({ index: 0 }));
   });
 });
