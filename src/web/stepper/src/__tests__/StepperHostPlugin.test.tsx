@@ -1,27 +1,43 @@
-import type { StepperMessage } from "@sourceacademy/common-stepper";
+import type {
+  SerializedStepperStep,
+  StepperMessage,
+  SyntaxProfile,
+} from "@sourceacademy/common-stepper";
 import type { Tab } from "@sourceacademy/common-tabs";
+import { act, createElement } from "react";
+import TestRenderer from "react-test-renderer";
 import { describe, expect, test, vi } from "vitest";
 
-// The hotkey library needs react-dom, which it does not declare (so it does not resolve here).
-vi.mock("@mantine/hooks", () => ({ getHotkeyHandler: () => () => {} }));
+// The view itself is tested in SubstVisualizer.test.tsx; here it only shows what it was given.
+vi.mock("../SubstVisualizer", () => ({
+  default: (props: { content: unknown[]; profile?: { name: string } }) =>
+    createElement("div", {
+      "data-steps": props.content.length,
+      "data-profile": props.profile?.name,
+    }),
+}));
 
 import { StepperHostPlugin } from "../StepperHostPlugin";
 
 type PluginArgs = ConstructorParameters<typeof StepperHostPlugin>;
 
+const steps = [{}, {}, {}] as unknown as SerializedStepperStep[];
+const profile = { name: "python" } as unknown as SyntaxProfile;
+
 function setUp() {
+  let deliver!: (message: StepperMessage) => void;
   const sent: StepperMessage[] = [];
   const channel = {
     name: "__stepper",
-    subscribe: () => {},
+    subscribe: (fn: (message: StepperMessage) => void) => (deliver = fn),
     unsubscribe: () => {},
     send: (message: StepperMessage) => sent.push(message),
     close: () => {},
   };
   let tab!: Tab;
   const tabService = { registerTab: (t: Tab) => (tab = t), revealTab: vi.fn() };
-  new StepperHostPlugin({} as PluginArgs[0], [channel], tabService);
-  return { tab, tabService, sent };
+  const plugin = new StepperHostPlugin({} as PluginArgs[0], [channel], tabService);
+  return { plugin, tab, tabService, sent, deliver: (m: StepperMessage) => act(() => deliver(m)) };
 }
 
 describe("StepperHostPlugin", () => {
@@ -34,5 +50,48 @@ describe("StepperHostPlugin", () => {
 
   test("tells the host to hide its REPL and to keep the side content's size", () => {
     expect(setUp().tab).toMatchObject({ hidesRepl: true, resizable: false });
+  });
+
+  test("keeps the latest steps and profile, and tells its listeners", () => {
+    const { plugin, deliver } = setUp();
+    const listener = vi.fn();
+    plugin.subscribe(listener);
+    deliver({ type: "steps", steps, profile });
+    expect(plugin.getSteps()).toBe(steps);
+    expect(plugin.getProfile()).toBe(profile);
+    expect(plugin.getError()).toBeNull();
+    expect(listener).toHaveBeenCalledTimes(1);
+  });
+
+  test("an error replaces the steps, and the next steps clear the error", () => {
+    const { plugin, deliver } = setUp();
+    deliver({ type: "steps", steps, profile });
+    deliver({ type: "error", error: "SyntaxError" });
+    expect(plugin.getSteps()).toEqual([]);
+    expect(plugin.getError()).toBe("SyntaxError");
+    deliver({ type: "steps", steps });
+    expect(plugin.getError()).toBeNull();
+    expect(plugin.getSteps()).toBe(steps);
+  });
+
+  test("a listener that unsubscribed hears nothing more", () => {
+    const { plugin, deliver } = setUp();
+    const listener = vi.fn();
+    const unsubscribe = plugin.subscribe(listener);
+    unsubscribe();
+    deliver({ type: "steps", steps });
+    expect(listener).not.toHaveBeenCalled();
+  });
+
+  test("the tab shows the steps it has received", () => {
+    const { tab, deliver } = setUp();
+    let renderer!: TestRenderer.ReactTestRenderer;
+    act(() => {
+      renderer = TestRenderer.create(tab.body as React.ReactElement);
+    });
+    expect(renderer.root.findByType("div").props["data-steps"]).toBe(0);
+    deliver({ type: "steps", steps, profile });
+    expect(renderer.root.findByType("div").props["data-steps"]).toBe(3);
+    expect(renderer.root.findByType("div").props["data-profile"]).toBe("python");
   });
 });
