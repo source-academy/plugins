@@ -69,6 +69,8 @@ describe("StepperHostPlugin", () => {
     deliver({ type: "error", error: "SyntaxError" });
     expect(plugin.getSteps()).toEqual([]);
     expect(plugin.getError()).toBe("SyntaxError");
+    // The failed run has no trace, so the end of the one before does not describe it.
+    expect(plugin.getEnd()).toBeUndefined();
     deliver({ type: "steps", steps });
     expect(plugin.getError()).toBeNull();
     expect(plugin.getSteps()).toBe(steps);
@@ -93,5 +95,71 @@ describe("StepperHostPlugin", () => {
     deliver({ type: "steps", steps, profile });
     expect(renderer.root.findByType("div").props["data-steps"]).toBe(3);
     expect(renderer.root.findByType("div").props["data-profile"]).toBe("python");
+  });
+
+  describe("batches", () => {
+    const first = [{}, {}] as unknown as SerializedStepperStep[];
+    const second = [{}] as unknown as SerializedStepperStep[];
+
+    test("each batch continues the steps before it, and the first one brings the profile", () => {
+      const { plugin, deliver } = setUp();
+      const listener = vi.fn();
+      plugin.subscribe(listener);
+      deliver({ type: "batch", index: 0, steps: first, profile });
+      expect(plugin.getSteps()).toHaveLength(2);
+      expect(plugin.getProfile()).toBe(profile);
+      expect(plugin.getEnd()).toBeUndefined();
+      deliver({ type: "batch", index: 2, steps: second });
+      expect(plugin.getSteps()).toHaveLength(3);
+      expect(plugin.getProfile()).toBe(profile);
+      expect(listener).toHaveBeenCalledTimes(2);
+    });
+
+    test("the last batch says how the trace ended", () => {
+      const { plugin, deliver } = setUp();
+      deliver({ type: "batch", index: 0, steps: first });
+      deliver({
+        type: "batch",
+        index: 2,
+        steps: [],
+        end: { status: "cut-off", reason: "too long" },
+      });
+      expect(plugin.getEnd()).toEqual({ status: "cut-off", reason: "too long" });
+      expect(plugin.getSteps()).toHaveLength(2);
+    });
+
+    test("a batch at index 0 starts the run afresh", () => {
+      const { plugin, deliver } = setUp();
+      deliver({ type: "batch", index: 0, steps: first, end: { status: "complete" } });
+      deliver({ type: "batch", index: 0, steps: second });
+      expect(plugin.getSteps()).toHaveLength(1);
+      expect(plugin.getEnd()).toBeUndefined();
+      expect(plugin.getProfile()).toBeUndefined();
+    });
+
+    test("a batch that does not continue the steps received is dropped", () => {
+      const { plugin, deliver } = setUp();
+      deliver({ type: "batch", index: 0, steps: first });
+      deliver({ type: "batch", index: 5, steps: second });
+      expect(plugin.getSteps()).toHaveLength(2);
+    });
+
+    test("a trace sent whole is a complete one, and a batch after the end of a run replays over it", () => {
+      const { plugin, deliver } = setUp();
+      deliver({ type: "steps", steps: first });
+      expect(plugin.getEnd()).toEqual({ status: "complete" });
+      // The replay of a streamed run (on request) is one batch from index 0, with its end.
+      deliver({ type: "batch", index: 0, steps: second, end: { status: "complete" } });
+      expect(plugin.getSteps()).toHaveLength(1);
+      expect(plugin.getEnd()).toEqual({ status: "complete" });
+    });
+
+    test("a stopped run keeps the steps it had, with no end", () => {
+      const { plugin, deliver } = setUp();
+      deliver({ type: "batch", index: 0, steps: first });
+      expect(plugin.getSteps()).toHaveLength(2);
+      expect(plugin.getEnd()).toBeUndefined();
+      expect(plugin.getError()).toBeNull();
+    });
   });
 });

@@ -30,6 +30,7 @@ import type {
   SerializedStepperNode,
   SerializedStepperStep,
   SyntaxProfile,
+  TraceEnd,
 } from "@sourceacademy/common-stepper";
 
 /** The channel the e-stepper runner and host plugins communicate over. */
@@ -187,7 +188,7 @@ export interface EStepperStep extends SerializedStepperStep {
   cse?: CseSnapshot;
 }
 
-export type { SerializedMarker, SerializedStepperNode, SyntaxProfile };
+export type { SerializedMarker, SerializedStepperNode, SyntaxProfile, TraceEnd };
 
 /* -------------------------------------------------------------------------- */
 /*                              Channel protocol                              */
@@ -204,6 +205,18 @@ export interface EStepperStepsMessage {
   profile?: SyntaxProfile;
 }
 
+/** Runner → host: a part of the steps of the run that is going on; see `StepperBatchMessage`. */
+export interface EStepperBatchMessage {
+  type: "batch";
+  /** The number of steps of this run that precede this batch. 0 starts a run. */
+  index: number;
+  steps: EStepperStep[];
+  /** As {@link EStepperStepsMessage.profile}; sent with the first batch (`index` 0). */
+  profile?: SyntaxProfile;
+  /** Present on the last batch of the run. */
+  end?: TraceEnd;
+}
+
 /** Runner → host: stepping failed (e.g. a parse error). */
 export interface EStepperErrorMessage {
   type: "error";
@@ -216,4 +229,5 @@ export interface EStepperRequestMessage {
 }
 
 /** Every message that may cross the {@link E_STEPPER_CHANNEL_ID} channel. */
-export type EStepperMessage = EStepperStepsMessage | EStepperErrorMessage | EStepperRequestMessage;
+export type EStepperMessage =
+  EStepperStepsMessage | EStepperBatchMessage | EStepperErrorMessage | EStepperRequestMessage;
