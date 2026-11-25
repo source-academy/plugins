@@ -3,6 +3,7 @@ import packageJSON from "../package.json" with { type: "json" };
 import fs, { readFile, writeFile } from "fs/promises";
 import { spawn } from "child_process";
 import pathlib from "path";
+import { plugins as directoryPlugins } from "@sourceacademy/plugin-directory";
 import type { IPluginDefinition } from "@sourceacademy/plugin-directory/dist/types/IPluginDefinition.js";
 import process from "process";
 const program = new Command();
@@ -12,6 +13,13 @@ interface Manifest {
 
 const globalManifest: Record<string, Record<string, Manifest>> = {};
 const pluginDirectory: Record<string, IPluginDefinition> = {};
+
+// The side-content tab that a plugin contributes is described in @sourceacademy/plugin-directory,
+// not in the plugin's folder, so the generated directory takes it from there: without it, hosts
+// that read the deployed directory.json (the frontend) do not know that a plugin has a tab.
+const tabs = new Map(
+  directoryPlugins.flatMap(plugin => (plugin.tab ? [[plugin.id, plugin.tab]] : [])),
+);
 
 /**
  * Generates the manifest files for each plugin and updates the changeset config to ignore non-installable plugins.
@@ -46,6 +54,7 @@ async function generateManifest() {
             id: folderName,
             name: folderName,
             description: packageJSONFile.description,
+            ...(tabs.has(folderName) ? { tab: tabs.get(folderName) } : {}),
             resolutions: {},
           };
           // Use the plugin's own declared entry point rather than assuming ".js": external
