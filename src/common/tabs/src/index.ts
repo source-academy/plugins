@@ -14,6 +14,17 @@ export type Tab = {
   body: React.ReactElement | null;
   id: string;
   disabled?: boolean;
+  /**
+   * Whether the host hides its own REPL while this tab is the selected one. For a tab that shows the
+   * program's output itself, such as a stepper, which has no use for a second place to type and
+   * print. Defaults to `false`.
+   */
+  hidesRepl?: boolean;
+  /**
+   * Whether the user can resize the host's side content while this tab is selected. Defaults to
+   * `true`; `false` for a tab whose layout depends on the space it was given, such as a stepper.
+   */
+  resizable?: boolean;
 };
 
 export interface ITabService {

@@ -72,6 +72,10 @@ export class StepperHostPlugin implements IPlugin {
       id: TAB_ID,
       label: "Stepper",
       iconName: "flow-review",
+      // The tab shows the program and its output itself, so the host has no use for its REPL, and the
+      // layout of the steps depends on the width it was given.
+      hidesRepl: true,
+      resizable: false,
       body: createElement(StepperTab),
     };
     tabService.registerTab(tab);
