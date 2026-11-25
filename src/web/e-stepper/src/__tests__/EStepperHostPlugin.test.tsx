@@ -58,6 +58,8 @@ describe("EStepperHostPlugin", () => {
     expect(plugin.getState().steps).toHaveLength(3);
     deliver({ type: "error", error: "SyntaxError" });
     expect(plugin.getState()).toMatchObject({ steps: [], error: "SyntaxError" });
+    // The failed run has no trace, so the end of the one before does not describe it.
+    expect(plugin.getState().end).toBeUndefined();
   });
 
   test("lends the host's CSE diagram to the tab", () => {

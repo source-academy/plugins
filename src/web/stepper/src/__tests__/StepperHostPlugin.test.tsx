@@ -69,6 +69,8 @@ describe("StepperHostPlugin", () => {
     deliver({ type: "error", error: "SyntaxError" });
     expect(plugin.getSteps()).toEqual([]);
     expect(plugin.getError()).toBe("SyntaxError");
+    // The failed run has no trace, so the end of the one before does not describe it.
+    expect(plugin.getEnd()).toBeUndefined();
     deliver({ type: "steps", steps });
     expect(plugin.getError()).toBeNull();
     expect(plugin.getSteps()).toBe(steps);

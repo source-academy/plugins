@@ -68,6 +68,7 @@ export class StepperHostPlugin implements IPlugin {
         this.__emit();
       } else if (message.type === "error") {
         this.__steps = [];
+        this.__end = undefined;
         this.__error = message.error;
         this.__emit();
       }
