@@ -46,6 +46,8 @@ describe("EStepperHostPlugin", () => {
   test("registers and reveals the E-Stepper tab, and asks for the last run's steps", () => {
     const { tab, tabService, sent } = setUp();
     expect(tab).toMatchObject({ id: "e-stepper", label: "E-Stepper", iconName: "flow-review" });
+    // The host hides its REPL and fixes the side content's size while this tab is open.
+    expect(tab).toMatchObject({ hidesRepl: true, resizable: false });
     expect(tabService.revealTab).toHaveBeenCalledWith("e-stepper");
     expect(sent).toEqual([{ type: "request" }]);
   });

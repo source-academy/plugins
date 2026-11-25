@@ -91,6 +91,10 @@ export class EStepperHostPlugin implements IPlugin {
       label: "E-Stepper",
       // The Stepper's icon: the two never appear together (Stepper: Python §1-2, E-Stepper: §3-4).
       iconName: "flow-review",
+      // The tab shows the program and its output itself, so the host has no use for its REPL, and the
+      // layout of the steps depends on the width it was given.
+      hidesRepl: true,
+      resizable: false,
       body: createElement(EStepperTab),
     };
     tabService.registerTab(tab);
