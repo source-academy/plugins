@@ -1,5 +1,6 @@
 import { BaseAutoCompleteRunnerPlugin } from "..";
 import {
+  ANALYSIS_CHANNEL_ID,
   AUTOCOMPLETE_CHANNEL_ID,
   RUNNER_PLUGIN_ID,
   SYNTAX_CHANNEL_ID,
@@ -26,6 +27,7 @@ test("should have a valid channel id", () => {
   expect(BaseAutoCompleteRunnerPlugin.channelAttach).toEqual([
     AUTOCOMPLETE_CHANNEL_ID,
     SYNTAX_CHANNEL_ID,
+    ANALYSIS_CHANNEL_ID,
   ]);
 });
 
