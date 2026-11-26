@@ -553,7 +553,8 @@ export default function EStepperView({ steps, profile, error, cutOff, cseDiagram
           <Pre className="result-output">{error}</Pre>
         </Card>
       ) : null}
-      {hasRun && cutOff ? (
+      {/* Also for a trace that was cut off before its first step: the reason is all there is to show. */}
+      {cutOff ? (
         <Callout intent="warning" icon="warning-sign" compact style={{ marginTop: 8 }}>
           The steps end here, before the program finished: {cutOff}.
         </Callout>

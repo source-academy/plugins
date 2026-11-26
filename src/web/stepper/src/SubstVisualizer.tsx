@@ -252,7 +252,8 @@ export default function StepperView(props: StepperViewProps) {
           <Button disabled={!hasRunCode} icon="double-chevron-right" onClick={stepNextBreakpoint} />
         </ButtonGroup>
       </div>{" "}
-      {hasRunCode && props.cutOff ? <CutOffNotice reason={props.cutOff} /> : null}
+      {/* Also for a trace that was cut off before its first step: the reason is all there is to show. */}
+      {props.cutOff ? <CutOffNotice reason={props.cutOff} /> : null}
       <br />
       {hasRunCode ? (
         <CustomASTRenderer {...getAST(stepValue)} profile={props.profile} />

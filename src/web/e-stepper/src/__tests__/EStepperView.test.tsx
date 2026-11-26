@@ -99,6 +99,11 @@ describe("EStepperView", () => {
     expect(shown).toContain("the limit of 2000 steps was reached");
   });
 
+  test("says why even when the trace was cut off before its first step", () => {
+    const shown = text(render({ steps: [], cutOff: "the limit of 0 steps was reached" }).root);
+    expect(shown).toContain("the limit of 0 steps was reached");
+  });
+
   test("says nothing of the kind when the trace was not cut off", () => {
     expect(text(render({ steps: fixture }).root)).not.toContain("The steps end here");
   });

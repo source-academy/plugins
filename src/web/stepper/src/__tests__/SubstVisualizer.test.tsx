@@ -223,6 +223,16 @@ describe("a trace that was cut off", () => {
     expect(JSON.stringify(renderer.toJSON())).toContain("the limit of 3000 steps was reached");
   });
 
+  test("says why even when the trace was cut off before its first step", () => {
+    let renderer!: TestRenderer.ReactTestRenderer;
+    act(() => {
+      renderer = TestRenderer.create(
+        <StepperView content={[]} cutOff="the limit of 0 steps was reached" />,
+      );
+    });
+    expect(JSON.stringify(renderer.toJSON())).toContain("the limit of 0 steps was reached");
+  });
+
   test("says nothing when the trace was not cut off", () => {
     expect(JSON.stringify(render(run(5)).toJSON())).not.toContain("The steps end here");
   });
