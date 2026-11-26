@@ -75,3 +75,47 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+
+  # Publishes the versions on main that are not on npm yet.
+  #
+  # changesets/action publishes only when no changeset is left, and the changesets of the ignored web
+  # packages (see `ignore` in .changeset/config.json) are never consumed, so the step above always
+  # takes its "Version Packages" branch and fails when that pull request is merged ("No commits
+  # between main and changeset-release/main"): nothing was ever published by it. `changeset publish`
+  # publishes exactly the versions that are not on npm, so it is safe to run on every push to main
+  # (it does nothing when everything is published), and runs here by itself so that the build and
+  # deploy above do not depend on it, nor it on them.
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    # One publish at a time: two pushes in a row would otherwise try to publish the same version.
+    concurrency:
+      group: npm-publish
+      cancel-in-progress: false
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Enable corepack
+        run: corepack enable
+      - name: Setup node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: yarn
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      # A package's own prepack builds it, but the packages it builds on must be built first.
+      - name: yarn run build
+        run: yarn run build
+      - name: Publish unpublished versions
+        run: yarn changeset publish
+        env:
+          # `yarn npm publish` (which changesets runs) reads its login from Yarn's own settings,
+          # not from ~/.npmrc: the registry to publish to, and the token for it.
+          YARN_NPM_REGISTRY_SERVER: https://registry.npmjs.org
+          YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      # changeset publish tags each release; the tags are pushed so that they are on GitHub.
+      - name: Push release tags
+        run: git push origin --tags
