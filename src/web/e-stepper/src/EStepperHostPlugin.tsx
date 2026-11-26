@@ -105,6 +105,7 @@ export class EStepperHostPlugin implements IPlugin {
         steps: state.steps,
         profile: state.profile,
         error: state.error,
+        cutOff: state.end?.status === "cut-off" ? state.end.reason : undefined,
         cseDiagram,
         layout,
       });
