@@ -1,4 +1,5 @@
 import {
+  ANALYSIS_CHANNEL_ID,
   AUTOCOMPLETE_CHANNEL_ID,
   SYNTAX_CHANNEL_ID,
   WEB_PLUGIN_ID,
@@ -93,6 +94,7 @@ test("exposes its identity and defers mode loading until after subclass initiali
   expect(BaseAutoCompleteWebPlugin.channelAttach).toEqual([
     AUTOCOMPLETE_CHANNEL_ID,
     SYNTAX_CHANNEL_ID,
+    ANALYSIS_CHANNEL_ID,
   ]);
 });
 
