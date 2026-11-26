@@ -2,6 +2,7 @@ import { describe, test, expect, vi } from "vitest";
 import { CseMachineHostPlugin } from "..";
 import {
   CSE_CHANNEL,
+  CSE_MESSAGE_TYPE_SNAPSHOT_BATCH,
   CSE_MESSAGE_TYPE_SNAPSHOTS,
   WEB_ID,
   type CseSnapshot,
@@ -209,5 +210,91 @@ describe("re-exports from common", () => {
     // This test documents the contract rather than testing runtime behaviour.
     const snap: CseSnapshot = snapshot();
     expect(snap).toBeDefined();
+  });
+});
+
+// ── Batches ───────────────────────────────────────────────────────────────────
+
+describe("snapshot batches", () => {
+  const at = (stepIndex: number): CseSnapshot => ({ ...snapshot(), stepIndex });
+  const batch = (
+    index: number,
+    snapshots: CseSnapshot[],
+    extra: { breakpointSteps?: number[]; end?: unknown } = {},
+  ) => ({ type: CSE_MESSAGE_TYPE_SNAPSHOT_BATCH, index, snapshots, ...extra });
+
+  const makeWithEnd = () => {
+    const channel = makeChannel();
+    const receive = vi.fn();
+    const receiveEnd = vi.fn();
+    class TestPlugin extends CseMachineHostPlugin {
+      receiveSnapshots = receive;
+      override receiveEnd = receiveEnd;
+    }
+    new TestPlugin({} as IConduit, [channel]);
+    return { channel, receive, receiveEnd };
+  };
+
+  test("each batch hands over the snapshots so far, as a whole run is handed over", () => {
+    const { channel, receive } = makeWithEnd();
+    channel.emit(batch(0, [at(0), at(1)]));
+    channel.emit(batch(2, [at(2)]));
+    expect(receive).toHaveBeenNthCalledWith(1, [at(0), at(1)], []);
+    expect(receive).toHaveBeenNthCalledWith(2, [at(0), at(1), at(2)], []);
+  });
+
+  test("the breakpoint steps of the batches add up", () => {
+    const { channel, receive } = makeWithEnd();
+    channel.emit(batch(0, [at(0), at(1)], { breakpointSteps: [1] }));
+    channel.emit(batch(2, [at(2), at(3)], { breakpointSteps: [3] }));
+    expect(receive).toHaveBeenLastCalledWith([at(0), at(1), at(2), at(3)], [1, 3]);
+  });
+
+  test("a batch at index 0 starts the run afresh, with no breakpoints of the one before", () => {
+    const { channel, receive } = makeWithEnd();
+    channel.emit(batch(0, [at(0), at(1)], { breakpointSteps: [1] }));
+    channel.emit(batch(0, [at(0)]));
+    expect(receive).toHaveBeenLastCalledWith([at(0)], []);
+  });
+
+  test("a batch that skips ahead is dropped", () => {
+    const { channel, receive } = makeWithEnd();
+    channel.emit(batch(0, [at(0)]));
+    channel.emit(batch(5, [at(5)]));
+    expect(receive).toHaveBeenCalledTimes(1);
+  });
+
+  test("the last batch tells how the run ended, and hands over no snapshots again", () => {
+    const { channel, receive, receiveEnd } = makeWithEnd();
+    channel.emit(batch(0, [at(0)]));
+    channel.emit(batch(1, [], { end: { status: "cut-off", reason: "too long" } }));
+    expect(receiveEnd).toHaveBeenCalledExactlyOnceWith({ status: "cut-off", reason: "too long" });
+    expect(receive).toHaveBeenCalledTimes(1);
+  });
+
+  test("a run that ends without a snapshot is told to the host as well", () => {
+    const { channel, receive, receiveEnd } = makeWithEnd();
+    channel.emit(batch(0, [], { end: { status: "complete" } }));
+    expect(receiveEnd).toHaveBeenCalledWith({ status: "complete" });
+    expect(receive).not.toHaveBeenCalled();
+  });
+
+  test("a host that does not care how a run ended need not implement receiveEnd", () => {
+    const channel = makeChannel();
+    const { receive } = makePlugin(channel);
+    expect(() => channel.emit(batch(0, [at(0)], { end: { status: "complete" } }))).not.toThrow();
+    expect(receive).toHaveBeenCalledTimes(1);
+  });
+
+  test("a malformed batch is ignored", () => {
+    const { channel, receive } = makeWithEnd();
+    channel.emit({ type: CSE_MESSAGE_TYPE_SNAPSHOT_BATCH, index: 0, snapshots: "nope" });
+    expect(receive).not.toHaveBeenCalled();
+  });
+
+  test("a whole run still works as before", () => {
+    const { channel, receive } = makeWithEnd();
+    channel.emit(validMessage([at(0), at(1)], [1]));
+    expect(receive).toHaveBeenCalledExactlyOnceWith([at(0), at(1)], [1]);
   });
 });
