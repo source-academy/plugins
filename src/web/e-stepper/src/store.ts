@@ -20,16 +20,16 @@ interface Seen {
 }
 const seen = new WeakMap<EStepperStep[], Seen>();
 
-const order = (id: string): number => (id === "Global" ? -1 : Number(id.replace(/\D/g, "")));
-
 /**
  * The whole store at `steps[index]`. What is unreachable stays so, so the evaluator puts a frame or
  * an object that has become unreachable in the step where it does, and in none of the steps after
  * it (all of them in every step would make the steps of a long run grow with the square of their
  * number: py-slang#611). The store at a step is the latest version of every frame and object in
  * that step and the ones before it; those the step itself does not have are unreachable. (An
- * evaluator that repeats them in every step gives the same store.) Frames are in creation order,
- * the global frame first, and objects in the order of their labels.
+ * evaluator that repeats them in every step gives the same store.) Frames and objects are in
+ * creation order, as the steps give them (the global frame first): the order in which an item
+ * first appears in a step, which is what the maps keep. It is not worked out from the ids, which
+ * are the evaluator's to choose.
  */
 export function storeAt(steps: EStepperStep[], index: number): Store {
   let state = seen.get(steps);
@@ -51,11 +51,7 @@ export function storeAt(steps: EStepperStep[], index: number): Store {
     ids: Set<string>,
   ): T => (ids.has(item.id) || item.isGarbage ? item : { ...item, isGarbage: true });
   return {
-    frames: [...state.frames.values()]
-      .map(f => unreachable(f, here.frames))
-      .sort((a, b) => order(a.id) - order(b.id)),
-    heap: [...state.heap.values()]
-      .map(o => unreachable(o, here.heap))
-      .sort((a, b) => order(a.id) - order(b.id)),
+    frames: [...state.frames.values()].map(f => unreachable(f, here.frames)),
+    heap: [...state.heap.values()].map(o => unreachable(o, here.heap)),
   };
 }

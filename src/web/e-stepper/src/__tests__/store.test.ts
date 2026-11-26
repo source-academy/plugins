@@ -83,11 +83,17 @@ describe("storeAt", () => {
     }
   });
 
-  test("frames are in creation order, the global frame first", () => {
-    const shuffled = [
-      step([frame("E10"), frame("E2"), frame("Global")], [list("#10"), list("#9")]),
+  test("keeps the order of creation, whatever the ids say (it is not worked out from them)", () => {
+    // The ids are the evaluator's: E10 is created before E2, and the objects are not numbered.
+    const opaque = [
+      step([frame("Global"), frame("E10")], [list("b"), list("a")]),
+      step([frame("Global"), frame("E10", true), frame("E2")], [list("b"), list("a"), list("c")]),
+      step([frame("Global"), frame("E2")], [list("c")]),
     ];
-    expect(ids(storeAt(shuffled, 0).frames)).toEqual(["Global", "E2", "E10"]);
-    expect(ids(storeAt(shuffled, 0).heap)).toEqual(["#9", "#10"]);
+    expect(ids(storeAt(opaque, 1).frames)).toEqual(["Global", "E10!", "E2"]);
+    expect(ids(storeAt(opaque, 1).heap)).toEqual(["b", "a", "c"]);
+    // What is unreachable stays where it was created, not where its id would put it.
+    expect(ids(storeAt(opaque, 2).frames)).toEqual(["Global", "E10!", "E2"]);
+    expect(ids(storeAt(opaque, 2).heap)).toEqual(["b!", "a!", "c"]);
   });
 });
