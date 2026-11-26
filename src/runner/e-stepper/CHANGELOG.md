@@ -1,5 +1,15 @@
 # @sourceacademy/runner-e-stepper
 
+## 0.0.2
+
+### Patch Changes
+
+- 79413aa: Require the stepper packages that can send a trace in batches (`common-stepper` and `runner-stepper` 0.1.0), which the e-stepper runner extends and so offers to its languages
+- Updated dependencies [5ab3224]
+  - @sourceacademy/common-stepper@0.1.0
+  - @sourceacademy/common-e-stepper@0.1.0
+  - @sourceacademy/runner-stepper@0.1.0
+
 ## 0.0.1
 
 ### Patch Changes
