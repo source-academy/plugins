@@ -79,10 +79,16 @@ export class StepperHostPlugin implements IPlugin {
     const subscribe = (listener: () => void) => this.subscribe(listener);
     const getSteps = () => this.getSteps();
     const getProfile = () => this.getProfile();
+    const getEnd = () => this.getEnd();
     function StepperTab() {
       const steps = useSyncExternalStore(subscribe, getSteps);
+      const end = useSyncExternalStore(subscribe, getEnd);
       // The profile updates together with the steps (same message), so reading it here is current.
-      return createElement(StepperView, { content: steps, profile: getProfile() });
+      return createElement(StepperView, {
+        content: steps,
+        profile: getProfile(),
+        cutOff: end?.status === "cut-off" ? end.reason : undefined,
+      });
     }
 
     const tab: Tab = {

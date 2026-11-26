@@ -1,6 +1,7 @@
 import {
   Button,
   ButtonGroup,
+  Callout,
   Card,
   Checkbox,
   Classes,
@@ -51,6 +52,12 @@ type Props = {
   steps: EStepperStep[];
   profile?: SyntaxProfile;
   error?: string | null;
+  /**
+   * Why the steps end before the program finished, if the runner cut the trace off (for example
+   * `"the limit of 2000 steps was reached"`): the view says so. A run that is stopped, or that ends
+   * on its own, has no reason to give.
+   */
+  cutOff?: string;
   /** The host's CSE machine visualization, if it lends one (see `ICseDiagramService`). */
   cseDiagram?: ICseDiagramService;
   /**
@@ -227,7 +234,7 @@ function useSize(): [(element: HTMLElement | null) => void, { width: number; hei
  */
 export { sliderLabels };
 
-export default function EStepperView({ steps, profile, error, cseDiagram, layout }: Props) {
+export default function EStepperView({ steps, profile, error, cutOff, cseDiagram, layout }: Props) {
   const [stepValue, setStepValue] = useState(1);
   const [hovered, setHovered] = useState<string | null>(null);
   const [hoveredFrame, setHoveredFrame] = useState<string | null>(null);
@@ -545,6 +552,12 @@ export default function EStepperView({ steps, profile, error, cseDiagram, layout
         <Card style={{ ...CARD_STYLE, marginTop: 8 }}>
           <Pre className="result-output">{error}</Pre>
         </Card>
+      ) : null}
+      {/* Also for a trace that was cut off before its first step: the reason is all there is to show. */}
+      {cutOff ? (
+        <Callout intent="warning" icon="warning-sign" compact style={{ marginTop: 8 }}>
+          The steps end here, before the program finished: {cutOff}.
+        </Callout>
       ) : null}
       {!hasRun ? (
         error ? null : (
