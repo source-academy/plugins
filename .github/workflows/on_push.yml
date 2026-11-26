@@ -34,12 +34,13 @@ jobs:
         with:
           path: dist/
 
-  # Opens or updates the "Version Packages" pull request. A job of its own: it fails ("No commits
-  # between main and changeset-release/main") whenever there is no changeset that `changeset version`
-  # consumes, and the changesets of the ignored web packages (see `ignore` in
-  # .changeset/config.json) are never consumed, so that is every push to main after a release. It
-  # must not hold up the build and the deploy of the plugins, which it did while it was a step of
-  # the build job. Publishing is the `publish` job's; this one only prepares the versions.
+  # Opens or updates the "Version Packages" pull request, when a pending changeset releases a package.
+  # A job of its own: it must not hold up the build and the deploy of the plugins, which it did while
+  # it was a step of the build job. The changesets of the ignored web packages (see `ignore` in
+  # .changeset/config.json) are never consumed by `changeset version`, so the action's attempt to open
+  # a pull request fails ("No commits between main and changeset-release/main") on every push to main
+  # while one of them is pending. So the action runs only when `changeset status` says that some
+  # package is released. Publishing is the `publish` job's; this one only prepares the versions.
   version-pr:
     name: Version Packages pull request
     runs-on: ubuntu-latest
@@ -58,8 +59,23 @@ jobs:
           cache: yarn
       - name: Install dependencies
         run: yarn install --frozen-lockfile
+      - name: Find out whether a pending changeset releases a package
+        id: pending
+        run: |
+          # No changeset file at all (right after a release): nothing to release. `changeset status`
+          # exits 1 then, and writes nothing, so it is not asked.
+          if ! ls .changeset/*.md | grep -qv README.md; then
+            echo "releases=0" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          yarn changeset status --output="$RUNNER_TEMP/changeset-status.json"
+          # The status also lists the dependents of a released package, with the type "none".
+          releases=$(node -e "console.log(require(process.argv[1]).releases.filter(r => r.type !== 'none').length)" "$RUNNER_TEMP/changeset-status.json")
+          echo "releases=$releases" >> "$GITHUB_OUTPUT"
+          echo "Packages released by the pending changesets: $releases"
       - name: Create or update the Version Packages pull request
         id: changesets
+        if: steps.pending.outputs.releases != '0'
         # v1 goes with @changesets/cli v2 (package.json). changesets/action v2 requires CLI v3 and
         # renames the inputs below to publish-script/version-script; upgrade both together.
         uses: changesets/action@v1
