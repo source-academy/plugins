@@ -91,6 +91,23 @@ describe("EStepperView", () => {
     });
   });
 
+  test("says why the steps end, when the runner cut the trace off", () => {
+    const shown = text(
+      render({ steps: fixture, cutOff: "the limit of 2000 steps was reached" }).root,
+    );
+    expect(shown).toContain("The steps end here, before the program finished");
+    expect(shown).toContain("the limit of 2000 steps was reached");
+  });
+
+  test("says why even when the trace was cut off before its first step", () => {
+    const shown = text(render({ steps: [], cutOff: "the limit of 0 steps was reached" }).root);
+    expect(shown).toContain("the limit of 0 steps was reached");
+  });
+
+  test("says nothing of the kind when the trace was not cut off", () => {
+    expect(text(render({ steps: fixture }).root)).not.toContain("The steps end here");
+  });
+
   test("shows the welcome text before anything has run", () => {
     const view = render({ steps: [] });
     expect(text(view.root)).toContain("Welcome to the environment stepper");

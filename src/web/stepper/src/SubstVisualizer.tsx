@@ -1,4 +1,13 @@
-import { Button, ButtonGroup, Card, Classes, Divider, Pre, Slider } from "@blueprintjs/core";
+import {
+  Button,
+  ButtonGroup,
+  Callout,
+  Card,
+  Classes,
+  Divider,
+  Pre,
+  Slider,
+} from "@blueprintjs/core";
 import { getHotkeyHandler, type HotkeyItem } from "@mantine/hooks";
 import type { SerializedStepperStep, SyntaxProfile } from "@sourceacademy/common-stepper";
 import classNames from "classnames";
@@ -77,10 +86,25 @@ function SubstOutputDisplay(props: { content: string }) {
   );
 }
 
+/** Says that the steps end before the program finished, and why. */
+function CutOffNotice({ reason }: { reason: string }) {
+  return (
+    <Callout intent="warning" icon="warning-sign" compact style={{ margin: "8px 0" }}>
+      The steps end here, before the program finished: {reason}.
+    </Callout>
+  );
+}
+
 type StepperViewProps = {
   content: SerializedStepperStep[];
   /** The active language's rendering rules; when absent, the default (Source) syntax is used. */
   profile?: SyntaxProfile;
+  /**
+   * Why the steps end before the program finished, if the runner cut the trace off (for example
+   * `"the limit of 3000 steps was reached"`): the view says so. A run that is stopped, or that ends
+   * on its own, has no reason to give.
+   */
+  cutOff?: string;
 };
 
 /**
@@ -228,6 +252,8 @@ export default function StepperView(props: StepperViewProps) {
           <Button disabled={!hasRunCode} icon="double-chevron-right" onClick={stepNextBreakpoint} />
         </ButtonGroup>
       </div>{" "}
+      {/* Also for a trace that was cut off before its first step: the reason is all there is to show. */}
+      {props.cutOff ? <CutOffNotice reason={props.cutOff} /> : null}
       <br />
       {hasRunCode ? (
         <CustomASTRenderer {...getAST(stepValue)} profile={props.profile} />

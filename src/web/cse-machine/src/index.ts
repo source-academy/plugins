@@ -1,9 +1,11 @@
 import {
   CSE_CHANNEL,
+  CSE_MESSAGE_TYPE_SNAPSHOT_BATCH,
   CSE_MESSAGE_TYPE_SNAPSHOTS,
   WEB_ID,
+  type CseMessage,
   type CseSnapshot,
-  type CseSnapshotMessage,
+  type CseTraceEnd,
 } from "@sourceacademy/common-cse-machine";
 import type { IPlugin, IChannel, IConduit } from "@sourceacademy/conductor/conduit";
 
@@ -16,6 +18,9 @@ export type {
   CseSerializedBinding,
   CseSerializedEnvFrame,
   CseSnapshotMessage,
+  CseSnapshotBatchMessage,
+  CseMessage,
+  CseTraceEnd,
 } from "@sourceacademy/common-cse-machine";
 
 /**
@@ -40,6 +45,17 @@ export abstract class CseMachineHostPlugin implements IPlugin {
    */
   abstract receiveSnapshots(snapshots: CseSnapshot[], breakpointSteps: number[]): void;
 
+  /**
+   * Called when a run that was sent in batches ends, with how it ended: complete, or cut off by the
+   * runner (with the reason). Not called for a run that is stopped before it ends, nor for one sent
+   * whole. Implement this in the host app to say so in the visualization; the default does nothing.
+   */
+  receiveEnd(_end: CseTraceEnd): void {}
+
+  /** The snapshots of the run being received in batches, so far. */
+  private __snapshots: CseSnapshot[] = [];
+  private __breakpointSteps: number[] = [];
+
   constructor(
     _conduit: IConduit,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -48,8 +64,10 @@ export abstract class CseMachineHostPlugin implements IPlugin {
     if (!cseChannel) {
       throw new Error("CSE channel is required but was not provided.");
     }
-    (cseChannel as IChannel<CseSnapshotMessage>).subscribe(message => {
-      if (
+    (cseChannel as IChannel<CseMessage>).subscribe(message => {
+      if (message?.type === CSE_MESSAGE_TYPE_SNAPSHOT_BATCH) {
+        this.__receiveBatch(message);
+      } else if (
         message?.type === CSE_MESSAGE_TYPE_SNAPSHOTS &&
         Array.isArray(message.snapshots) &&
         message.totalSteps === message.snapshots.length
@@ -60,5 +78,22 @@ export abstract class CseMachineHostPlugin implements IPlugin {
         );
       }
     });
+  }
+
+  /**
+   * A batch continues the snapshots that came before it (index 0 starts the run afresh); one that
+   * does not (a batch was missed) is dropped rather than put in the wrong place. The host gets the
+   * snapshots so far each time, as it does for a whole run.
+   */
+  private __receiveBatch(message: CseSnapshotBatchMessage): void {
+    if (!Array.isArray(message.snapshots) || message.index > this.__snapshots.length) return;
+    this.__snapshots = this.__snapshots.slice(0, message.index).concat(message.snapshots);
+    this.__breakpointSteps = (message.index === 0 ? [] : this.__breakpointSteps).concat(
+      Array.isArray(message.breakpointSteps) ? message.breakpointSteps : [],
+    );
+    if (message.snapshots.length > 0) {
+      this.receiveSnapshots(this.__snapshots, this.__breakpointSteps);
+    }
+    if (message.end) this.receiveEnd(message.end);
   }
 }

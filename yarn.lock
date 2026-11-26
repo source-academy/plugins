@@ -2087,7 +2087,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sourceacademy/common-autocomplete@npm:^0.0.1, @sourceacademy/common-autocomplete@workspace:src/common/autocomplete":
+"@sourceacademy/common-autocomplete@npm:^0.0.2, @sourceacademy/common-autocomplete@workspace:src/common/autocomplete":
   version: 0.0.0-use.local
   resolution: "@sourceacademy/common-autocomplete@workspace:src/common/autocomplete"
   dependencies:
@@ -2148,8 +2148,8 @@ __metadata:
     tslib: "npm:^2.8.1"
     typescript: "npm:^6.0.3"
   peerDependencies:
-    "@sourceacademy/common-cse-machine": ">=0.4.0"
-    "@sourceacademy/common-stepper": ">=0.0.4"
+    "@sourceacademy/common-cse-machine": ">=0.5.0"
+    "@sourceacademy/common-stepper": ">=0.1.0"
   languageName: unknown
   linkType: soft
 
@@ -2229,10 +2229,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sourceacademy/plugin-directory@source-academy/plugin-directory#main":
-  version: 0.0.2
-  resolution: "@sourceacademy/plugin-directory@https://github.com/source-academy/plugin-directory.git#commit=28515735bd7b271b685793de96938e049f70ace9"
-  checksum: 10c0/e5d4185ff0ff2d5cca39decd011fb56d6296dc0f9fe37fac444b51e04f3db919a84811baa3852a65cec763fa78c36166b6187b0567ca473e302f26cc14377749
+"@sourceacademy/plugin-directory@https://github.com/source-academy/plugin-directory.git#0.0.5":
+  version: 0.0.3
+  resolution: "@sourceacademy/plugin-directory@https://github.com/source-academy/plugin-directory.git#commit=0cc9be5a99d4354acdeed7421eacf0a4bbdf6450"
+  checksum: 10c0/2922cad07844af91efb3dacc7fa7839327aa38d69bf3bb6bf3e42ff02f3542f44e8aa1566988a5abe0d8fc5020b77bc215992bd5f4e813a36ffbd71fff8f7bdc
   languageName: node
   linkType: hard
 
@@ -2243,7 +2243,7 @@ __metadata:
     "@rollup/plugin-node-resolve": "npm:^16.0.3"
     "@rollup/plugin-terser": "npm:^1.0.0"
     "@rollup/plugin-typescript": "npm:^12.3.0"
-    "@sourceacademy/common-autocomplete": "npm:^0.0.1"
+    "@sourceacademy/common-autocomplete": "npm:^0.0.2"
     "@sourceacademy/conductor": "npm:^0.8.0"
     rollup: "npm:^4.60.2"
     tslib: "npm:^2.8.1"
@@ -2269,7 +2269,7 @@ __metadata:
     typescript: "npm:^6.0.3"
     vitest: "npm:^5.0.0"
   peerDependencies:
-    "@sourceacademy/common-cse-machine": ">=0.4.0"
+    "@sourceacademy/common-cse-machine": ">=0.5.0"
     "@sourceacademy/conductor": ^0.8.0
   languageName: unknown
   linkType: soft
@@ -2313,9 +2313,9 @@ __metadata:
     typescript: "npm:^6.0.3"
   peerDependencies:
     "@sourceacademy/common-e-stepper": ">=0.0.0"
-    "@sourceacademy/common-stepper": ">=0.0.4"
+    "@sourceacademy/common-stepper": ">=0.1.0"
     "@sourceacademy/conductor": ^0.8.0
-    "@sourceacademy/runner-stepper": ">=0.0.1"
+    "@sourceacademy/runner-stepper": ">=0.1.0"
   languageName: unknown
   linkType: soft
 
@@ -2415,7 +2415,7 @@ __metadata:
     "@rollup/plugin-node-resolve": "npm:^16.0.3"
     "@rollup/plugin-terser": "npm:^1.0.0"
     "@rollup/plugin-typescript": "npm:^12.3.0"
-    "@sourceacademy/common-autocomplete": "npm:^0.0.1"
+    "@sourceacademy/common-autocomplete": "npm:^0.0.2"
     "@sourceacademy/conductor": "npm:^0.8.0"
     rollup: "npm:^4.60.2"
     tslib: "npm:^2.8.1"
@@ -2441,7 +2441,7 @@ __metadata:
     typescript: "npm:^6.0.3"
     vitest: "npm:^5.0.0"
   peerDependencies:
-    "@sourceacademy/common-cse-machine": ">=0.4.0"
+    "@sourceacademy/common-cse-machine": ">=0.5.0"
     "@sourceacademy/conductor": ^0.8.0
   languageName: unknown
   linkType: soft
@@ -2582,7 +2582,7 @@ __metadata:
     typescript: "npm:^6.0.3"
     vitest: "npm:^4.1.9"
   peerDependencies:
-    "@sourceacademy/common-tabs": ^0.0.1
+    "@sourceacademy/common-tabs": ^0.1.0
     "@sourceacademy/conductor": ^0.8.0
     react: ^19
     react-dom: ^19
@@ -6206,7 +6206,7 @@ __metadata:
   dependencies:
     "@changesets/cli": "npm:^3.0.0"
     "@sourceacademy/conductor": "npm:^0.8.0"
-    "@sourceacademy/plugin-directory": "source-academy/plugin-directory#main"
+    "@sourceacademy/plugin-directory": "https://github.com/source-academy/plugin-directory.git#0.0.5"
     "@types/node": "npm:^25.9.1"
     "@vitest/coverage-istanbul": "npm:^5.0.0"
     commander: "npm:^15.0.0"

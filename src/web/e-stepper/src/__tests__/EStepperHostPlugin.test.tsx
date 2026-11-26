@@ -46,6 +46,8 @@ describe("EStepperHostPlugin", () => {
   test("registers and reveals the E-Stepper tab, and asks for the last run's steps", () => {
     const { tab, tabService, sent } = setUp();
     expect(tab).toMatchObject({ id: "e-stepper", label: "E-Stepper", iconName: "flow-review" });
+    // The host hides its REPL and fixes the side content's size while this tab is open.
+    expect(tab).toMatchObject({ hidesRepl: true, resizable: false });
     expect(tabService.revealTab).toHaveBeenCalledWith("e-stepper");
     expect(sent).toEqual([{ type: "request" }]);
   });
@@ -56,6 +58,8 @@ describe("EStepperHostPlugin", () => {
     expect(plugin.getState().steps).toHaveLength(3);
     deliver({ type: "error", error: "SyntaxError" });
     expect(plugin.getState()).toMatchObject({ steps: [], error: "SyntaxError" });
+    // The failed run has no trace, so the end of the one before does not describe it.
+    expect(plugin.getState().end).toBeUndefined();
   });
 
   test("lends the host's CSE diagram to the tab", () => {
@@ -78,5 +82,53 @@ describe("EStepperHostPlugin", () => {
     expect(view.root.findAllByType("host-cse-view" as unknown as React.ElementType)).toHaveLength(
       1,
     );
+  });
+
+  describe("batches", () => {
+    const some = steps as unknown as EStepperStep[];
+    const one = some.slice(0, 1);
+    const rest = some.slice(1);
+
+    test("each batch continues the steps before it, and the end is kept", () => {
+      const { plugin, deliver } = setUp();
+      deliver({ type: "batch", index: 0, steps: one });
+      expect(plugin.getState().steps).toHaveLength(1);
+      expect(plugin.getState().end).toBeUndefined();
+      deliver({ type: "batch", index: 1, steps: rest, end: { status: "complete" } });
+      expect(plugin.getState().steps).toHaveLength(some.length);
+      expect(plugin.getState().end).toEqual({ status: "complete" });
+    });
+
+    test("a cut-off trace keeps its steps and says why", () => {
+      const { plugin, deliver } = setUp();
+      deliver({ type: "batch", index: 0, steps: some });
+      deliver({
+        type: "batch",
+        index: some.length,
+        steps: [],
+        end: { status: "cut-off", reason: "too long" },
+      });
+      expect(plugin.getState()).toMatchObject({
+        error: null,
+        end: { status: "cut-off", reason: "too long" },
+      });
+      expect(plugin.getState().steps).toHaveLength(some.length);
+    });
+
+    test("a batch at index 0 starts the run afresh, and one that skips ahead is dropped", () => {
+      const { plugin, deliver } = setUp();
+      deliver({ type: "batch", index: 0, steps: some, end: { status: "complete" } });
+      deliver({ type: "batch", index: 0, steps: one });
+      expect(plugin.getState().steps).toHaveLength(1);
+      expect(plugin.getState().end).toBeUndefined();
+      deliver({ type: "batch", index: 9, steps: rest });
+      expect(plugin.getState().steps).toHaveLength(1);
+    });
+
+    test("a trace sent whole is a complete one", () => {
+      const { plugin, deliver } = setUp();
+      deliver({ type: "steps", steps: some });
+      expect(plugin.getState().end).toEqual({ status: "complete" });
+    });
   });
 });

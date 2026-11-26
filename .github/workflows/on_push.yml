@@ -28,13 +28,58 @@ jobs:
         uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Create Release Pull Request or Publish to npm
+      - name: Upload artifacts
+        id: deployment
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist/
+
+  # Opens or updates the "Version Packages" pull request, when a pending changeset releases a package.
+  # A job of its own: it must not hold up the build and the deploy of the plugins, which it did while
+  # it was a step of the build job. The changesets of the ignored web packages (see `ignore` in
+  # .changeset/config.json) are never consumed by `changeset version`, so the action's attempt to open
+  # a pull request fails ("No commits between main and changeset-release/main") on every push to main
+  # while one of them is pending. So the action runs only when `changeset status` says that some
+  # package is released. Publishing is the `publish` job's; this one only prepares the versions.
+  version-pr:
+    name: Version Packages pull request
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Enable corepack
+        run: corepack enable
+      - name: Setup node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: yarn
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Find out whether a pending changeset releases a package
+        id: pending
+        run: |
+          # No changeset file at all (right after a release): nothing to release. `changeset status`
+          # exits 1 then, and writes nothing, so it is not asked.
+          if ! ls .changeset/*.md | grep -qv README.md; then
+            echo "releases=0" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          yarn changeset status --output="$RUNNER_TEMP/changeset-status.json"
+          # The status also lists the dependents of a released package, with the type "none".
+          releases=$(node -e "console.log(require(process.argv[1]).releases.filter(r => r.type !== 'none').length)" "$RUNNER_TEMP/changeset-status.json")
+          echo "releases=$releases" >> "$GITHUB_OUTPUT"
+          echo "Packages released by the pending changesets: $releases"
+      - name: Create or update the Version Packages pull request
         id: changesets
+        if: steps.pending.outputs.releases != '0'
         # v1 goes with @changesets/cli v2 (package.json). changesets/action v2 requires CLI v3 and
         # renames the inputs below to publish-script/version-script; upgrade both together.
         uses: changesets/action@v1
         with:
-          publish: yarn changeset publish
           # changeset version only rewrites package.json/CHANGELOG.md — it never re-runs
           # install, so a peerDependency range bump (e.g. common-cse-machine >=0.1.0 -> >=0.2.0
           # in a dependent's package.json) can leave yarn.lock stale. That stale lockfile then
@@ -55,11 +100,6 @@ jobs:
           # pattern: without it, this install could itself run in an immutable/frozen mode and
           # fail instead of regenerating the lockfile.
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
-      - name: Upload artifacts
-        id: deployment
-        uses: actions/upload-pages-artifact@v5
-        with:
-          path: dist/
 
   deploy:
     needs: build
@@ -75,3 +115,47 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+
+  # Publishes the versions on main that are not on npm yet.
+  #
+  # changesets/action publishes only when no changeset is left, and the changesets of the ignored web
+  # packages (see `ignore` in .changeset/config.json) are never consumed, so the step above always
+  # takes its "Version Packages" branch and fails when that pull request is merged ("No commits
+  # between main and changeset-release/main"): nothing was ever published by it. `changeset publish`
+  # publishes exactly the versions that are not on npm, so it is safe to run on every push to main
+  # (it does nothing when everything is published), and runs here by itself so that the build and
+  # deploy above do not depend on it, nor it on them.
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    # One publish at a time: two pushes in a row would otherwise try to publish the same version.
+    concurrency:
+      group: npm-publish
+      cancel-in-progress: false
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Enable corepack
+        run: corepack enable
+      - name: Setup node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: yarn
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      # A package's own prepack builds it, but the packages it builds on must be built first.
+      - name: yarn run build
+        run: yarn run build
+      - name: Publish unpublished versions
+        run: yarn changeset publish
+        env:
+          # `yarn npm publish` (which changesets runs) reads its login from Yarn's own settings,
+          # not from ~/.npmrc: the registry to publish to, and the token for it.
+          YARN_NPM_REGISTRY_SERVER: https://registry.npmjs.org
+          YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      # changeset publish tags each release; the tags are pushed so that they are on GitHub.
+      - name: Push release tags
+        run: git push origin --tags

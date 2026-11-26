@@ -31,8 +31,11 @@ export const WEB_ID = "__web_cse";
  */
 export const CSE_DIRECTORY_ID = "cse-machine";
 
-/** The {@link CseSnapshotMessage.type} discriminator for a batch of snapshots. */
+/** The {@link CseSnapshotMessage.type} discriminator for the snapshots of a whole run. */
 export const CSE_MESSAGE_TYPE_SNAPSHOTS = "snapshots";
+
+/** The {@link CseSnapshotBatchMessage.type} discriminator for a part of a run's snapshots. */
+export const CSE_MESSAGE_TYPE_SNAPSHOT_BATCH = "snapshot-batch";
 
 /**
  * A single value on the stash or bound in an environment, serialized to plain JSON.
@@ -158,6 +161,42 @@ export interface CseSnapshotMessage {
    */
   breakpointSteps?: number[];
 }
+
+/**
+ * How a run that was sent in batches ended: it ran to its end (`complete`), or the runner stopped
+ * recording before that (`cut-off`, with the reason, such as a limit of the runner's own). The same
+ * shape as the stepper's `TraceEnd` (`@sourceacademy/common-stepper`); a run with no end at all (the
+ * host stopped it) is as far as it got.
+ */
+export type CseTraceEnd = { status: "complete" } | { status: "cut-off"; reason: string };
+
+/**
+ * A part of the snapshots of the run that is going on, sent while it runs, so that a run that is
+ * stopped, or never finishes, still leaves the snapshots that it had computed. See
+ * {@link CseSnapshotMessage} for a runner that sends a whole run at the end instead.
+ *
+ * A run is a series of batches whose `index` values continue from one another: the first has `index`
+ * 0 (and starts the run afresh), and each next one has the number of snapshots that came before it.
+ * The last carries `end`, and may have no snapshots (the end is known only after the last step).
+ */
+export interface CseSnapshotBatchMessage {
+  /** Discriminator; always {@link CSE_MESSAGE_TYPE_SNAPSHOT_BATCH}. */
+  type: typeof CSE_MESSAGE_TYPE_SNAPSHOT_BATCH;
+  /** The number of snapshots of this run that precede this batch. 0 starts a run. */
+  index: number;
+  /** The snapshots of this batch, in step order. */
+  snapshots: CseSnapshot[];
+  /**
+   * As {@link CseSnapshotMessage.breakpointSteps} (absolute step indices of the run), for the
+   * steps of this batch only.
+   */
+  breakpointSteps?: number[];
+  /** Present on the last batch of the run. */
+  end?: CseTraceEnd;
+}
+
+/** Every message that may cross the {@link CSE_CHANNEL} channel, runner to host. */
+export type CseMessage = CseSnapshotMessage | CseSnapshotBatchMessage;
 
 /* -------------------------------------------------------------------------- */
 /*                         Host services for web plugins                      */

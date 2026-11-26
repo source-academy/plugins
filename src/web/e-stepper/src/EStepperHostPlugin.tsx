@@ -4,6 +4,7 @@ import {
   type EStepperMessage,
   type EStepperStep,
   type SyntaxProfile,
+  type TraceEnd,
 } from "@sourceacademy/common-e-stepper";
 import type { ICseDiagramService, IHostServices } from "@sourceacademy/common-cse-machine";
 import type { ITabService, Tab } from "@sourceacademy/common-tabs";
@@ -33,6 +34,11 @@ interface State {
   steps: EStepperStep[];
   profile?: SyntaxProfile;
   error: string | null;
+  /**
+   * How the most recent run's trace ended, once it has: complete, or cut off by the runner. Absent
+   * while it is arriving, and for a run that was stopped before it ended.
+   */
+  end?: TraceEnd;
 }
 
 /**
@@ -62,7 +68,25 @@ export class EStepperHostPlugin implements IPlugin {
     this.__channel = channel;
     this.__channel.subscribe(message => {
       if (message.type === "steps") {
-        this.__state = { steps: message.steps, profile: message.profile, error: null };
+        // A trace sent whole is a complete one.
+        this.__state = {
+          steps: message.steps,
+          profile: message.profile,
+          error: null,
+          end: { status: "complete" },
+        };
+        this.__emit();
+      } else if (message.type === "batch") {
+        // A batch continues the steps that came before it (index 0 starts the run afresh). One
+        // that does not (a batch was missed) is dropped rather than put in the wrong place.
+        const { steps, profile, end } = this.__state;
+        if (message.index > steps.length) return;
+        this.__state = {
+          steps: steps.slice(0, message.index).concat(message.steps),
+          profile: message.index === 0 ? message.profile : profile,
+          error: null,
+          end: message.end ?? (message.index === 0 ? undefined : end),
+        };
         this.__emit();
       } else if (message.type === "error") {
         this.__state = { steps: [], error: message.error };
@@ -81,6 +105,7 @@ export class EStepperHostPlugin implements IPlugin {
         steps: state.steps,
         profile: state.profile,
         error: state.error,
+        cutOff: state.end?.status === "cut-off" ? state.end.reason : undefined,
         cseDiagram,
         layout,
       });
@@ -91,6 +116,10 @@ export class EStepperHostPlugin implements IPlugin {
       label: "E-Stepper",
       // The Stepper's icon: the two never appear together (Stepper: Python §1-2, E-Stepper: §3-4).
       iconName: "flow-review",
+      // The tab shows the program and its output itself, so the host has no use for its REPL, and the
+      // layout of the steps depends on the width it was given.
+      hidesRepl: true,
+      resizable: false,
       body: createElement(EStepperTab),
     };
     tabService.registerTab(tab);

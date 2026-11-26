@@ -1,6 +1,6 @@
 {
   "name": "@sourceacademy/common-e-stepper",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "packageManager": "yarn@4.18.1",
   "description": "Shared, language-agnostic protocol for the Source Academy environment stepper (e-stepper) plugin pair",
   "scripts": {
@@ -24,8 +24,8 @@
     }
   },
   "peerDependencies": {
-    "@sourceacademy/common-cse-machine": ">=0.4.0",
-    "@sourceacademy/common-stepper": ">=0.0.4"
+    "@sourceacademy/common-cse-machine": ">=0.5.0",
+    "@sourceacademy/common-stepper": ">=0.1.0"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^16.0.3",

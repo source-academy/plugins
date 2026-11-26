@@ -4,6 +4,7 @@ import {
   type SerializedStepperStep,
   type StepperMessage,
   type SyntaxProfile,
+  type TraceEnd,
 } from "@sourceacademy/common-stepper";
 import type { ITabService, Tab } from "@sourceacademy/common-tabs";
 import {
@@ -36,6 +37,7 @@ export class StepperHostPlugin implements IPlugin {
   private __steps: SerializedStepperStep[] = [];
   private __profile: SyntaxProfile | undefined = undefined;
   private __error: string | null = null;
+  private __end: TraceEnd | undefined = undefined;
   private readonly __listeners = new Set<() => void>();
 
   constructor(
@@ -49,9 +51,24 @@ export class StepperHostPlugin implements IPlugin {
         this.__steps = message.steps;
         this.__profile = message.profile;
         this.__error = null;
+        // A trace sent whole is a complete one.
+        this.__end = { status: "complete" };
+        this.__emit();
+      } else if (message.type === "batch") {
+        // A batch continues the steps that came before it (index 0 starts the run afresh). One
+        // that does not (a batch was missed) is dropped rather than put in the wrong place.
+        if (message.index > this.__steps.length) return;
+        this.__steps = this.__steps.slice(0, message.index).concat(message.steps);
+        if (message.index === 0) {
+          this.__profile = message.profile;
+          this.__end = undefined;
+        }
+        if (message.end) this.__end = message.end;
+        this.__error = null;
         this.__emit();
       } else if (message.type === "error") {
         this.__steps = [];
+        this.__end = undefined;
         this.__error = message.error;
         this.__emit();
       }
@@ -62,16 +79,26 @@ export class StepperHostPlugin implements IPlugin {
     const subscribe = (listener: () => void) => this.subscribe(listener);
     const getSteps = () => this.getSteps();
     const getProfile = () => this.getProfile();
+    const getEnd = () => this.getEnd();
     function StepperTab() {
       const steps = useSyncExternalStore(subscribe, getSteps);
+      const end = useSyncExternalStore(subscribe, getEnd);
       // The profile updates together with the steps (same message), so reading it here is current.
-      return createElement(StepperView, { content: steps, profile: getProfile() });
+      return createElement(StepperView, {
+        content: steps,
+        profile: getProfile(),
+        cutOff: end?.status === "cut-off" ? end.reason : undefined,
+      });
     }
 
     const tab: Tab = {
       id: TAB_ID,
       label: "Stepper",
       iconName: "flow-review",
+      // The tab shows the program and its output itself, so the host has no use for its REPL, and the
+      // layout of the steps depends on the width it was given.
+      hidesRepl: true,
+      resizable: false,
       body: createElement(StepperTab),
     };
     tabService.registerTab(tab);
@@ -92,6 +119,14 @@ export class StepperHostPlugin implements IPlugin {
   /** The active language's rendering rules from the most recent run, if any. */
   getProfile(): SyntaxProfile | undefined {
     return this.__profile;
+  }
+
+  /**
+   * How the most recent run's trace ended, once it has: complete, or cut off by the runner (with
+   * the reason). `undefined` while it is arriving, and for a run that was stopped before it ended.
+   */
+  getEnd(): TraceEnd | undefined {
+    return this.__end;
   }
 
   /** The most recent stepping error, if any. */

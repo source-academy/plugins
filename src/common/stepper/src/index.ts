@@ -222,6 +222,38 @@ export interface StepperStepsMessage {
   profile?: SyntaxProfile;
 }
 
+/**
+ * How a trace that was sent in batches ended: it ran to its end (`complete`), or the runner stopped
+ * recording before that (`cut-off`, with the reason, such as a limit of the runner's own).
+ *
+ * A trace that never gets an end (the run was stopped by the host, which terminates the runner) is
+ * neither: it is as far as the run got.
+ */
+export type TraceEnd = { status: "complete" } | { status: "cut-off"; reason: string };
+
+/**
+ * Runner → host: a part of the steps of the run that is going on, sent while it runs, so that a run
+ * that is stopped, or never finishes, still leaves the steps that it had computed.
+ *
+ * A run is a series of batches whose `index` values continue from one another: the first has
+ * `index` 0 (and starts the run afresh, replacing what the host had), and each next one has the
+ * number of steps that came before it. The last batch carries `end`; it may have no steps (when the
+ * end is only known after the last step).
+ *
+ * A runner that does not stream sends one {@link StepperStepsMessage} at the end instead, which a
+ * host takes as a complete trace.
+ */
+export interface StepperBatchMessage {
+  type: "batch";
+  /** The number of steps of this run that precede this batch. 0 starts a run. */
+  index: number;
+  steps: SerializedStepperStep[];
+  /** As {@link StepperStepsMessage.profile}; sent with the first batch (`index` 0). */
+  profile?: SyntaxProfile;
+  /** Present on the last batch of the run. */
+  end?: TraceEnd;
+}
+
 /** Runner → host: stepping failed (e.g. a parse error). */
 export interface StepperErrorMessage {
   type: "error";
@@ -237,4 +269,5 @@ export interface StepperRequestMessage {
 }
 
 /** Every message that may cross the {@link STEPPER_CHANNEL_ID} channel. */
-export type StepperMessage = StepperStepsMessage | StepperErrorMessage | StepperRequestMessage;
+export type StepperMessage =
+  StepperStepsMessage | StepperBatchMessage | StepperErrorMessage | StepperRequestMessage;
