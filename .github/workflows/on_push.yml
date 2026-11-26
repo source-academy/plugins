@@ -28,13 +28,42 @@ jobs:
         uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Create Release Pull Request or Publish to npm
+      - name: Upload artifacts
+        id: deployment
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist/
+
+  # Opens or updates the "Version Packages" pull request. A job of its own: it fails ("No commits
+  # between main and changeset-release/main") whenever there is no changeset that `changeset version`
+  # consumes, and the changesets of the ignored web packages (see `ignore` in
+  # .changeset/config.json) are never consumed, so that is every push to main after a release. It
+  # must not hold up the build and the deploy of the plugins, which it did while it was a step of
+  # the build job. Publishing is the `publish` job's; this one only prepares the versions.
+  version-pr:
+    name: Version Packages pull request
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Enable corepack
+        run: corepack enable
+      - name: Setup node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: yarn
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Create or update the Version Packages pull request
         id: changesets
         # v1 goes with @changesets/cli v2 (package.json). changesets/action v2 requires CLI v3 and
         # renames the inputs below to publish-script/version-script; upgrade both together.
         uses: changesets/action@v1
         with:
-          publish: yarn changeset publish
           # changeset version only rewrites package.json/CHANGELOG.md — it never re-runs
           # install, so a peerDependency range bump (e.g. common-cse-machine >=0.1.0 -> >=0.2.0
           # in a dependent's package.json) can leave yarn.lock stale. That stale lockfile then
@@ -55,11 +84,6 @@ jobs:
           # pattern: without it, this install could itself run in an immutable/frozen mode and
           # fail instead of regenerating the lockfile.
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
-      - name: Upload artifacts
-        id: deployment
-        uses: actions/upload-pages-artifact@v5
-        with:
-          path: dist/
 
   deploy:
     needs: build
