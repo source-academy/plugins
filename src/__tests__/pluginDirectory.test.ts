@@ -14,7 +14,9 @@ import { describe, expect, test, vi } from "vitest";
 vi.mock("../web/stepper/src/SubstVisualizer", () => ({ default: () => null }));
 vi.mock("../web/e-stepper/src/EStepperView", () => ({ default: () => null }));
 vi.mock("../web/data-visualizer/src/DataVisualizerView", () => ({ default: () => null }));
+vi.mock("../web/cse-machine/src/CseMachineView", () => ({ default: () => null }));
 
+import { CseMachineTabPlugin } from "../web/cse-machine/src/CseMachineTabPlugin";
 import { DataVisualizerHostPlugin } from "../web/data-visualizer/src/DataVisualizerHostPlugin";
 import { EStepperHostPlugin } from "../web/e-stepper/src/EStepperHostPlugin";
 import { StepperHostPlugin } from "../web/stepper/src/StepperHostPlugin";
@@ -24,6 +26,7 @@ const hostPlugins = {
   stepper: StepperHostPlugin,
   "e-stepper": EStepperHostPlugin,
   "data-visualizer": DataVisualizerHostPlugin,
+  "cse-machine": CseMachineTabPlugin,
 } as const;
 
 function registeredTab(id: keyof typeof hostPlugins): Tab {
