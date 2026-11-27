@@ -1,5 +1,11 @@
 # @sourceacademy/common-cse-machine
 
+## 0.6.0
+
+### Minor Changes
+
+- 70c7897: The metadata that a renderer reads is now typed and documented: `CseFunctionMetadata` (`closureFrameId`, `params`, `funcName`, `body`, `locals`, `globals`, and the new `builtin`) and `CseEnvironmentInstructionMetadata` (`instrType` `"env"`, `envId`; `CSE_INSTR_TYPE_ENVIRONMENT`). All optional and additive: an evaluator that sends none of the new fields works as before.
+
 ## 0.5.0
 
 ### Minor Changes
