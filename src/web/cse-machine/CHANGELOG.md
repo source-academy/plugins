@@ -1,5 +1,13 @@
 # @sourceacademy/web-cse-machine
 
+## 3.1.1
+
+### Patch Changes
+
+- 9186564: The package declares the Apache License 2.0 (its metadata said ISC) and ships the licence text; the code is unchanged.
+- Updated dependencies [9186564]
+  - @sourceacademy/common-cse-machine@0.6.1
+
 ## 3.1.0
 
 ### Minor Changes

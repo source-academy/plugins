@@ -1,6 +1,6 @@
 {
   "name": "@sourceacademy/runner-autocomplete",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "packageManager": "yarn@4.18.1",
   "description": "The runner plugin for the Conductor autocomplete framework",
   "scripts": {
@@ -28,7 +28,7 @@
     "@sourceacademy/conductor": "^0.8.0"
   },
   "dependencies": {
-    "@sourceacademy/common-autocomplete": "^0.0.2"
+    "@sourceacademy/common-autocomplete": "^0.0.3"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^16.0.3",

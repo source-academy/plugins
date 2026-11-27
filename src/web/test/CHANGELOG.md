@@ -1,5 +1,13 @@
 # @sourceacademy/web-test
 
+## 0.0.5
+
+### Patch Changes
+
+- 9186564: The package declares the Apache License 2.0 (its metadata said ISC) and ships the licence text; the code is unchanged.
+- Updated dependencies [9186564]
+  - @sourceacademy/common-tabs@0.2.1
+
 ## 0.0.4
 
 ### Patch Changes

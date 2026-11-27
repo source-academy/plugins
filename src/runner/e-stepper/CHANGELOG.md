@@ -1,5 +1,15 @@
 # @sourceacademy/runner-e-stepper
 
+## 0.0.3
+
+### Patch Changes
+
+- 9186564: The package declares the Apache License 2.0 (its metadata said ISC) and ships the licence text; the code is unchanged.
+- Updated dependencies [9186564]
+  - @sourceacademy/common-e-stepper@0.1.2
+  - @sourceacademy/common-stepper@0.1.1
+  - @sourceacademy/runner-stepper@0.1.1
+
 ## 0.0.2
 
 ### Patch Changes
