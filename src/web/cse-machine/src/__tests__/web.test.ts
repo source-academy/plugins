@@ -1,5 +1,5 @@
 import { describe, test, expect, vi } from "vitest";
-import { CseMachineHostPlugin } from "..";
+import { CseMachineHostPlugin } from "../CseMachineHostPlugin";
 import {
   CSE_CHANNEL,
   CSE_MESSAGE_TYPE_SNAPSHOT_BATCH,

@@ -3,9 +3,12 @@
   "exclude": ["./dist"],
   "include": ["./src"],
   "compilerOptions": {
-    "declaration": true,
+    "declaration": false,
     "outDir": "./dist",
-    "rootDir": "./src",
-    "types": []
+    // The tab draws with the environment-diagram library, which is TypeScript source in ../environment-diagram/src, so the root spans both.
+    "rootDir": "..",
+    "types": [],
+    // The library is read from its source, not through the workspace link (a virtual path that is outside the root).
+    "paths": { "@sourceacademy/web-environment-diagram": ["../environment-diagram/src/index.ts"] }
   }
 }
