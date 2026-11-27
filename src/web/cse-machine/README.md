@@ -1,63 +1,41 @@
-<h1 align="center"> CSE Machine </h1>
+# @sourceacademy/web-cse-machine
 
-<p align="center">Web/host-side plugin for the Source Academy CSE machine — receives evaluation snapshots for rendering</p>
+The host (web) plugin of the Source Academy CSE machine. It receives the snapshots that a language's
+runner sends (`@sourceacademy/common-cse-machine`) and contributes a **CSE Machine** side-content
+tab: a step slider, the control, the stash and the environment diagram at each step, with the toggles
+(control and stash, truncate, alignment, arrow filters, print, save, clear unreachable objects) and
+step navigation (by step, by change, by breakpoint) of the CSE machine. It knows no language.
 
-<p align="center">
-  <a href="https://www.npmjs.com/package/@sourceacademy/web-cse-machine"><img src="https://img.shields.io/npm/v/@sourceacademy/web-cse-machine?color=1a2530&label=npm"></a>
-  <a href="https://github.com/source-academy/plugins/tree/main/src/web/cse-machine"><img src="https://img.shields.io/badge/github-repo-blue?logo=github"></a>
-</p>
+It is an external web plugin, like the E-Stepper: it is not installed from npm, and an evaluator
+loads it with `hostLoadPlugin(CSE_DIRECTORY_ID)` (`"cse-machine"`); the host resolves that through the
+plugin directory. Up to 3.1.0 this package was published to npm as the transport only (an abstract
+`CseMachineHostPlugin`, from which the frontend drew the diagram itself); those versions stay on npm,
+and nothing newer is published.
 
-## Features
-- Subscribes to the CSE channel and delivers snapshot batches to the host app's visualization layer
-- Language-agnostic: works with any evaluator that sends `CseSnapshot`s via the runner plugin
-- Re-exports all protocol types from `@sourceacademy/common-cse-machine` so host apps need only one import
+## What it needs from the host
 
-## Installation
-In production, use the [plugin directory](https://github.com/source-academy/plugin-directory) hosted on [GitHub Pages](https://source-academy.github.io/plugins/directory.json). It contains a list of all plugins available in this monorepo. Your host app should be able to load plugins from the plugin directory (the Source Academy frontend does).
+`ITabService` (to contribute the tab; the tab hides the REPL and is not resizable), and, optionally,
+`editor.highlight` of the host contract (`IHostContract` of `@sourceacademy/common-tabs`), with
+which it marks the line of the step in the editor and clears it when the tab goes away. A host that
+has no editor still gets the tab. Nothing else is asked of the host: the snapshots arrive on the
+plugin's own channel, the size is that of the tab, and the keys (a, e, f, b: first, last, next,
+previous step) work while the focus is on it.
 
-For locally hosting the plugin repository, run `yarn build` at the root of the repository. Then serve the plugin directory with:
-```bash
-yarn dlx serve --cors dist/ -p 1915
-```
-The plugin directory will be available at `http://localhost:1915/directory.json`.
+## How it is built
 
-To install the package directly:
-```bash
-yarn add @sourceacademy/web-cse-machine
-# OR
-npm i @sourceacademy/web-cse-machine
-# OR
-pnpm add @sourceacademy/web-cse-machine
-```
+- `CseMachineHostPlugin` (`src/CseMachineHostPlugin.ts`): the transport. It subscribes to
+  `CSE_CHANNEL`, puts the batches of a run together, and calls `receiveSnapshots` and `receiveEnd`.
+- `CseMachineTabPlugin` (`src/CseMachineTabPlugin.tsx`): its subclass that keeps the snapshots as an
+  external store and registers the tab.
+- `CseMachineView` (`src/CseMachineView.tsx`): the tab, ported from the frontend's
+  `SideContentCseMachine`. It draws with `@sourceacademy/web-environment-diagram`, a library in this
+  repository whose source the bundle inlines (see `rollup.config.mjs` and the `paths` entry of
+  `tsconfig.json`, which make the build read it from its source).
+- React, Konva, react-konva and Blueprint are provided by the host and are not bundled.
 
-## Structure
-This package ([`@sourceacademy/web-cse-machine`](https://github.com/source-academy/plugins/tree/main/src/web/cse-machine)) contains the `CseMachineHostPlugin` abstract class — a Conductor host plugin that subscribes to the [`CSE_CHANNEL`](https://github.com/source-academy/plugins/tree/main/src/common/cse-machine/README.md#constants) and delivers received [`CseSnapshot`](https://github.com/source-academy/plugins/tree/main/src/common/cse-machine/README.md#csesnapshot) batches to the host app.
+## Not done yet
 
-The plugin owns only the transport/receipt. Wiring snapshots into the actual visualization layer (adapter + renderer) is the host app's responsibility and stays in the host repo, because it is tightly coupled to the host's existing CSE machine UI.
-
-### API Reference
-| Name | Description |
-|------|-------------|
-| `abstract receiveSnapshots(snapshots: CseSnapshot[]): void` | Called by the plugin each time a batch of snapshots arrives. Implement this in your host app to wire the snapshots into your visualization layer. |
-
-## Usage
-Extend `CseMachineHostPlugin` and implement `receiveSnapshots` to connect incoming snapshots to your rendering layer:
-
-```ts
-import { CseMachineHostPlugin } from '@sourceacademy/web-cse-machine';
-import type { CseSnapshot } from '@sourceacademy/web-cse-machine'; // re-exported from common
-
-export class MyCseMachinePlugin extends CseMachineHostPlugin {
-  receiveSnapshots(snapshots: CseSnapshot[]): void {
-    // Hand snapshots to your visualization layer, e.g.:
-    cseMachineStore.setSnapshots(snapshots);
-  }
-}
-```
-
-For a full example of how the Source Academy frontend wires this into its CSE machine UI, see the [frontend source](https://github.com/source-academy/frontend).
-
-## Further reading
-- For the shared protocol types and IDs, see [`@sourceacademy/common-cse-machine`](https://github.com/source-academy/plugins/tree/main/src/common/cse-machine)
-- For the runner-side plugin that sends snapshots, see [`@sourceacademy/runner-cse-machine`](https://github.com/source-academy/plugins/tree/main/src/runner/cse-machine)
-- The [plugins wiki](https://github.com/source-academy/plugins/wiki) covers how Conductor plugins communicate
+The frontend still draws its own CSE machine tab and does not load this plugin (it skips the id, so
+that a user does not get two tabs); the switch is source-academy/frontend#4587. The diagram does not
+follow the frontend's green-screen mode (plugins#194, "green-screen mode"). `CseSnapshotAdapter`,
+which turns snapshots into js-slang-shaped objects for the renderer, is still in the library.
