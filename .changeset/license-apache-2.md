@@ -21,4 +21,4 @@
 "@sourceacademy/web-test": patch
 ---
 
-The package declares the Apache License 2.0 (its metadata said ISC); the code is unchanged.
+The package declares the Apache License 2.0 (its metadata said ISC) and ships the licence text; the code is unchanged.
