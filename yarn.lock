@@ -2749,12 +2749,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^25.9.1":
-  version: 25.9.9
-  resolution: "@types/node@npm:25.9.9"
+"@types/node@npm:^24":
+  version: 24.19.4
+  resolution: "@types/node@npm:24.19.4"
   dependencies:
     undici-types: "npm:>=7.24.0 <7.24.7"
-  checksum: 10c0/2ba08caa7118af2f2761f2f5db9b6304faf5bd027a2dcb72bf6fcae3dd9e470d17045fec27f89023c02e7d4e0661c6e5877174bd39794bef080db8b35ad4a1ea
+  checksum: 10c0/3fce002ce5d6baa78be1b03f24ef676a12d14ef22a600ad07e78308d10ae62fb10d8ac18a67bcdcdd631a6f1de2129cb9e0c1d2badab85e36fc075d319191d99
   languageName: node
   linkType: hard
 
@@ -6207,7 +6207,7 @@ __metadata:
     "@changesets/cli": "npm:^3.0.0"
     "@sourceacademy/conductor": "npm:^0.8.0"
     "@sourceacademy/plugin-directory": "https://github.com/source-academy/plugin-directory.git#0.0.5"
-    "@types/node": "npm:^25.9.1"
+    "@types/node": "npm:^24"
     "@vitest/coverage-istanbul": "npm:^5.0.0"
     commander: "npm:^15.0.0"
     eslint: "npm:^10.0.3"
