@@ -1,6 +1,9 @@
 {
   "name": "plugins",
   "packageManager": "yarn@4.18.1",
+  "engines": {
+    "node": ">=24.11.0"
+  },
   "workspaces": [
     "src/common/*/",
     "src/runner/*/",
@@ -21,7 +24,7 @@
     "@changesets/cli": "^3.0.0",
     "@sourceacademy/conductor": "^0.8.0",
     "@sourceacademy/plugin-directory": "https://github.com/source-academy/plugin-directory.git#0.0.5",
-    "@types/node": "^25.9.1",
+    "@types/node": "^24",
     "@vitest/coverage-istanbul": "^5.0.0",
     "canvas": "^3.1.0",
     "commander": "^15.0.0",
