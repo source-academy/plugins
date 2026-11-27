@@ -2582,7 +2582,7 @@ __metadata:
     typescript: "npm:^6.0.3"
     vitest: "npm:^4.1.9"
   peerDependencies:
-    "@sourceacademy/common-tabs": ^0.1.0
+    "@sourceacademy/common-tabs": ^0.2.0
     "@sourceacademy/conductor": ^0.8.0
     react: ^19
     react-dom: ^19

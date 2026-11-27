@@ -1,5 +1,12 @@
 # @sourceacademy/web-test
 
+## 0.0.4
+
+### Patch Changes
+
+- Updated dependencies [a889063]
+  - @sourceacademy/common-tabs@0.2.0
+
 ## 0.0.3
 
 ### Patch Changes
