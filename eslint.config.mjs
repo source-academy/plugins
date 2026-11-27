@@ -31,6 +31,16 @@ export default defineConfig([
     },
   },
   {
+    // The environment diagram was lifted unchanged from the frontend, whose lint rules are looser.
+    // Tightening it is separate work; until then these rules are off for this package only.
+    files: ["src/web/environment-diagram/**/*.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unsafe-function-type": "off",
+      "@typescript-eslint/no-unnecessary-type-assertion": "off",
+    },
+  },
+  {
     files: ["src/**/*.js"],
     rules: {
       "@typescript-eslint/no-require-imports": "off",
