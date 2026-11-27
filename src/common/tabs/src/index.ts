@@ -64,68 +64,31 @@ export interface ITabService {
    * The hideTab method is used to hide a tab that is currently being displayed. The tab is identified by its id, which is passed as an argument to the method. When the hideTab method is called, the tab service will stop rendering the corresponding tab component, effectively hiding it from view. This allows for dynamic hiding of tabs based on user interactions or other events.
    */
   hideTab(id: string): void;
-
-  /**
-   * Draws the attention of the user to a tab that is not the selected one, because something new has
-   * arrived in it (for example the steps of a run that has just finished). A host may leave this
-   * out; a plugin calls it as `tabService.alertTab?.(id)`.
-   * @param id The id of the tab to alert.
-   */
-  alertTab?(id: string): void;
-
-  /**
-   * Whether the tab is the one that the user is looking at. A host may leave this out, and then a
-   * plugin cannot tell.
-   * @param id The id of a registered tab.
-   */
-  isTabSelected?(id: string): boolean;
-
-  /**
-   * Calls `listener` with `true` when the tab becomes the selected one and with `false` when it
-   * stops being so. A host may leave this out.
-   * @param id The id of a registered tab.
-   * @param listener Called on every change of the tab's selection.
-   * @returns A function that stops the listening.
-   */
-  onTabSelectionChange?(id: string, listener: (selected: boolean) => void): () => void;
 }
 
 /**
  * A range of lines of the editor: the first and the last, 1-based and inclusive, as the editor shows
- * them. Columns are not part of it yet; they can be added as an optional field.
+ * them. Columns are not part of it; they can be added as an optional field.
  */
 export type LineRange = readonly [first: number, last: number];
 
 /** What a host offers a plugin to do with the editor. */
 export interface IEditorService {
   /**
-   * Marks lines of the editor, replacing what `owner` has marked before. How the lines look is the
-   * host's to decide, in its own theme. A tab clears what it has marked when it is deselected, and
-   * the host clears it when the owner's tab is unregistered. There is one kind of highlight; a
-   * second can be added, as an optional parameter, when a visualizer needs one.
-   * @param owner The id of the plugin, or of its tab: highlights are kept apart by it.
-   * @param lines The lines to mark; none removes the owner's highlights.
+   * Marks lines of the editor, replacing what was marked before; no lines removes the highlight.
+   * It is the editor's one highlight, and how it looks is the host's to decide, in its own theme.
+   * A plugin clears what it has marked when it no longer applies.
+   * @param lines The lines to mark.
    */
-  highlight(owner: string, lines: readonly LineRange[]): void;
-
-  /** Removes all the highlights that `owner` has made. */
-  clearHighlights(owner: string): void;
-}
-
-/** What a host offers a plugin to do with the run of the program. */
-export interface IRunService {
-  /** Asks the host to run the program again, as its Run button does. */
-  request(): void;
+  highlight(lines: readonly LineRange[]): void;
 }
 
 /**
  * The host contract: what a host may offer a plugin that contributes a tab, apart from the tab
- * service. It is for every visualizer and names no tool and no language. Every service is optional
- * (so is every new member of {@link ITabService}): a plugin works with a host that offers none of
- * them, a host that offers them works with a plugin that uses none, and the contract grows by
- * adding members.
+ * service. It is for every visualizer and names no tool and no language. Every service is optional,
+ * so a plugin works with a host that offers none of them, a host that offers them works with a
+ * plugin that uses none, and the contract grows by adding members.
  */
 export interface IHostContract {
   readonly editor?: IEditorService;
-  readonly run?: IRunService;
 }
