@@ -1,6 +1,6 @@
 {
   "name": "@sourceacademy/common-autocomplete",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "packageManager": "yarn@4.18.1",
   "description": "The common types of the Conductor autocomplete framework",
   "scripts": {

@@ -1,6 +1,6 @@
 {
   "name": "@sourceacademy/common-tabs",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "packageManager": "yarn@4.18.1",
   "description": "Common utilities for tab loading in Source Academy",
   "scripts": {
