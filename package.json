@@ -42,7 +42,7 @@
     "type": "git",
     "url": "git+https://github.com/source-academy/plugins.git"
   },
-  "license": "ISC",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/source-academy/plugins/issues"
   },
