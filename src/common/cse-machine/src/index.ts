@@ -47,7 +47,12 @@ export const CSE_MESSAGE_TYPE_SNAPSHOT_BATCH = "snapshot-batch";
 export interface CseSerializedValue {
   /** Pre-rendered display string for the value. */
   displayValue: string;
-  /** Coarse type label, e.g. `"number"`, `"closure"`, `"list"`. */
+  /**
+   * Coarse type label, e.g. `"number"`, `"closure"`, `"list"`. The renderer knows `"none"`,
+   * `"nonetype"` and `"null"` (case-insensitively) as the language's value for nothing: it draws
+   * `displayValue` (`"None"` for Python), and a slash inside a list's box. Source's empty list has
+   * the label `"empty_list"` instead.
+   */
   label: string;
   /** Optional fine-grained tag for the visualizer. */
   tag?: string;
@@ -59,6 +64,47 @@ export interface CseSerializedValue {
    * through {@link ICseDiagramService} uses it to refer to the object, e.g. to highlight it.
    */
   objectId?: string;
+}
+
+/**
+ * What a function value's `metadata` may carry (a {@link CseSerializedValue} whose `label` says it is
+ * a function or closure). Every field is optional, and a renderer shows what is there, so an
+ * evaluator sends what its language has, and no renderer needs to know which language it is.
+ */
+export interface CseFunctionMetadata {
+  /** For a closure: the id of the frame it was defined in. */
+  closureFrameId?: string;
+  /** The parameter names. */
+  params?: string[];
+  /** The function's own name; absent or `"lambda"` for an anonymous one. */
+  funcName?: string;
+  /** The body's source text, if the evaluator has it. */
+  body?: string;
+  /** The names that the body assigns or defines (the function's own scope), with `globals`. */
+  locals?: string[];
+  /** The names that the body declares as global. */
+  globals?: string[];
+  /**
+   * `true` for a built-in function: one with no defining frame and no source. It is drawn as such
+   * (without parameters or body), and its `displayValue` is its name. Without this flag, a function
+   * with no `closureFrameId` is taken to be a built-in as well; send the flag, and do not rely on that.
+   */
+  builtin?: boolean;
+}
+
+/** The {@link CseEnvironmentInstructionMetadata.instrType} of an instruction that restores a frame. */
+export const CSE_INSTR_TYPE_ENVIRONMENT = "env";
+
+/**
+ * What the `metadata` of the control item that restores an environment carries (the instruction that
+ * the machine pushes before a call or a block, so that the frame is current again when the body is
+ * done). A renderer draws an arrow from the item to the frame `envId`. Send `displayText` as you
+ * like (`"ENVIRONMENT"` has been the habit); a renderer takes the instruction by its `instrType`.
+ */
+export interface CseEnvironmentInstructionMetadata {
+  instrType: typeof CSE_INSTR_TYPE_ENVIRONMENT;
+  /** The id of the frame (a {@link CseSerializedEnvFrame.id}) that this instruction restores. */
+  envId: string;
 }
 
 /**

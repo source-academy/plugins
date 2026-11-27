@@ -91,7 +91,7 @@ function toJsValue(
     // String(value) or the empty-list ArrayNullUnit visual, both of which render JS `null`
     // as "null" rather than Python's `None`. In a list's box, though, it is drawn like the
     // empty list, as a slash (`isNone`; see isSnapshotNone).
-    return { toReplString: () => "None", isNone: true };
+    return { toReplString: () => v.displayValue, isNone: true };
   }
   if (label === "undefined") {
     return undefined;
@@ -184,9 +184,10 @@ function toJsValue(
 
   if (/closure|function|lambda|method/.test(label)) {
     const meta = v.metadata as any;
+    // `meta` is a CseFunctionMetadata (common-cse-machine).
     const closureFrameId: string | undefined = meta?.closureFrameId;
 
-    if (!closureFrameId) {
+    if (meta?.builtin === true || !closureFrameId) {
       // Built-ins (e.g. Python's `abs`, `print`) have no defining Python frame — py-slang
       // sends no closureFrameId for them. Without this branch they fell through to the
       // generic string fallback below, and StashItemComponent's `typeof val === 'string'`

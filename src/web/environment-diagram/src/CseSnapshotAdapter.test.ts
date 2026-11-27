@@ -2,7 +2,7 @@
 import Konva from "konva";
 import { describe, expect, it, vi } from "vitest";
 
-import type { CseSnapshot } from "@sourceacademy/common-cse-machine";
+import { CSE_INSTR_TYPE_ENVIRONMENT, type CseSnapshot } from "@sourceacademy/common-cse-machine";
 import { ArrayNullUnit } from "./components/ArrayNullUnit";
 import { Binding } from "./components/Binding";
 import { Frame } from "./components/Frame";
@@ -15,6 +15,7 @@ import { Layout } from "./CseMachineLayout";
 import type { EnvTree } from "./CseMachineTypes";
 import { getBodyText, getParamsText, getScopeNamesTexts, isBuiltInFn } from "./CseMachineUtils";
 import type { Control, Stash } from "./CseRenderTypes";
+import { InstrType } from "./CseInstructions";
 import { buildFakeEnvTreeFromSnapshot } from "./CseSnapshotAdapter";
 
 // Real (headless) Konva stage/layer so animation components — which need a live layer
@@ -1276,5 +1277,68 @@ describe("a name bound to a built-in function (py-slang#583)", () => {
       false,
       false,
     ]);
+  });
+});
+
+describe("the typed metadata of the protocol (common-cse-machine)", () => {
+  const snapshotWith = (parts: object) =>
+    ({
+      stepIndex: 0,
+      control: [],
+      stash: [],
+      environments: [{ id: "g", name: "global", parentId: null, bindings: [], isActive: true }],
+      ...parts,
+    }) as unknown as CseSnapshot;
+  const headOf = (bindings: { name: string; value: unknown }[]) => {
+    const snapshot = snapshotWith({
+      environments: [{ id: "g", name: "global", parentId: null, bindings, isActive: true }],
+    });
+    return (findNode(buildFakeEnvTreeFromSnapshot(snapshot).envTree, "g")!.environment as any).head;
+  };
+
+  it("takes a function with `builtin: true` as a built-in, even if it names a frame", () => {
+    const head = headOf([
+      {
+        name: "abs",
+        value: {
+          displayValue: "abs",
+          label: "function",
+          metadata: { builtin: true, closureFrameId: "g", params: ["x"] },
+        },
+      },
+      {
+        name: "f",
+        value: {
+          displayValue: "f",
+          label: "function",
+          metadata: { closureFrameId: "g", params: ["x"], funcName: "f" },
+        },
+      },
+    ]);
+    expect(head.abs.isPyBuiltin).toBe(true);
+    expect(head.f.isPyBuiltin).toBeUndefined();
+  });
+
+  it("draws a language's value for nothing as the snapshot spells it", () => {
+    const head = headOf([
+      { name: "x", value: { displayValue: "None", label: "NoneType" } },
+      { name: "y", value: { displayValue: "nil", label: "none" } },
+    ]);
+    expect(head.x.toReplString()).toBe("None");
+    expect(head.y.toReplString()).toBe("nil");
+  });
+
+  it("takes an instruction that restores a frame by its `instrType`, whatever its displayText", () => {
+    const { fakeControl } = buildFakeEnvTreeFromSnapshot(
+      snapshotWith({
+        control: [
+          {
+            displayText: "back to g",
+            metadata: { instrType: CSE_INSTR_TYPE_ENVIRONMENT, envId: "g" },
+          },
+        ],
+      }),
+    );
+    expect((fakeControl as any).peek().instrType).toBe(InstrType.ENVIRONMENT);
   });
 });
