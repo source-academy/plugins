@@ -23,9 +23,11 @@
     "@sourceacademy/plugin-directory": "https://github.com/source-academy/plugin-directory.git#0.0.5",
     "@types/node": "^25.9.1",
     "@vitest/coverage-istanbul": "^5.0.0",
+    "canvas": "^3.1.0",
     "commander": "^15.0.0",
     "eslint": "^10.0.3",
     "eslint-config-prettier": "^10.1.8",
+    "jsdom": "^30.0.0",
     "prettier": "^3.8.1",
     "tsx": "^4.22.3",
     "typescript": "^6.0.3",
@@ -41,5 +43,10 @@
   "bugs": {
     "url": "https://github.com/source-academy/plugins/issues"
   },
-  "homepage": "https://github.com/source-academy/plugins#readme"
+  "homepage": "https://github.com/source-academy/plugins#readme",
+  "dependenciesMeta": {
+    "canvas": {
+      "built": true
+    }
+  }
 }
