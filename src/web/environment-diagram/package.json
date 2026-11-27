@@ -2,7 +2,7 @@
   "name": "@sourceacademy/web-environment-diagram",
   "version": "0.0.0",
   "private": true,
-  "packageManager": "yarn@4.18.1",
+  "packageManager": "yarn@4.19.0",
   "description": "The environment diagram of the CSE machine (frames, bindings, values, arrows, control and stash) as a library, drawn from CseSnapshots. Not a plugin: web plugins list it as a devDependency and their bundles inline it.",
   "scripts": {
     "build": "tsc --noEmit -p ."
