@@ -257,6 +257,20 @@ describe("snapshot batches", () => {
     expect(receive).toHaveBeenLastCalledWith([at(0)], []);
   });
 
+  test("a run that starts with no snapshots replaces the one before, and the host is told", () => {
+    const { channel, receive } = makeWithEnd();
+    channel.emit(batch(0, [at(0), at(1)], { breakpointSteps: [1] }));
+    channel.emit(batch(0, []));
+    expect(receive).toHaveBeenLastCalledWith([], []);
+  });
+
+  test("a later batch with no snapshots is not news", () => {
+    const { channel, receive } = makeWithEnd();
+    channel.emit(batch(0, [at(0)]));
+    channel.emit(batch(1, []));
+    expect(receive).toHaveBeenCalledTimes(1);
+  });
+
   test("a batch that skips ahead is dropped", () => {
     const { channel, receive } = makeWithEnd();
     channel.emit(batch(0, [at(0)]));
@@ -276,7 +290,9 @@ describe("snapshot batches", () => {
     const { channel, receive, receiveEnd } = makeWithEnd();
     channel.emit(batch(0, [], { end: { status: "complete" } }));
     expect(receiveEnd).toHaveBeenCalledWith({ status: "complete" });
-    expect(receive).not.toHaveBeenCalled();
+    // The run is empty, and the host is told so (a run that starts replaces the one before it).
+    expect(receive).toHaveBeenCalledTimes(1);
+    expect(receive).toHaveBeenCalledWith([], []);
   });
 
   test("a host that does not care how a run ended need not implement receiveEnd", () => {

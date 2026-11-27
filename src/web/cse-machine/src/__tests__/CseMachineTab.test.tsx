@@ -97,6 +97,20 @@ describe("CseMachineView", () => {
     expect(host.highlight).toHaveBeenCalledWith([]);
   });
 
+  test("an empty run replaces the one before: the diagram and the highlight go", () => {
+    const host = editor();
+    const { rerender } = render(
+      <CseMachineView snapshots={run} breakpointSteps={[]} end={null} editor={host} />,
+    );
+    expect(screen.queryByTestId("cse-machine-default-text")).toBeNull();
+    host.highlight.mockClear();
+
+    rerender(<CseMachineView snapshots={[]} breakpointSteps={[]} end={null} editor={host} />);
+
+    expect(screen.getByTestId("cse-machine-default-text")).toBeTruthy();
+    expect(host.highlight).toHaveBeenCalledWith([]);
+  });
+
   test("says when the run was cut off, beside the diagram", () => {
     render(
       <CseMachineView
@@ -172,6 +186,19 @@ describe("CseMachineTabPlugin", () => {
     });
     expect(plugin.getState().snapshots).toHaveLength(3);
     expect(plugin.getState().breakpointSteps).toEqual([2]);
+    expect(plugin.getState().end).toEqual({ status: "complete" });
+  });
+
+  test("a run of batches that has no snapshots replaces the run before it", () => {
+    const { plugin, emit } = setup();
+    emit({ type: CSE_MESSAGE_TYPE_SNAPSHOT_BATCH, index: 0, snapshots: run });
+    emit({
+      type: CSE_MESSAGE_TYPE_SNAPSHOT_BATCH,
+      index: 0,
+      snapshots: [],
+      end: { status: "complete" },
+    });
+    expect(plugin.getState().snapshots).toEqual([]);
     expect(plugin.getState().end).toEqual({ status: "complete" });
   });
 

@@ -22,6 +22,21 @@ const external = [
   "react-konva",
 ];
 
+/** The id of the module that stands for every `konva/lib/...` import (see the plugin below). */
+const KONVA_SUBPATHS = "\0konva-subpaths-from-host";
+/** What the environment-diagram library imports from those subpaths at run time. */
+const KONVA_CLASSES = [
+  "Easings",
+  "Group",
+  "Label",
+  "Layer",
+  "Node",
+  "Rect",
+  "Shape",
+  "Stage",
+  "Text",
+];
+
 /**
  * @type {import('rollup').RollupOptions}
  */
@@ -34,6 +49,21 @@ export default {
   },
   external,
   plugins: [
+    {
+      // The library imports Konva's classes from subpaths (`konva/lib/Group`, ...). Bundled, they would
+      // be a second copy next to the host's (the one react-konva draws with), and `instanceof Group`
+      // would fail for the nodes that react-konva makes. So every subpath is the host's own Konva:
+      // the classes are taken from the external `konva` object.
+      name: "konva-subpaths-from-host",
+      resolveId(source) {
+        return source.startsWith("konva/lib/") ? KONVA_SUBPATHS : null;
+      },
+      load(id) {
+        return id === KONVA_SUBPATHS
+          ? `import Konva from "konva"; export const { ${KONVA_CLASSES.join(", ")} } = Konva;`
+          : null;
+      },
+    },
     {
       // The environment-diagram library is TypeScript source. Yarn resolves a workspace dependency
       // through a virtual path that the TypeScript plugin does not transform, so it is resolved to its

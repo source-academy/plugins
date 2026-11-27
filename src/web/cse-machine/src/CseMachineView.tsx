@@ -50,6 +50,10 @@ interface State {
   sliderKey: number;
 }
 
+/** Whether there is a run to show: snapshots, and at least one. */
+const hasRun = (snapshots: CseSnapshot[] | null): snapshots is CseSnapshot[] =>
+  snapshots !== null && snapshots.length > 0;
+
 /** The padding around the diagram that the old tab left for the host's own chrome. */
 const PADDING = 50;
 
@@ -99,7 +103,7 @@ export default class CseMachineView extends Component<CseMachineViewProps, State
     }
     document.addEventListener("fullscreenchange", this.handleFullscreenChange);
     this.measure();
-    if (this.props.snapshots) {
+    if (hasRun(this.props.snapshots)) {
       this.renderSnapshotAt(0);
       this.setState({ value: 0 });
     }
@@ -126,9 +130,9 @@ export default class CseMachineView extends Component<CseMachineViewProps, State
     const { snapshots } = this.props;
     if (prev.snapshots === snapshots) return;
 
-    // The snapshots went away (a run that produced none): clear the view rather than leave the
-    // previous run's diagram and step controls active.
-    if (snapshots === null) {
+    // The snapshots went away, or are none (a run that produced none): clear the view rather than
+    // leave the previous run's diagram and step controls active.
+    if (!hasRun(snapshots)) {
       this.setState({ visualization: null, value: -1 });
       this.clearView();
       return;

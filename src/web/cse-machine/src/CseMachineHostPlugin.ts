@@ -69,7 +69,7 @@ export abstract class CseMachineHostPlugin implements IPlugin {
   /**
    * A batch continues the snapshots that came before it (index 0 starts the run afresh); one that
    * does not (a batch was missed) is dropped rather than put in the wrong place. The host gets the
-   * snapshots so far each time, as it does for a whole run.
+   * snapshots so far each time, as it does for a whole run (for index 0, also if there are none).
    */
   private __receiveBatch(message: CseSnapshotBatchMessage): void {
     if (!Array.isArray(message.snapshots) || message.index > this.__snapshots.length) return;
@@ -77,7 +77,9 @@ export abstract class CseMachineHostPlugin implements IPlugin {
     this.__breakpointSteps = (message.index === 0 ? [] : this.__breakpointSteps).concat(
       Array.isArray(message.breakpointSteps) ? message.breakpointSteps : [],
     );
-    if (message.snapshots.length > 0) {
+    // A batch that adds nothing is not news, except the one that starts a run: a run with no snapshots
+    // replaces the one before it, and the host has to hear that, or it goes on showing the old one.
+    if (message.snapshots.length > 0 || message.index === 0) {
       this.receiveSnapshots(this.__snapshots, this.__breakpointSteps);
     }
     if (message.end) this.receiveEnd(message.end);
