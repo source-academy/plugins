@@ -20,7 +20,7 @@
   },
   "peerDependencies": {
     "@blueprintjs/core": ">=5",
-    "@sourceacademy/common-cse-machine": ">=0.6.1",
+    "@sourceacademy/common-cse-machine": ">=0.6.2",
     "@sourceacademy/common-tabs": ">=0.2.0",
     "@sourceacademy/conductor": "^0.8.0",
     "konva": ">=9",
