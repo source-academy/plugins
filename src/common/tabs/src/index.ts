@@ -65,3 +65,30 @@ export interface ITabService {
    */
   hideTab(id: string): void;
 }
+
+/**
+ * A range of lines of the editor: the first and the last, 1-based and inclusive, as the editor shows
+ * them. Columns are not part of it; they can be added as an optional field.
+ */
+export type LineRange = readonly [first: number, last: number];
+
+/** What a host offers a plugin to do with the editor. */
+export interface IEditorService {
+  /**
+   * Marks lines of the editor, replacing what was marked before; no lines removes the highlight.
+   * It is the editor's one highlight, and how it looks is the host's to decide, in its own theme.
+   * A plugin clears what it has marked when it no longer applies.
+   * @param lines The lines to mark.
+   */
+  highlight(lines: readonly LineRange[]): void;
+}
+
+/**
+ * The host contract: what a host may offer a plugin that contributes a tab, apart from the tab
+ * service. It is for every visualizer and names no tool and no language. Every service is optional,
+ * so a plugin works with a host that offers none of them, a host that offers them works with a
+ * plugin that uses none, and the contract grows by adding members.
+ */
+export interface IHostContract {
+  readonly editor?: IEditorService;
+}
