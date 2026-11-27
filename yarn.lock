@@ -2271,7 +2271,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sourceacademy/common-autocomplete@npm:^0.0.2, @sourceacademy/common-autocomplete@workspace:src/common/autocomplete":
+"@sourceacademy/common-autocomplete@npm:^0.0.3, @sourceacademy/common-autocomplete@workspace:src/common/autocomplete":
   version: 0.0.0-use.local
   resolution: "@sourceacademy/common-autocomplete@workspace:src/common/autocomplete"
   dependencies:
@@ -2332,8 +2332,8 @@ __metadata:
     tslib: "npm:^2.8.1"
     typescript: "npm:^6.0.3"
   peerDependencies:
-    "@sourceacademy/common-cse-machine": ">=0.6.0"
-    "@sourceacademy/common-stepper": ">=0.1.0"
+    "@sourceacademy/common-cse-machine": ">=0.6.1"
+    "@sourceacademy/common-stepper": ">=0.1.1"
   languageName: unknown
   linkType: soft
 
@@ -2427,7 +2427,7 @@ __metadata:
     "@rollup/plugin-node-resolve": "npm:^16.0.3"
     "@rollup/plugin-terser": "npm:^1.0.0"
     "@rollup/plugin-typescript": "npm:^12.3.0"
-    "@sourceacademy/common-autocomplete": "npm:^0.0.2"
+    "@sourceacademy/common-autocomplete": "npm:^0.0.3"
     "@sourceacademy/conductor": "npm:^0.8.0"
     rollup: "npm:^4.60.2"
     tslib: "npm:^2.8.1"
@@ -2453,7 +2453,7 @@ __metadata:
     typescript: "npm:^6.0.3"
     vitest: "npm:^5.0.0"
   peerDependencies:
-    "@sourceacademy/common-cse-machine": ">=0.6.0"
+    "@sourceacademy/common-cse-machine": ">=0.6.1"
     "@sourceacademy/conductor": ^0.8.0
   languageName: unknown
   linkType: soft
@@ -2497,9 +2497,9 @@ __metadata:
     typescript: "npm:^6.0.3"
   peerDependencies:
     "@sourceacademy/common-e-stepper": ">=0.0.0"
-    "@sourceacademy/common-stepper": ">=0.1.0"
+    "@sourceacademy/common-stepper": ">=0.1.1"
     "@sourceacademy/conductor": ^0.8.0
-    "@sourceacademy/runner-stepper": ">=0.1.0"
+    "@sourceacademy/runner-stepper": ">=0.1.1"
   languageName: unknown
   linkType: soft
 
@@ -2599,7 +2599,7 @@ __metadata:
     "@rollup/plugin-node-resolve": "npm:^16.0.3"
     "@rollup/plugin-terser": "npm:^1.0.0"
     "@rollup/plugin-typescript": "npm:^12.3.0"
-    "@sourceacademy/common-autocomplete": "npm:^0.0.2"
+    "@sourceacademy/common-autocomplete": "npm:^0.0.3"
     "@sourceacademy/conductor": "npm:^0.8.0"
     rollup: "npm:^4.60.2"
     tslib: "npm:^2.8.1"
@@ -2640,7 +2640,7 @@ __metadata:
     vitest: "npm:^5.0.0"
   peerDependencies:
     "@blueprintjs/core": ">=5"
-    "@sourceacademy/common-cse-machine": ">=0.6.0"
+    "@sourceacademy/common-cse-machine": ">=0.6.1"
     "@sourceacademy/common-tabs": ">=0.2.0"
     "@sourceacademy/conductor": ^0.8.0
     konva: ">=9"
@@ -2821,7 +2821,7 @@ __metadata:
     typescript: "npm:^6.0.3"
     vitest: "npm:^4.1.9"
   peerDependencies:
-    "@sourceacademy/common-tabs": ^0.2.0
+    "@sourceacademy/common-tabs": ^0.2.1
     "@sourceacademy/conductor": ^0.8.0
     react: ^19
     react-dom: ^19

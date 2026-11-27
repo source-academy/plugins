@@ -1,13 +1,13 @@
 {
   "name": "@sourceacademy/web-cse-machine",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "packageManager": "yarn@4.18.1",
   "description": "Host (web) plugin for the Source Academy CSE machine: receives evaluation snapshots and contributes the CSE Machine tab",
   "scripts": {
     "build": "rollup -c && node wrap.mjs",
     "prepack": "yarn build"
   },
-  "license": "ISC",
+  "license": "Apache-2.0",
   "files": [
     "dist"
   ],
@@ -20,7 +20,7 @@
   },
   "peerDependencies": {
     "@blueprintjs/core": ">=5",
-    "@sourceacademy/common-cse-machine": ">=0.6.0",
+    "@sourceacademy/common-cse-machine": ">=0.6.1",
     "@sourceacademy/common-tabs": ">=0.2.0",
     "@sourceacademy/conductor": "^0.8.0",
     "konva": ">=9",

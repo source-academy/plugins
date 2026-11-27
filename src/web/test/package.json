@@ -1,13 +1,13 @@
 {
   "name": "@sourceacademy/web-test",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "packageManager": "yarn@4.18.1",
   "description": "The test web plugin for the plugins repository",
   "scripts": {
     "build": "rollup -c",
     "prepack": "yarn build"
   },
-  "license": "ISC",
+  "license": "Apache-2.0",
   "publishConfig": {
     "access": "public"
   },
@@ -25,7 +25,7 @@
     }
   },
   "peerDependencies": {
-    "@sourceacademy/common-tabs": "^0.2.0",
+    "@sourceacademy/common-tabs": "^0.2.1",
     "@sourceacademy/conductor": "^0.8.0",
     "react": "^19",
     "react-dom": "^19"

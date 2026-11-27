@@ -1,13 +1,13 @@
 {
   "name": "@sourceacademy/runner-module-loader",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "packageManager": "yarn@4.18.1",
   "description": "The runner plugin for the module loader in Source Academy",
   "scripts": {
     "build": "rollup -c",
     "prepack": "yarn build"
   },
-  "license": "ISC",
+  "license": "Apache-2.0",
   "files": [
     "dist"
   ],

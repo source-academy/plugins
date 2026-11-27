@@ -1,6 +1,6 @@
 {
   "name": "@sourceacademy/runner-e-stepper",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "packageManager": "yarn@4.18.1",
   "description": "Language-agnostic runner plugin for the Source Academy environment stepper (e-stepper)",
   "scripts": {
@@ -9,7 +9,7 @@
     "test": "jest",
     "test-coverage": "jest --coverage"
   },
-  "license": "ISC",
+  "license": "Apache-2.0",
   "files": [
     "dist"
   ],
@@ -25,9 +25,9 @@
   },
   "peerDependencies": {
     "@sourceacademy/common-e-stepper": ">=0.0.0",
-    "@sourceacademy/common-stepper": ">=0.1.0",
+    "@sourceacademy/common-stepper": ">=0.1.1",
     "@sourceacademy/conductor": "^0.8.0",
-    "@sourceacademy/runner-stepper": ">=0.1.0"
+    "@sourceacademy/runner-stepper": ">=0.1.1"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^16.0.3",
