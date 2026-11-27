@@ -1,5 +1,11 @@
 # @sourceacademy/common-cse-machine
 
+## 0.6.2
+
+### Patch Changes
+
+- c44f225: `ICseDiagramService` and `IHostServices` are deprecated: the E-Stepper draws its environments with the environment-diagram library that its bundle contains, so a host lends nothing. A host that still passes them is ignored.
+
 ## 0.6.1
 
 ### Patch Changes
