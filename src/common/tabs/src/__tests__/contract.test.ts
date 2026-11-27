@@ -1,13 +1,6 @@
 import { describe, expect, expectTypeOf, test } from "vitest";
 
-import type {
-  HighlightKind,
-  IEditorService,
-  IHostContract,
-  IRunService,
-  ITabService,
-  LineRange,
-} from "..";
+import type { IEditorService, IHostContract, IRunService, ITabService, LineRange } from "..";
 
 describe("the host contract", () => {
   test("a host that has none of the newer members is still a tab service", () => {
@@ -41,7 +34,7 @@ describe("the host contract", () => {
   test("the services are what the tab of a visualizer needs", () => {
     const calls: unknown[][] = [];
     const editor: IEditorService = {
-      highlight: (owner, lines, kind) => calls.push(["highlight", owner, lines, kind]),
+      highlight: (owner, lines) => calls.push(["highlight", owner, lines]),
       clearHighlights: owner => calls.push(["clear", owner]),
     };
     const run: IRunService = { request: () => calls.push(["run"]) };
@@ -50,8 +43,7 @@ describe("the host contract", () => {
       [3, 3],
       [5, 7],
     ];
-    const kind: HighlightKind = "primary";
-    editor.highlight("cse-machine", lines, kind);
+    editor.highlight("cse-machine", lines);
     editor.clearHighlights("cse-machine");
     run.request();
 
@@ -63,12 +55,10 @@ describe("the host contract", () => {
           [3, 3],
           [5, 7],
         ],
-        "primary",
       ],
       ["clear", "cse-machine"],
       ["run"],
     ]);
-    expectTypeOf<HighlightKind>().toEqualTypeOf<"primary" | "secondary">();
     expectTypeOf<LineRange>().toEqualTypeOf<readonly [first: number, last: number]>();
   });
 });

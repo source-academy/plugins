@@ -96,26 +96,19 @@ export interface ITabService {
  */
 export type LineRange = readonly [first: number, last: number];
 
-/**
- * How a highlight is drawn is the host's to decide, in its own theme. `primary` is the place that
- * the visualization is at (the line being evaluated), `secondary` a place that goes with it (for
- * example the lines of the item that is next on the control).
- */
-export type HighlightKind = "primary" | "secondary";
-
 /** What a host offers a plugin to do with the editor. */
 export interface IEditorService {
   /**
-   * Marks lines of the editor, replacing what `owner` has marked with the same `kind` before. A tab
-   * clears what it has marked when it is deselected, and the host clears it when the owner's tab is
-   * unregistered.
+   * Marks lines of the editor, replacing what `owner` has marked before. How the lines look is the
+   * host's to decide, in its own theme. A tab clears what it has marked when it is deselected, and
+   * the host clears it when the owner's tab is unregistered. There is one kind of highlight; a
+   * second can be added, as an optional parameter, when a visualizer needs one.
    * @param owner The id of the plugin, or of its tab: highlights are kept apart by it.
-   * @param lines The lines to mark; none removes the highlights of that kind.
-   * @param kind How the lines are to look.
+   * @param lines The lines to mark; none removes the owner's highlights.
    */
-  highlight(owner: string, lines: readonly LineRange[], kind: HighlightKind): void;
+  highlight(owner: string, lines: readonly LineRange[]): void;
 
-  /** Removes all the highlights that `owner` has made, of every kind. */
+  /** Removes all the highlights that `owner` has made. */
   clearHighlights(owner: string): void;
 }
 
