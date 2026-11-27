@@ -3,6 +3,7 @@ import nodeResolve from "@rollup/plugin-node-resolve";
 import replace from "@rollup/plugin-replace";
 import terser from "@rollup/plugin-terser";
 import typescript from "@rollup/plugin-typescript";
+import { environmentDiagram } from "../environment-diagram/rollup.mjs";
 
 // React, Blueprint, and Konva/react-konva are provided by the host at load time through the
 // require-provider (see the frontend's `requireProvider`, which already exposes them for other
@@ -33,6 +34,7 @@ export default {
   },
   external,
   plugins: [
+    ...environmentDiagram(),
     // konva/react-konva pull in CJS deps (e.g. react-is) that branch on `process.env.NODE_ENV` at
     // module-init time; there's no `process` global in the browser, so replace it at build time.
     replace({ preventAssignment: true, "process.env.NODE_ENV": JSON.stringify("production") }),

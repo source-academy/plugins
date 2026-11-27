@@ -38,11 +38,11 @@ for Python §3/§4), see the
   diagram. The output of the program is under it (a toggle).
 - **Environments:** frames and heap objects, with the active frame and the binding that a lookup
   read highlighted, and frames and objects that nothing refers to any more greyed out.
-  - When the host lends its CSE machine diagram (`ICseDiagramService` in `IHostServices`; the
-    Source Academy frontend does), the environments are drawn with it, as in the CSE machine, with
-    its toolbar (arrow filters, _Clear Unreachable Objects_). Each step carries its store as a CSE machine
-    snapshot for it.
-  - Otherwise, the plugin draws them with its own Konva diagram (`EnvDiagram.tsx`), with the
+  - When the steps carry their store as a CSE machine snapshot (`cse`), the environments are drawn
+    with the CSE machine's own diagram, from the `web-environment-diagram` library in this repository,
+    which this bundle contains: with its toolbar (arrow filters, _Clear Unreachable Objects_), as in the
+    CSE machine. The host lends nothing (the `ICseDiagramService` that hosts used to lend is ignored).
+  - Otherwise (a runner that sends no snapshots), the plugin draws them with its own Konva diagram (`EnvDiagram.tsx`), with the
     options _From program_ (arrows from the program to the diagram) and _Clear Unreachable Objects_.
 - **Controls:** a slider (0 is the start of the evaluation); buttons for the first, previous,
   next and last step; _Vertical_, which puts the program above the diagram instead of beside it.

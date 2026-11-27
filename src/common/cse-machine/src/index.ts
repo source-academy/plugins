@@ -314,6 +314,7 @@ export interface CseDiagramViewProps {
  * the CSE Machine tab does (arrow routing and filtering, alignment, printable mode, clearing unreachable
  * frames, saving, zoom) instead of drawing them themselves — e.g. the environment stepper.
  */
+/** @deprecated The E-Stepper draws with the environment-diagram library; a host lends nothing. */
 export interface ICseDiagramService {
   /**
    * Returns an element of the host's UI framework (a React element in the Source Academy frontend,
@@ -328,6 +329,7 @@ export interface ICseDiagramService {
  * `registerPlugin(PluginClass, tabService, hostServices)`. Every member is optional, and a plugin
  * that does not expect the argument simply ignores it.
  */
+/** @deprecated See {@link ICseDiagramService}. */
 export interface IHostServices {
   cseDiagram?: ICseDiagramService;
 }

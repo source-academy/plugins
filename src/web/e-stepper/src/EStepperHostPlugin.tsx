@@ -7,6 +7,7 @@ import {
   type TraceEnd,
 } from "@sourceacademy/common-e-stepper";
 import type { ICseDiagramService, IHostServices } from "@sourceacademy/common-cse-machine";
+import { CseEnvironmentView } from "@sourceacademy/web-environment-diagram";
 import type { ITabService, Tab } from "@sourceacademy/common-tabs";
 import {
   checkIsPluginClass,
@@ -17,6 +18,15 @@ import {
 import { createElement, useSyncExternalStore } from "react";
 
 import EStepperView, { type PaneLayout } from "./EStepperView";
+
+/**
+ * The CSE machine's environment diagram, from the environment-diagram library. The view draws
+ * through the same interface that hosts used to lend (`ICseDiagramService`), so that it works
+ * without the host's CSE machine, which the frontend is about to lose.
+ */
+const libraryDiagram: ICseDiagramService = {
+  createView: props => createElement(CseEnvironmentView, props),
+};
 
 /** The side-content tab id used by the host to show/hide the e-stepper tab. */
 const TAB_ID = "e-stepper";
@@ -45,8 +55,8 @@ interface State {
  * The host (browser-side) half of the environment stepper ("e-stepper"). Like the stepper's host
  * plugin, it listens on its channel for the steps pushed by the runner plugin, holds them as an
  * external store, and contributes a side-content tab that renders them — here the program together
- * with its environment diagram (drawn by the host's CSE machine visualization when the host lends
- * it — see `ICseDiagramService` — and by the plugin's own diagram otherwise). Language-agnostic: it only knows the protocol from
+ * with its environment diagram (drawn with the environment-diagram library when the steps carry CSE
+ * snapshots, and by the plugin's own diagram otherwise). Language-agnostic: it only knows the protocol from
  * `@sourceacademy/common-e-stepper` and the tab-service contract from `@sourceacademy/common-tabs`.
  */
 export class EStepperHostPlugin implements IPlugin {
@@ -61,9 +71,12 @@ export class EStepperHostPlugin implements IPlugin {
     _conduit: IConduit,
     [channel]: IChannel<EStepperMessage>[],
     tabService: ITabService,
-    /** The host's optional services; with a CSE diagram service, the environments are drawn with
-     * the host's CSE machine visualization instead of the plugin's own diagram. */
-    hostServices?: IHostServices,
+    /**
+     * The services that older hosts lend. Not used: the environments are drawn with the
+     * environment-diagram library, which is part of this bundle.
+     * @deprecated
+     */
+    _hostServices?: IHostServices,
   ) {
     this.__channel = channel;
     this.__channel.subscribe(message => {
@@ -98,7 +111,7 @@ export class EStepperHostPlugin implements IPlugin {
 
     const subscribe = (listener: () => void) => this.subscribe(listener);
     const getState = () => this.getState();
-    const cseDiagram: ICseDiagramService | undefined = hostServices?.cseDiagram;
+    const cseDiagram: ICseDiagramService = libraryDiagram;
     function EStepperTab() {
       const state = useSyncExternalStore(subscribe, getState);
       return createElement(EStepperView, {
