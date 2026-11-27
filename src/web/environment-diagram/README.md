@@ -16,6 +16,10 @@ import { CseEnvironmentView } from "@sourceacademy/web-environment-diagram";
 
 The package's `main` is its TypeScript source; a consumer's tsconfig has to include it (set `rootDir` high enough, as `web-e-stepper` does for `web-stepper`).
 
+## Styling by the host
+
+The drawing is on a canvas, which CSS cannot colour, so the library asks the host's style instead. A host that wants another background for the drawing sets the custom property `--visualizer-background` on the drawing's element or above it (a mode, a theme: the frontend sets it in its green-screen mode). The view reads it from its own element when it draws, and draws again when a class or a style above it changes the value (`hostStyle.ts`), so the plugin needs no message from the host and names no mode or class of the host. Unset, the library's own background applies (its printable mode still wins over nothing: a host's value, if set, wins over both).
+
 ## Origin and what is still to do
 
 Lifted without change of behaviour from the Source Academy frontend (`src/features/cseMachine`, with its tests), so the frontend can delete its copy once the CSE machine plugin has shipped (source-academy/frontend#4587, plugins#194). Three differences from the frontend: the protocol types come from `common-cse-machine`; the drag cursor is set with `style.cursor` instead of a SCSS module (the `:active` "grabbing" cursor is gone); and the lint rules `no-explicit-any`, `no-unsafe-function-type` and `no-unnecessary-type-assertion` are off for this package (see `eslint.config.mjs`) until the code is tightened.

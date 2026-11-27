@@ -1,4 +1,5 @@
 import { Group } from "konva/lib/Group";
+import { hostBackgroundColor } from "./hostStyle";
 import { Node } from "konva/lib/Node";
 import { Shape } from "konva/lib/Shape";
 import { Text } from "konva/lib/shapes/Text";
@@ -1334,9 +1335,6 @@ export const isStashItemInDanger = (stashIndex: number): boolean => {
   return false;
 };
 
-const isHulkModeEnabled = () =>
-  typeof document !== "undefined" && document.querySelector(".Playground.GreenScreen") !== null;
-
 /**
  * The background of a frame or object hovered in a plugin's linked diagram (see
  * `Layout.highlightFrame` / `Layout.highlightObject`): darker in the dark theme, a light grey in
@@ -1345,12 +1343,9 @@ const isHulkModeEnabled = () =>
 export const hoverBackgroundColor = () =>
   CseMachine.getPrintableMode() ? Config.PrintHoverFrameBgColor : Config.HoverFrameBgColor;
 
+/** The background of a drawing: the host's, if it sets one (see `hostStyle.ts`), else the library's. */
 export const defaultBackgroundColor = () =>
-  isHulkModeEnabled()
-    ? "#00ff00"
-    : CseMachine.getPrintableMode()
-      ? Config.PrintBgColor
-      : Config.BgColor;
+  hostBackgroundColor() ?? (CseMachine.getPrintableMode() ? Config.PrintBgColor : Config.BgColor);
 
 export const defaultTextColor = () =>
   CseMachine.getPrintableMode() ? Config.PrintTextColor : Config.TextColor;

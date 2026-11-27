@@ -7,6 +7,7 @@ import {
   Position,
   Tooltip,
 } from "@blueprintjs/core";
+import { clearHostStyleSource, observeHostStyle, setHostStyleSource } from "./hostStyle";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { CseSnapshot } from "@sourceacademy/common-cse-machine";
@@ -115,6 +116,23 @@ function CseEnvironmentView({
     observer.observe(area);
     return () => observer.disconnect();
   }, [area]);
+
+  // The host's background for the drawing is read from the style of this view's element, and the
+  // drawing is made again when the host changes it (see hostStyle.ts).
+  useEffect(() => {
+    if (!area) {
+      return;
+    }
+    setHostStyleSource(area);
+    const stop = observeHostStyle(area, () => {
+      CseMachine.clearCachedLayouts();
+      redraw();
+    });
+    return () => {
+      stop();
+      clearHostStyleSource(area);
+    };
+  }, [area, redraw]);
 
   // Whether this view is on screen (a side-content tab that is not selected is not).
   useEffect(() => {
