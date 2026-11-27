@@ -29,6 +29,7 @@ import classNames from "classnames";
 import { Component, createRef, type KeyboardEvent, type ReactNode } from "react";
 
 import { sliderLabels } from "../../stepper/src/sliderLabels";
+import { injectStepperStyles } from "../../stepper/src/styles";
 
 export interface CseMachineViewProps {
   /** The snapshots of the run that is being shown, or none if there is no run. */
@@ -99,6 +100,9 @@ export default class CseMachineView extends Component<CseMachineViewProps, State
   }
 
   componentDidMount() {
+    // The slider's look (the margin, and only the first and last labels) is that of the Stepper's, whose
+    // stylesheet defines it; the host's own CSS has it only for the tabs it knows by id.
+    injectStepperStyles();
     const element = this.container.current;
     if (element && typeof ResizeObserver !== "undefined") {
       this.resizeObserver = new ResizeObserver(() => this.measureSoon());
@@ -360,7 +364,7 @@ export default class CseMachineView extends Component<CseMachineViewProps, State
             disabled={disabled}
             min={0}
             max={this.stepsTotal}
-            labelValues={sliderLabels(Math.max(1, this.stepsTotal))}
+            labelValues={sliderLabels(this.stepsTotal)}
             onChange={this.sliderShift}
             onRelease={this.sliderRelease}
             value={value < 0 ? 0 : value}

@@ -111,6 +111,24 @@ describe("CseMachineView", () => {
     expect(labels.at(-1)).toBe("40");
   });
 
+  test("a run of one step labels only that step, not a step beyond the slider", () => {
+    const { container } = render(
+      <CseMachineView snapshots={[snapshot(0, 1)]} breakpointSteps={[]} end={null} />,
+    );
+    const labels = [...container.querySelectorAll(".bp6-slider-axis .bp6-slider-label")].map(
+      label => label.textContent,
+    );
+    expect(labels).toEqual(["0"]);
+  });
+
+  test("brings the stylesheet of the slider's look with it", () => {
+    render(<CseMachineView snapshots={run} breakpointSteps={[]} end={null} />);
+    const css = [...document.head.querySelectorAll("style")]
+      .map(style => style.textContent)
+      .join("");
+    expect(css).toContain(".sa-substituter .bp6-slider-label");
+  });
+
   test("an empty run replaces the one before: the diagram and the highlight go", () => {
     const host = editor();
     const { rerender } = render(
