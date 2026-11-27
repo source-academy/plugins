@@ -97,6 +97,38 @@ describe("CseMachineView", () => {
     expect(host.highlight).toHaveBeenCalledWith([]);
   });
 
+  test("the slider labels a round number of steps, and the last one, however long the run", () => {
+    const long = Array.from({ length: 41 }, (_, i) => snapshot(i, 1));
+    const { container } = render(
+      <CseMachineView snapshots={long} breakpointSteps={[]} end={null} />,
+    );
+    const labels = [...container.querySelectorAll(".bp6-slider-axis .bp6-slider-label")].map(
+      label => label.textContent,
+    );
+    // Blueprint's default would label all of 0 to 40.
+    expect(labels.length).toBeLessThanOrEqual(12);
+    expect(labels[0]).toBe("0");
+    expect(labels.at(-1)).toBe("40");
+  });
+
+  test("a run of one step labels only that step, not a step beyond the slider", () => {
+    const { container } = render(
+      <CseMachineView snapshots={[snapshot(0, 1)]} breakpointSteps={[]} end={null} />,
+    );
+    const labels = [...container.querySelectorAll(".bp6-slider-axis .bp6-slider-label")].map(
+      label => label.textContent,
+    );
+    expect(labels).toEqual(["0"]);
+  });
+
+  test("brings the stylesheet of the slider's look with it", () => {
+    render(<CseMachineView snapshots={run} breakpointSteps={[]} end={null} />);
+    const css = [...document.head.querySelectorAll("style")]
+      .map(style => style.textContent)
+      .join("");
+    expect(css).toContain(".sa-substituter .bp6-slider-label");
+  });
+
   test("an empty run replaces the one before: the diagram and the highlight go", () => {
     const host = editor();
     const { rerender } = render(

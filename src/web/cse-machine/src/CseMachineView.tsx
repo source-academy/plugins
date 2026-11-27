@@ -25,7 +25,11 @@ import {
   snapshotWithAllFrames,
   snapshotWithDeadFrames,
 } from "@sourceacademy/web-environment-diagram";
+import classNames from "classnames";
 import { Component, createRef, type KeyboardEvent, type ReactNode } from "react";
+
+import { sliderLabels } from "../../stepper/src/sliderLabels";
+import { injectStepperStyles } from "../../stepper/src/styles";
 
 export interface CseMachineViewProps {
   /** The snapshots of the run that is being shown, or none if there is no run. */
@@ -96,6 +100,9 @@ export default class CseMachineView extends Component<CseMachineViewProps, State
   }
 
   componentDidMount() {
+    // The slider's look (the margin, and only the first and last labels) is that of the Stepper's, whose
+    // stylesheet defines it; the host's own CSS has it only for the tabs it knows by id.
+    injectStepperStyles();
     const element = this.container.current;
     if (element && typeof ResizeObserver !== "undefined") {
       this.resizeObserver = new ResizeObserver(() => this.measureSoon());
@@ -348,12 +355,16 @@ export default class CseMachineView extends Component<CseMachineViewProps, State
           outline: "none",
         }}
       >
-        <div className={Classes.DARK}>
+        <div className={classNames("sa-substituter", Classes.DARK)}>
+          {/* As the Stepper's and the E-Stepper's: a round number of labels, always ending at the last
+              step (Blueprint's default labels every step, which runs off the end for a long run), and
+              a new key at each width and after a layout, because Blueprint measures its track once. */}
           <Slider
-            key={sliderKey}
+            key={`${sliderKey}-${this.state.width}`}
             disabled={disabled}
             min={0}
             max={this.stepsTotal}
+            labelValues={sliderLabels(this.stepsTotal)}
             onChange={this.sliderShift}
             onRelease={this.sliderRelease}
             value={value < 0 ? 0 : value}
