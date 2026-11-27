@@ -598,8 +598,17 @@ export function isDummyKey(key: string) {
   return isNumeric(key);
 }
 
-const canvas = document.createElement("canvas");
-const context = canvas.getContext("2d");
+let measuringContext: CanvasRenderingContext2D | null | undefined;
+/**
+ * The context that text is measured with, made when it is first needed: making it when the module
+ * is imported would need a document (and a canvas) just to import the library.
+ */
+function getMeasuringContext(): CanvasRenderingContext2D | null {
+  if (measuringContext === undefined) {
+    measuringContext = document.createElement("canvas").getContext("2d");
+  }
+  return measuringContext;
+}
 
 /**
  * Uses canvas.measureText to compute and return the width of the given text of given font in pixels.
@@ -611,6 +620,7 @@ export function getTextWidth(
   text: string,
   font: string = `${Config.FontStyle} ${Config.FontSize}px ${Config.FontFamily}`,
 ): number {
+  const context = getMeasuringContext();
   if (!context || !text) {
     return 0;
   }
@@ -644,6 +654,7 @@ export function getTextHeight(
   font: string = `${Config.FontStyle} ${Config.FontSize}px ${Config.FontFamily}`,
   fontSize: number = Config.FontSize,
 ): number {
+  const context = getMeasuringContext();
   if (!context || !text) {
     return 0;
   }

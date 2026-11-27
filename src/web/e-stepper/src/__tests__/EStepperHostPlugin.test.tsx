@@ -21,6 +21,11 @@ vi.mock("@blueprintjs/core", async (importOriginal: () => Promise<object>) => ({
 import { EStepperHostPlugin } from "../EStepperHostPlugin";
 import steps from "./makeWithdrawSteps.json";
 
+// The library draws with Konva, which needs a canvas; what is tested here is that the plugin uses it.
+vi.mock("@sourceacademy/web-environment-diagram", () => ({
+  CseEnvironmentView: () => createElement("library-cse-view"),
+}));
+
 type PluginArgs = ConstructorParameters<typeof EStepperHostPlugin>;
 
 function setUp(hostServices?: PluginArgs[3]) {
@@ -62,7 +67,7 @@ describe("EStepperHostPlugin", () => {
     expect(plugin.getState().end).toBeUndefined();
   });
 
-  test("lends the host's CSE diagram to the tab", () => {
+  test("draws the environments with the library's view, and a host's lent service is not used", () => {
     const createView = vi.fn(() => createElement("host-cse-view"));
     const { tab, deliver } = setUp({ cseDiagram: { createView } });
     let view!: TestRenderer.ReactTestRenderer;
@@ -78,10 +83,13 @@ describe("EStepperHostPlugin", () => {
         cse: { stepIndex: i, control: [], stash: [], environments: [] },
       })),
     });
-    expect(createView).toHaveBeenCalled();
+    expect(createView).not.toHaveBeenCalled();
     expect(view.root.findAllByType("host-cse-view" as unknown as React.ElementType)).toHaveLength(
-      1,
+      0,
     );
+    expect(
+      view.root.findAllByType("library-cse-view" as unknown as React.ElementType),
+    ).toHaveLength(1);
   });
 
   describe("batches", () => {

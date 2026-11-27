@@ -2699,6 +2699,7 @@ __metadata:
     "@sourceacademy/common-stepper": "workspace:*"
     "@sourceacademy/common-tabs": "workspace:^"
     "@sourceacademy/conductor": "npm:^0.8.0"
+    "@sourceacademy/web-environment-diagram": "workspace:*"
     "@types/react": "npm:^19.0.0"
     "@types/react-test-renderer": "npm:^19.0.0"
     classnames: "npm:^2.3.2"

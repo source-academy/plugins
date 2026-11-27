@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 /**
  * The plugin directory describes the tab of each web plugin that contributes one, so that a host can
  * show a placeholder and know how the tab behaves before the plugin is loaded. This checks that
