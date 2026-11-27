@@ -128,6 +128,11 @@ function toJsValue(
       id: { value: arrayId ?? `arr_${Math.random()}`, writable: true },
       environment: { value: envId ? (envMap.get(envId) ?? null) : null, writable: true },
     });
+    // The evaluator's name for the object, which the hover and the arrows from the plugin find it by
+    // (as for a `list`, below).
+    if (v.objectId !== undefined) {
+      arr.objectId = v.objectId;
+    }
 
     if (arrayId) {
       listCache.set(arrayId, arr);

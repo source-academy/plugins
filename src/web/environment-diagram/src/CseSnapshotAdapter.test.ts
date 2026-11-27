@@ -228,6 +228,21 @@ describe("heap objects in Python snapshots", () => {
     expect(head.xs.objectId).toBe("#1");
   });
 
+  it("keeps the objectId of an array, as of a list, for hovering and the plugin's arrows", () => {
+    const array = (id: string, objectId?: string) => ({
+      displayValue: "[...]",
+      label: "array",
+      metadata: { id, envId: "g", elements: [] },
+      ...(objectId ? { objectId } : {}),
+    });
+    const head = headOf([
+      { name: "xs", value: array("arr_1", "#1") },
+      { name: "ys", value: array("arr_2") },
+    ]);
+    expect(head.xs.objectId).toBe("#1");
+    expect(head.ys.objectId).toBeUndefined();
+  });
+
   it("keeps a frame's bindings in the order the evaluator listed them, functions included", () => {
     const head = headOf([
       { name: "f", value: lambda("#1") },
