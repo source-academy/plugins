@@ -10,6 +10,8 @@ import { act, cleanup, fireEvent, render, screen } from "@testing-library/react"
 import { afterEach, describe, expect, test, vi } from "vitest";
 
 import { CSE_MACHINE_TAB_ID, CseMachineTabPlugin } from "../CseMachineTabPlugin";
+import { CseMachine } from "@sourceacademy/web-environment-diagram";
+
 import CseMachineView from "../CseMachineView";
 
 afterEach(() => {
@@ -127,6 +129,40 @@ describe("CseMachineView", () => {
       .map(style => style.textContent)
       .join("");
     expect(css).toContain(".sa-substituter .bp6-slider-label");
+  });
+
+  test("draws again when the host changes the diagram's background above the tab", async () => {
+    const host = document.createElement("div");
+    document.body.appendChild(host);
+    const redraw = vi.spyOn(CseMachine, "redraw");
+    render(<CseMachineView snapshots={run} breakpointSteps={[]} end={null} />, {
+      container: host.appendChild(document.createElement("div")),
+    });
+    redraw.mockClear();
+
+    // As the frontend's green-screen mode does, with a class that sets the property.
+    host.style.setProperty("--visualizer-background", "#00ff00");
+
+    await vi.waitFor(() => expect(redraw).toHaveBeenCalled());
+    redraw.mockRestore();
+    host.remove();
+  });
+
+  test("does not draw again for a change of style that leaves the background as it was", async () => {
+    const host = document.createElement("div");
+    document.body.appendChild(host);
+    const redraw = vi.spyOn(CseMachine, "redraw");
+    render(<CseMachineView snapshots={run} breakpointSteps={[]} end={null} />, {
+      container: host.appendChild(document.createElement("div")),
+    });
+    redraw.mockClear();
+
+    host.style.width = "420px";
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    expect(redraw).not.toHaveBeenCalled();
+    redraw.mockRestore();
+    host.remove();
   });
 
   test("an empty run replaces the one before: the diagram and the highlight go", () => {

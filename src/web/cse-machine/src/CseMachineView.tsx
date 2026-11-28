@@ -21,7 +21,10 @@ import {
   Layout,
   computeFramesCoordChange,
   continuesRun,
+  clearHostStyleSource,
   fullscreenPortalContainer,
+  observeHostStyle,
+  setHostStyleSource,
   snapshotWithAllFrames,
   snapshotWithDeadFrames,
 } from "@sourceacademy/web-environment-diagram";
@@ -71,6 +74,7 @@ const PADDING = 50;
 export default class CseMachineView extends Component<CseMachineViewProps, State> {
   private readonly container = createRef<HTMLDivElement>();
   private resizeObserver?: ResizeObserver;
+  private stopObservingHostStyle?: () => void;
 
   constructor(props: CseMachineViewProps) {
     super(props);
@@ -109,6 +113,16 @@ export default class CseMachineView extends Component<CseMachineViewProps, State
       this.resizeObserver.observe(element);
     }
     document.addEventListener("fullscreenchange", this.handleFullscreenChange);
+    if (element) {
+      // The background of the diagram is the host's, if its style sets one (see hostStyle.ts in the
+      // environment-diagram library): a canvas is not coloured by CSS, so it is read from the style of
+      // this element, and the diagram is drawn again when the host changes it (a mode, a theme).
+      setHostStyleSource(element);
+      this.stopObservingHostStyle = observeHostStyle(element, () => {
+        CseMachine.clearCachedLayouts();
+        requestAnimationFrame(() => CseMachine.redraw());
+      });
+    }
     this.measure();
     if (hasRun(this.props.snapshots)) {
       this.renderSnapshotAt(0);
@@ -118,6 +132,8 @@ export default class CseMachineView extends Component<CseMachineViewProps, State
 
   componentWillUnmount() {
     this.resizeObserver?.disconnect();
+    this.stopObservingHostStyle?.();
+    if (this.container.current) clearHostStyleSource(this.container.current);
     clearTimeout(this.measureTimer);
     document.removeEventListener("fullscreenchange", this.handleFullscreenChange);
     CseMachine.resetArrowOriginFilters();

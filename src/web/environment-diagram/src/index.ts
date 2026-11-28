@@ -12,3 +12,9 @@ export { Layout } from "./CseMachineLayout";
 export { computeFramesCoordChange } from "./CseMachineUtils";
 export { ClearDeadFramesAnimation } from "./animationComponents/ClearDeadFramesAnimation";
 export { fullscreenPortalContainer } from "./fullscreenPortalContainer";
+export {
+  BACKGROUND_PROPERTY,
+  observeHostStyle,
+  setHostStyleSource,
+  clearHostStyleSource,
+} from "./hostStyle";
